@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefHeight="533.0" prefWidth="1121.0" style="-fx-background-color: #f8c471;" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.pos.app.controller.ItemsController">
+   <children>
+      <TableView fx:id="itemsTable" layoutX="14.0" layoutY="123.0" prefHeight="200.0" prefWidth="992.0">
+        <columns>
+            <TableColumn prefWidth="75.0" text="ID">
+                <cellValueFactory>
+                    <PropertyValueFactory property="id" />
+                </cellValueFactory>
+            </TableColumn>
+            <TableColumn prefWidth="75.0" text="Barcode">
+                <cellValueFactory>
+                    <PropertyValueFactory property="itemNumber" />
+                </cellValueFactory>
+            </TableColumn>
+            <TableColumn prefWidth="75.0" text="Name">
+                <cellValueFactory>
+                    <PropertyValueFactory property="name" />
+                </cellValueFactory>
+            </TableColumn>
+            <TableColumn prefWidth="75.0" text="Category">
+                <cellValueFactory>
+                    <PropertyValueFactory property="category" />
+                </cellValueFactory>
+            </TableColumn>
+            <TableColumn prefWidth="75.0" text="Company name">
+                <cellValueFactory>
+                    <PropertyValueFactory property="supplier" />
+                </cellValueFactory>
+            </TableColumn>
+            <TableColumn prefWidth="75.0" text="Wholesale price">
+                <cellValueFactory>
+                    <PropertyValueFactory property="wholesalePrice" />
+                </cellValueFactory>
+            </TableColumn>
+            <TableColumn prefWidth="75.0" text="Retail price">
+                <cellValueFactory>
+                    <PropertyValueFactory property="retailPrice" />
+                </cellValueFactory>
+            </TableColumn>
+            <TableColumn prefWidth="75.0" text="Quantity">
+                <cellValueFactory>
+                    <PropertyValueFactory property="quantity" />
+                </cellValueFactory>
+            </TableColumn>
+            <TableColumn prefWidth="75.0" text="Tax percent">
+                <cellValueFactory>
+                    <PropertyValueFactory property="taxPercent" />
+                </cellValueFactory>
+            </TableColumn>
+            <TableColumn prefWidth="75.0" text="Avatar">
+                <cellValueFactory>
+                    <PropertyValueFactory property="avatar" />
+                </cellValueFactory>
+            </TableColumn>
+            <TableColumn prefWidth="75.0" text="">
+            </TableColumn>
+            <TableColumn prefWidth="75.0" text="">
+            </TableColumn>
+            <TableColumn prefWidth="75.0" text="">
+            </TableColumn>
+
+        </columns>
+      </TableView>
+   </children>
+</AnchorPane>

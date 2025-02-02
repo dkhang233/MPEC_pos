@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.gluonhq.charm.glisten.control.Avatar?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.pos.app.controller.MainController">
+   <children>
+      <BorderPane layoutY="-14.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="700.0" prefWidth="1280.0">
+         <top>
+            <VBox prefHeight="139.0" prefWidth="1280.0" BorderPane.alignment="CENTER">
+               <children>
+                  <Pane prefHeight="58.0" prefWidth="1280.0">
+                     <children>
+                        <Label layoutX="21.0" layoutY="20.0" prefHeight="17.0" prefWidth="130.0" text="01/01/2025  21:00:00" />
+                        <Avatar layoutX="1230.0" layoutY="14.0" style="-fx-background-color: #bdc3c7;" />
+                        <Label layoutX="460.0" layoutY="18.0" prefHeight="27.0" prefWidth="207.0" text="MPEC Point of Sale" />
+                        <Label layoutX="1144.0" layoutY="18.0" prefHeight="27.0" prefWidth="104.0" text="dkhang233" />
+                     </children>
+                  </Pane>
+                  <Pane prefHeight="92.0" prefWidth="1280.0" style="-fx-background-color: #839192;">
+                     <children>
+                        <HBox layoutX="339.0" prefHeight="87.0" prefWidth="941.0">
+                           <children>
+                              <Pane onMouseClicked="#onSalesClicked" prefHeight="82.0" prefWidth="86.0" style="-fx-background-color: #58d68d;">
+                                 <children>
+                                    <Avatar layoutX="27.0" layoutY="14.0" onMouseClicked="#onSalesClicked" />
+                                    <Label alignment="CENTER" contentDisplay="CENTER" layoutX="1.0" layoutY="57.0" prefHeight="27.0" prefWidth="88.0" text="Sales" textAlignment="CENTER" textFill="#fbfcfc" />
+                                 </children>
+                              </Pane>
+                              <Pane layoutX="10.0" layoutY="10.0" onMouseClicked="#onItemsClicked" prefHeight="100.0" prefWidth="89.0">
+                                 <children>
+                                    <Avatar layoutX="27.0" layoutY="14.0" onMouseClicked="#onItemsClicked" />
+                                    <Label alignment="CENTER" contentDisplay="CENTER" layoutX="1.0" layoutY="57.0" prefHeight="27.0" prefWidth="88.0" text="Items" textAlignment="CENTER" textFill="#fbfcfc" />
+                                 </children>
+                              </Pane>
+                              <Pane layoutX="100.0" layoutY="10.0" onMouseClicked="#onItemsKitsClicked" prefHeight="100.0" prefWidth="89.0">
+                                 <children>
+                                    <Avatar layoutX="27.0" layoutY="14.0" onMouseClicked="#onItemsKitsClicked" />
+                                    <Label alignment="CENTER" contentDisplay="CENTER" layoutX="1.0" layoutY="57.0" prefHeight="27.0" prefWidth="88.0" text="Items Kits" textAlignment="CENTER" textFill="#fbfcfc" />
+                                 </children>
+                              </Pane>
+                              <Pane layoutX="189.0" layoutY="10.0" prefHeight="100.0" prefWidth="89.0">
+                                 <children>
+                                    <Avatar layoutX="27.0" layoutY="14.0" />
+                                    <Label alignment="CENTER" contentDisplay="CENTER" layoutX="1.0" layoutY="57.0" prefHeight="27.0" prefWidth="88.0" text="Customer" textAlignment="CENTER" textFill="#fbfcfc" />
+                                 </children>
+                              </Pane>
+                              <Pane layoutX="279.0" layoutY="10.0" prefHeight="100.0" prefWidth="89.0">
+                                 <children>
+                                    <Avatar layoutX="27.0" layoutY="14.0" />
+                                    <Label alignment="CENTER" contentDisplay="CENTER" layoutX="1.0" layoutY="57.0" prefHeight="27.0" prefWidth="88.0" text="Supplier" textAlignment="CENTER" textFill="#fbfcfc" />
+                                 </children>
+                              </Pane>
+                              <Pane layoutX="368.0" layoutY="10.0" prefHeight="100.0" prefWidth="89.0">
+                                 <children>
+                                    <Avatar layoutX="27.0" layoutY="14.0" />
+                                    <Label alignment="CENTER" contentDisplay="CENTER" layoutX="1.0" layoutY="57.0" prefHeight="27.0" prefWidth="88.0" text="Receiving" textAlignment="CENTER" textFill="#fbfcfc" />
+                                 </children>
+                              </Pane>
+                              <Pane layoutX="458.0" layoutY="10.0" prefHeight="100.0" prefWidth="89.0">
+                                 <children>
+                                    <Avatar layoutX="27.0" layoutY="14.0" />
+                                    <Label alignment="CENTER" contentDisplay="CENTER" layoutX="1.0" layoutY="57.0" prefHeight="27.0" prefWidth="88.0" text="Expense" textAlignment="CENTER" textFill="#fbfcfc" />
+                                 </children>
+                              </Pane>
+                              <Pane layoutX="548.0" layoutY="10.0" prefHeight="100.0" prefWidth="89.0">
+                                 <children>
+                                    <Avatar layoutX="27.0" layoutY="14.0" />
+                                    <Label alignment="CENTER" contentDisplay="CENTER" layoutX="1.0" layoutY="57.0" prefHeight="27.0" prefWidth="88.0" text="Cashup" textAlignment="CENTER" textFill="#fbfcfc" />
+                                 </children>
+                              </Pane>
+                              <Pane layoutX="637.0" layoutY="10.0" prefHeight="100.0" prefWidth="89.0">
+                                 <children>
+                                    <Avatar layoutX="27.0" layoutY="14.0" />
+                                    <Label alignment="CENTER" contentDisplay="CENTER" layoutX="1.0" layoutY="57.0" prefHeight="27.0" prefWidth="88.0" text="Report" textAlignment="CENTER" textFill="#fbfcfc" />
+                                 </children>
+                              </Pane>
+                              <Pane layoutX="727.0" layoutY="10.0" prefHeight="100.0" prefWidth="89.0">
+                                 <children>
+                                    <Avatar layoutX="27.0" layoutY="14.0" />
+                                    <Label alignment="CENTER" contentDisplay="CENTER" layoutX="1.0" layoutY="57.0" prefHeight="27.0" prefWidth="88.0" text="Office" textAlignment="CENTER" textFill="#fbfcfc" />
+                                 </children>
+                              </Pane>
+                           </children>
+                        </HBox>
+                     </children></Pane>
+               </children>
+            </VBox>
+         </top>
+         <center>
+            <StackPane prefHeight="150.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+               <children>
+                  <fx:include fx:id="itemsView" source="items_kits.fxml" />
+                  <fx:include fx:id="itemsKitsView" source="items.fxml" />
+               </children>
+            </StackPane>
+         </center>
+      </BorderPane>
+   </children>
+</AnchorPane>
