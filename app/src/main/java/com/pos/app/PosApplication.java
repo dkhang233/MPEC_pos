@@ -5,6 +5,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.kordamp.bootstrapfx.BootstrapFX;
 
 import java.io.IOException;
 
@@ -14,6 +15,7 @@ public class PosApplication extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("com/pos/app/main.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
         stage.setTitle("Hello!");
+        scene.getStylesheets().addAll(BootstrapFX.bootstrapFXStylesheet(), getClass().getClassLoader().getResource("css/styles.css").toExternalForm());
         stage.setScene(scene);
         stage.show();
     }

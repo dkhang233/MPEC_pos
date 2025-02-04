@@ -2,32 +2,50 @@
 
 <?import com.gluonhq.charm.glisten.control.Avatar?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.effect.Blend?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.pos.app.controller.MainController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.pos.app.controller.MainController">
    <children>
       <BorderPane layoutY="-14.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="700.0" prefWidth="1280.0">
          <top>
-            <VBox prefHeight="139.0" prefWidth="1280.0" BorderPane.alignment="CENTER">
+            <VBox prefHeight="139.0" prefWidth="1280.0" style="-fx-background-color: #e5e7e9;" BorderPane.alignment="CENTER">
                <children>
-                  <Pane prefHeight="58.0" prefWidth="1280.0">
+                  <Pane prefHeight="58.0" prefWidth="1280.0" style="-fx-background-color: #1abc9c;">
                      <children>
-                        <Label layoutX="21.0" layoutY="20.0" prefHeight="17.0" prefWidth="130.0" text="01/01/2025  21:00:00" />
+                        <Label layoutX="21.0" layoutY="20.0" prefHeight="17.0" prefWidth="130.0" text="01/01/2025  21:00:00" textFill="#f7f9f9" />
                         <Avatar layoutX="1230.0" layoutY="14.0" style="-fx-background-color: #bdc3c7;" />
-                        <Label layoutX="460.0" layoutY="18.0" prefHeight="27.0" prefWidth="207.0" text="MPEC Point of Sale" />
-                        <Label layoutX="1144.0" layoutY="18.0" prefHeight="27.0" prefWidth="104.0" text="dkhang233" />
+                        <Label layoutX="460.0" layoutY="18.0" prefHeight="27.0" prefWidth="207.0" text="MPEC Point of Sale" textFill="#f7f9f9" />
+                        <ImageView fitHeight="33.0" fitWidth="39.0" layoutX="1168.0" layoutY="15.0" pickOnBounds="true" preserveRatio="true" />
+                        <Label alignment="CENTER" contentDisplay="CENTER" layoutX="1193.0" layoutY="31.0" prefHeight="12.0" prefWidth="20.0" style="-fx-background-radius: 20; -fx-background-color: #ec7063;" text="1" textAlignment="CENTER" textFill="#f7f9f9" textOverrun="CLIP">
+                           <effect>
+                              <Blend />
+                           </effect>
+                           <font>
+                              <Font name="System Bold" size="12.0" />
+                           </font>
+                        </Label>
+                        <ImageView fitHeight="24.0" fitWidth="20.0" layoutX="1179.0" layoutY="23.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../../../static/notification.png" />
+                           </image>
+                        </ImageView>
+                        <Pane layoutX="1030.0" layoutY="61.0" prefHeight="39.0" prefWidth="39.0" />
                      </children>
                   </Pane>
-                  <Pane prefHeight="92.0" prefWidth="1280.0" style="-fx-background-color: #839192;">
+                  <Pane prefHeight="92.0" prefWidth="1280.0" style="-fx-background-color: #d7dbdd;">
                      <children>
                         <HBox layoutX="339.0" prefHeight="87.0" prefWidth="941.0">
                            <children>
-                              <Pane onMouseClicked="#onSalesClicked" prefHeight="82.0" prefWidth="86.0" style="-fx-background-color: #58d68d;">
+                              <Pane onMouseClicked="#onSalesClicked" prefHeight="82.0" prefWidth="86.0">
                                  <children>
                                     <Avatar layoutX="27.0" layoutY="14.0" onMouseClicked="#onSalesClicked" />
                                     <Label alignment="CENTER" contentDisplay="CENTER" layoutX="1.0" layoutY="57.0" prefHeight="27.0" prefWidth="88.0" text="Sales" textAlignment="CENTER" textFill="#fbfcfc" />
@@ -73,12 +91,6 @@
                                  <children>
                                     <Avatar layoutX="27.0" layoutY="14.0" />
                                     <Label alignment="CENTER" contentDisplay="CENTER" layoutX="1.0" layoutY="57.0" prefHeight="27.0" prefWidth="88.0" text="Cashup" textAlignment="CENTER" textFill="#fbfcfc" />
-                                 </children>
-                              </Pane>
-                              <Pane layoutX="637.0" layoutY="10.0" prefHeight="100.0" prefWidth="89.0">
-                                 <children>
-                                    <Avatar layoutX="27.0" layoutY="14.0" />
-                                    <Label alignment="CENTER" contentDisplay="CENTER" layoutX="1.0" layoutY="57.0" prefHeight="27.0" prefWidth="88.0" text="Report" textAlignment="CENTER" textFill="#fbfcfc" />
                                  </children>
                               </Pane>
                               <Pane layoutX="727.0" layoutY="10.0" prefHeight="100.0" prefWidth="89.0">

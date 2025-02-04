@@ -5,65 +5,65 @@
 <?import javafx.scene.control.cell.PropertyValueFactory?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane prefHeight="533.0" prefWidth="1121.0" style="-fx-background-color: #f8c471;" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.pos.app.controller.ItemsController">
+<AnchorPane prefHeight="533.0" prefWidth="1282.0" style="-fx-background-color: #f8c471;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.pos.app.controller.ItemsController">
    <children>
-      <TableView fx:id="itemsTable" layoutX="14.0" layoutY="123.0" prefHeight="200.0" prefWidth="992.0">
+      <TableView fx:id="itemsTable" layoutX="29.0" layoutY="102.0" prefHeight="400.0">
         <columns>
-            <TableColumn prefWidth="75.0" text="ID">
+            <TableColumn prefWidth="48.799983978271484" styleClass="col" text="ID">
                 <cellValueFactory>
                     <PropertyValueFactory property="id" />
                 </cellValueFactory>
             </TableColumn>
-            <TableColumn prefWidth="75.0" text="Barcode">
+            <TableColumn prefWidth="124.800048828125" styleClass="col" text="Barcode">
                 <cellValueFactory>
                     <PropertyValueFactory property="itemNumber" />
                 </cellValueFactory>
             </TableColumn>
-            <TableColumn prefWidth="75.0" text="Name">
+            <TableColumn editable="false" prefWidth="100.80000305175781" styleClass="col" text="Name">
                 <cellValueFactory>
                     <PropertyValueFactory property="name" />
                 </cellValueFactory>
             </TableColumn>
-            <TableColumn prefWidth="75.0" text="Category">
+            <TableColumn editable="false" prefWidth="88.0" styleClass="col" text="Category">
                 <cellValueFactory>
                     <PropertyValueFactory property="category" />
                 </cellValueFactory>
             </TableColumn>
-            <TableColumn prefWidth="75.0" text="Company name">
+            <TableColumn minWidth="0.0" prefWidth="92.79998779296875" styleClass="col" text="Company">
                 <cellValueFactory>
                     <PropertyValueFactory property="supplier" />
                 </cellValueFactory>
             </TableColumn>
-            <TableColumn prefWidth="75.0" text="Wholesale price">
+            <TableColumn prefWidth="125.60003662109375" styleClass="col" text="Wholesale price">
                 <cellValueFactory>
                     <PropertyValueFactory property="wholesalePrice" />
                 </cellValueFactory>
             </TableColumn>
-            <TableColumn prefWidth="75.0" text="Retail price">
+            <TableColumn minWidth="0.0" prefWidth="109.60003662109375" styleClass="col" text="Retail price">
                 <cellValueFactory>
                     <PropertyValueFactory property="retailPrice" />
                 </cellValueFactory>
             </TableColumn>
-            <TableColumn prefWidth="75.0" text="Quantity">
+            <TableColumn minWidth="0.0" prefWidth="91.2000732421875" styleClass="col" text="Quantity">
                 <cellValueFactory>
                     <PropertyValueFactory property="quantity" />
                 </cellValueFactory>
             </TableColumn>
-            <TableColumn prefWidth="75.0" text="Tax percent">
+            <TableColumn prefWidth="95.20001220703125" styleClass="col" text="Tax percent">
                 <cellValueFactory>
                     <PropertyValueFactory property="taxPercent" />
                 </cellValueFactory>
             </TableColumn>
-            <TableColumn prefWidth="75.0" text="Avatar">
+            <TableColumn fx:id="avatarColumn" prefWidth="119.99993896484375" styleClass="col" text="Avatar">
                 <cellValueFactory>
                     <PropertyValueFactory property="avatar" />
                 </cellValueFactory>
             </TableColumn>
-            <TableColumn prefWidth="75.0" text="">
+            <TableColumn fx:id="updateStock" prefWidth="62.39990234375" styleClass="col" text="">
             </TableColumn>
-            <TableColumn prefWidth="75.0" text="">
+            <TableColumn fx:id="stockHistory" minWidth="0.0" prefWidth="60.0" styleClass="col" text="">
             </TableColumn>
-            <TableColumn prefWidth="75.0" text="">
+            <TableColumn fx:id="updateItem" maxWidth="138.4000244140625" minWidth="0.0" prefWidth="60.0" styleClass="col" text="">
             </TableColumn>
 
         </columns>

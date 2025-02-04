@@ -38,6 +38,11 @@
             <version>11.1.2</version>
         </dependency>
         <dependency>
+            <groupId>com.jfoenix</groupId>
+            <artifactId>jfoenix</artifactId>
+            <version>9.0.10</version>
+        </dependency>
+        <dependency>
             <groupId>com.gluonhq</groupId>
             <artifactId>charm-glisten</artifactId>
             <version>6.2.2</version>
@@ -116,6 +121,20 @@
                             <noManPages>true</noManPages>
                             <stripDebug>true</stripDebug>
                             <noHeaderFiles>true</noHeaderFiles>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>debug</id>
+                        <phase>validate</phase> <!-- Chạy ở giai đoạn validate để sẵn sàng cho việc debug -->
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>com.pos.app.PosApplication</mainClass>
+                            <!-- Mở cổng debug trên 5005 -->
+<!--                            <args>-->
+<!--                                <arg>-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005</arg>-->
+<!--                            </args>-->
                         </configuration>
                     </execution>
                 </executions>

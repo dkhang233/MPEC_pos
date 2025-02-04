@@ -1,0 +1,13 @@
+.col {
+    -fx-alignment: CENTER;
+    -fx-padding: 5px;
+}
+
+
+.btn-custom {
+    -fx-background-color:  #1abc9c;
+    -fx-text-fill: white;
+    -fx-text-alignment: center;
+    -fx-font-size: 10px;
+    -fx-wrap-text: true;
+}
