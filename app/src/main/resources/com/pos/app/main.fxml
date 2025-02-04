@@ -65,7 +65,7 @@
                               </Pane>
                               <Pane layoutX="189.0" layoutY="10.0" prefHeight="100.0" prefWidth="89.0">
                                  <children>
-                                    <Avatar layoutX="27.0" layoutY="14.0" />
+                                    <Avatar layoutX="27.0" layoutY="14.0" onMouseClicked="#onCustomerClicked" />
                                     <Label alignment="CENTER" contentDisplay="CENTER" layoutX="1.0" layoutY="57.0" prefHeight="27.0" prefWidth="88.0" text="Customer" textAlignment="CENTER" textFill="#fbfcfc" />
                                  </children>
                               </Pane>
@@ -108,8 +108,9 @@
          <center>
             <StackPane prefHeight="150.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                <children>
-                  <fx:include fx:id="itemsView" source="items_kits.fxml" />
-                  <fx:include fx:id="itemsKitsView" source="items.fxml" />
+                  <fx:include fx:id="itemsView" source="items.fxml" />
+                  <fx:include fx:id="itemsKitsView" source="items_kits.fxml" />
+                  <fx:include fx:id="customersView" source="customers.fxml" />
                </children>
             </StackPane>
          </center>

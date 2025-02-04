@@ -121,7 +121,7 @@ public class ItemsController {
         });
         
         // Thêm dữ liệu vào bảng
-        ObservableList<Item> people = FXCollections.observableArrayList(
+        ObservableList<Item> items = FXCollections.observableArrayList(
                 Item.builder()
                         .id(1)
                         .itemNumber("8982323213")
@@ -147,6 +147,6 @@ public class ItemsController {
                         .avatar("a-woman-working-on-a-laptop-6uAssP0vuPs")
                         .build()
         );
-        itemsTable.setItems(people);
+        itemsTable.setItems(items);
     }
 }
