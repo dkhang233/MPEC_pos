@@ -3,11 +3,45 @@
     -fx-padding: 5px;
 }
 
+.circular-pane {
+    -fx-background-radius: 50%;
+    -fx-border-radius: 50%;
+}
+
+.avatar{
+    -fx-background-color: white;
+    -fx-background-image: url("../static/default-avatar.png");
+}
+
+.item {
+    -fx-background-color: #f5f5f5;
+    -fx-background-image: url("../static/default-item.png");
+    -fx-background-size: cover;
+    -fx-background-position: center center;
+    -fx-background-repeat: no-repeat;
+}
+
+.item-wrapper:hover {
+    -fx-background-color: #1abc9c;
+    -fx-cursor: hand;
+}
+
+.btn:hover {
+    -fx-cursor: hand;
+}
+
 
 .btn-custom {
     -fx-background-color:  #1abc9c;
     -fx-text-fill: white;
     -fx-text-alignment: center;
     -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-padding: 10px;
     -fx-wrap-text: true;
+}
+
+.btn-custom:hover {
+    -fx-background-color: #16a085;
+    -fx-cursor: hand;
 }

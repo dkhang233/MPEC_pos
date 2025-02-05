@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.gluonhq.charm.glisten.control.Avatar?>
+<?import java.lang.String?>
+<?import javafx.scene.Group?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.effect.Blend?>
 <?import javafx.scene.image.Image?>
@@ -13,103 +14,157 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.pos.app.controller.MainController">
+<AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.pos.app.controller.MainController">
    <children>
-      <BorderPane layoutY="-14.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="700.0" prefWidth="1280.0">
+      <BorderPane layoutY="-14.0" prefHeight="700.0" prefWidth="1280.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <top>
             <VBox prefHeight="139.0" prefWidth="1280.0" style="-fx-background-color: #e5e7e9;" BorderPane.alignment="CENTER">
                <children>
-                  <Pane prefHeight="58.0" prefWidth="1280.0" style="-fx-background-color: #1abc9c;">
+                  <AnchorPane prefHeight="86.0" prefWidth="1380.0" style="-fx-background-color: #1abc9c;">
                      <children>
-                        <Label layoutX="21.0" layoutY="20.0" prefHeight="17.0" prefWidth="130.0" text="01/01/2025  21:00:00" textFill="#f7f9f9" />
-                        <Avatar layoutX="1230.0" layoutY="14.0" style="-fx-background-color: #bdc3c7;" />
-                        <Label layoutX="460.0" layoutY="18.0" prefHeight="27.0" prefWidth="207.0" text="MPEC Point of Sale" textFill="#f7f9f9" />
-                        <ImageView fitHeight="33.0" fitWidth="39.0" layoutX="1168.0" layoutY="15.0" pickOnBounds="true" preserveRatio="true" />
-                        <Label alignment="CENTER" contentDisplay="CENTER" layoutX="1193.0" layoutY="31.0" prefHeight="12.0" prefWidth="20.0" style="-fx-background-radius: 20; -fx-background-color: #ec7063;" text="1" textAlignment="CENTER" textFill="#f7f9f9" textOverrun="CLIP">
-                           <effect>
-                              <Blend />
-                           </effect>
-                           <font>
-                              <Font name="System Bold" size="12.0" />
-                           </font>
-                        </Label>
-                        <ImageView fitHeight="24.0" fitWidth="20.0" layoutX="1179.0" layoutY="23.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../../../static/notification.png" />
-                           </image>
-                        </ImageView>
-                        <Pane layoutX="1030.0" layoutY="61.0" prefHeight="39.0" prefWidth="39.0" />
-                     </children>
-                  </Pane>
-                  <Pane prefHeight="92.0" prefWidth="1280.0" style="-fx-background-color: #d7dbdd;">
-                     <children>
-                        <HBox layoutX="339.0" prefHeight="87.0" prefWidth="941.0">
+                        <Label layoutX="20.8" layoutY="15.4" prefHeight="17.0" prefWidth="130.0" text="01/01/2025  21:00:00" textFill="#f7f9f9" AnchorPane.leftAnchor="20.8" AnchorPane.topAnchor="15.4" />
+                        <Label layoutX="608.0" layoutY="10.0" prefHeight="27.0" prefWidth="125.0" text="MPEC Point of Sale" textFill="#f7f9f9" AnchorPane.topAnchor="10.0" />
+                        <Group layoutX="1168.0" layoutY="15.0" AnchorPane.bottomAnchor="9.0" AnchorPane.rightAnchor="20.0">
                            <children>
-                              <Pane onMouseClicked="#onSalesClicked" prefHeight="82.0" prefWidth="86.0">
+                              <ImageView fitHeight="33.0" fitWidth="39.0" pickOnBounds="true" preserveRatio="true" />
+                              <Label alignment="CENTER" contentDisplay="CENTER" layoutX="25.0" layoutY="16.0" prefHeight="12.0" prefWidth="20.0" style="-fx-background-radius: 20; -fx-background-color: #ec7063;" text="1" textAlignment="CENTER" textFill="#f7f9f9" textOverrun="CLIP">
+                                 <effect>
+                                    <Blend />
+                                 </effect>
+                                 <font>
+                                    <Font name="System Bold" size="12.0" />
+                                 </font>
+                              </Label>
+                              <ImageView fitHeight="24.0" fitWidth="20.0" layoutX="11.0" layoutY="8.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../../../static/notification.png" />
+                                 </image>
+                              </ImageView>
+                              <Pane layoutX="59.0" layoutY="3.0" prefHeight="30.0" prefWidth="30.0">
+                                 <styleClass>
+                                    <String fx:value="avatar" />
+                                    <String fx:value="circular-pane" />
+                                 </styleClass>
+                              </Pane>
+                           </children>
+                        </Group>
+                     </children>
+                  </AnchorPane>
+                  <AnchorPane style="-fx-background-color: #34495e;">
+                     <children>
+                        <HBox layoutX="431.0" prefHeight="87.0" prefWidth="858.0" AnchorPane.rightAnchor="0.0">
+                           <children>
+                              <Pane onMouseClicked="#onSalesClicked" prefHeight="82.0" prefWidth="86.0" styleClass="item-wrapper">
                                  <children>
-                                    <Avatar layoutX="27.0" layoutY="14.0" onMouseClicked="#onSalesClicked" />
                                     <Label alignment="CENTER" contentDisplay="CENTER" layoutX="1.0" layoutY="57.0" prefHeight="27.0" prefWidth="88.0" text="Sales" textAlignment="CENTER" textFill="#fbfcfc" />
+                                    <Pane layoutX="26.0" layoutY="14.0" prefHeight="40.0" prefWidth="40.0">
+                                       <styleClass>
+                                          <String fx:value="item" />
+                                          <String fx:value="circular-pane" />
+                                       </styleClass>
+                                    </Pane>
                                  </children>
                               </Pane>
-                              <Pane layoutX="10.0" layoutY="10.0" onMouseClicked="#onItemsClicked" prefHeight="100.0" prefWidth="89.0">
+                              <Pane layoutX="10.0" layoutY="10.0" onMouseClicked="#onItemsClicked" prefHeight="100.0" prefWidth="89.0" styleClass="item-wrapper">
                                  <children>
-                                    <Avatar layoutX="27.0" layoutY="14.0" onMouseClicked="#onItemsClicked" />
+                                    <Pane layoutX="26.0" layoutY="14.0" prefHeight="40.0" prefWidth="40.0">
+                                       <styleClass>
+                                          <String fx:value="item" />
+                                          <String fx:value="circular-pane" />
+                                       </styleClass>
+                                    </Pane>
                                     <Label alignment="CENTER" contentDisplay="CENTER" layoutX="1.0" layoutY="57.0" prefHeight="27.0" prefWidth="88.0" text="Items" textAlignment="CENTER" textFill="#fbfcfc" />
                                  </children>
                               </Pane>
-                              <Pane layoutX="100.0" layoutY="10.0" onMouseClicked="#onItemsKitsClicked" prefHeight="100.0" prefWidth="89.0">
+                              <Pane layoutX="100.0" layoutY="10.0" onMouseClicked="#onItemsKitsClicked" prefHeight="100.0" prefWidth="89.0" styleClass="item-wrapper">
                                  <children>
-                                    <Avatar layoutX="27.0" layoutY="14.0" onMouseClicked="#onItemsKitsClicked" />
+                                    <Pane layoutX="25.0" layoutY="14.0" prefHeight="40.0" prefWidth="40.0">
+                                       <styleClass>
+                                          <String fx:value="item" />
+                                          <String fx:value="circular-pane" />
+                                       </styleClass>
+                                    </Pane>
                                     <Label alignment="CENTER" contentDisplay="CENTER" layoutX="1.0" layoutY="57.0" prefHeight="27.0" prefWidth="88.0" text="Items Kits" textAlignment="CENTER" textFill="#fbfcfc" />
                                  </children>
                               </Pane>
-                              <Pane layoutX="189.0" layoutY="10.0" prefHeight="100.0" prefWidth="89.0">
+                              <Pane layoutX="189.0" layoutY="10.0" prefHeight="100.0" prefWidth="89.0" styleClass="item-wrapper">
                                  <children>
-                                    <Avatar layoutX="27.0" layoutY="14.0" />
+                                    <Pane layoutX="25.0" layoutY="14.0" prefHeight="40.0" prefWidth="40.0">
+                                       <styleClass>
+                                          <String fx:value="item" />
+                                          <String fx:value="circular-pane" />
+                                       </styleClass>
+                                    </Pane>
                                     <Label alignment="CENTER" contentDisplay="CENTER" layoutX="1.0" layoutY="57.0" prefHeight="27.0" prefWidth="88.0" text="Customer" textAlignment="CENTER" textFill="#fbfcfc" />
                                  </children>
                               </Pane>
-                              <Pane layoutX="279.0" layoutY="10.0" prefHeight="100.0" prefWidth="89.0">
+                              <Pane layoutX="279.0" layoutY="10.0" prefHeight="100.0" prefWidth="89.0" styleClass="item-wrapper">
                                  <children>
-                                    <Avatar layoutX="27.0" layoutY="14.0" />
+                                    <Pane layoutX="25.0" layoutY="14.0" prefHeight="40.0" prefWidth="40.0">
+                                       <styleClass>
+                                          <String fx:value="item" />
+                                          <String fx:value="circular-pane" />
+                                       </styleClass>
+                                    </Pane>
                                     <Label alignment="CENTER" contentDisplay="CENTER" layoutX="1.0" layoutY="57.0" prefHeight="27.0" prefWidth="88.0" text="Supplier" textAlignment="CENTER" textFill="#fbfcfc" />
                                  </children>
                               </Pane>
-                              <Pane layoutX="368.0" layoutY="10.0" prefHeight="100.0" prefWidth="89.0">
+                              <Pane layoutX="368.0" layoutY="10.0" prefHeight="100.0" prefWidth="89.0" styleClass="item-wrapper">
                                  <children>
-                                    <Avatar layoutX="27.0" layoutY="14.0" />
+                                    <Pane layoutX="23.0" layoutY="14.0" prefHeight="40.0" prefWidth="40.0">
+                                       <styleClass>
+                                          <String fx:value="item" />
+                                          <String fx:value="circular-pane" />
+                                       </styleClass>
+                                    </Pane>
                                     <Label alignment="CENTER" contentDisplay="CENTER" layoutX="1.0" layoutY="57.0" prefHeight="27.0" prefWidth="88.0" text="Receiving" textAlignment="CENTER" textFill="#fbfcfc" />
                                  </children>
                               </Pane>
-                              <Pane layoutX="458.0" layoutY="10.0" prefHeight="100.0" prefWidth="89.0">
+                              <Pane layoutX="458.0" layoutY="10.0" prefHeight="100.0" prefWidth="89.0" styleClass="item-wrapper">
                                  <children>
-                                    <Avatar layoutX="27.0" layoutY="14.0" />
+                                    <Pane layoutX="27.0" layoutY="14.0" prefHeight="40.0" prefWidth="40.0">
+                                       <styleClass>
+                                          <String fx:value="item" />
+                                          <String fx:value="circular-pane" />
+                                       </styleClass>
+                                    </Pane>
                                     <Label alignment="CENTER" contentDisplay="CENTER" layoutX="1.0" layoutY="57.0" prefHeight="27.0" prefWidth="88.0" text="Expense" textAlignment="CENTER" textFill="#fbfcfc" />
                                  </children>
                               </Pane>
-                              <Pane layoutX="548.0" layoutY="10.0" prefHeight="100.0" prefWidth="89.0">
+                              <Pane layoutX="548.0" layoutY="10.0" prefHeight="100.0" prefWidth="89.0" styleClass="item-wrapper">
                                  <children>
-                                    <Avatar layoutX="27.0" layoutY="14.0" />
+                                    <Pane layoutX="26.0" layoutY="14.0" prefHeight="40.0" prefWidth="40.0">
+                                       <styleClass>
+                                          <String fx:value="item" />
+                                          <String fx:value="circular-pane" />
+                                       </styleClass>
+                                    </Pane>
                                     <Label alignment="CENTER" contentDisplay="CENTER" layoutX="1.0" layoutY="57.0" prefHeight="27.0" prefWidth="88.0" text="Cashup" textAlignment="CENTER" textFill="#fbfcfc" />
                                  </children>
                               </Pane>
-                              <Pane layoutX="727.0" layoutY="10.0" prefHeight="100.0" prefWidth="89.0">
+                              <Pane layoutX="727.0" layoutY="10.0" prefHeight="100.0" prefWidth="89.0" styleClass="item-wrapper">
                                  <children>
-                                    <Avatar layoutX="27.0" layoutY="14.0" />
+                                    <Pane layoutX="25.0" layoutY="14.0" prefHeight="40.0" prefWidth="40.0">
+                                       <styleClass>
+                                          <String fx:value="item" />
+                                          <String fx:value="circular-pane" />
+                                       </styleClass>
+                                    </Pane>
                                     <Label alignment="CENTER" contentDisplay="CENTER" layoutX="1.0" layoutY="57.0" prefHeight="27.0" prefWidth="88.0" text="Office" textAlignment="CENTER" textFill="#fbfcfc" />
                                  </children>
                               </Pane>
                            </children>
                         </HBox>
-                     </children></Pane>
+                     </children>
+                  </AnchorPane>
                </children>
             </VBox>
          </top>
          <center>
-            <StackPane prefHeight="150.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+            <StackPane fx:id="wrapView" prefHeight="561.0" prefWidth="1356.0" BorderPane.alignment="CENTER">
                <children>
-                  <fx:include fx:id="itemsView" source="items_kits.fxml" />
-                  <fx:include fx:id="itemsKitsView" source="items.fxml" />
+                  <fx:include fx:id="itemsKitsView" source="items_kits.fxml" />
+                  <fx:include fx:id="itemsView" source="items.fxml" />
                </children>
             </StackPane>
          </center>
