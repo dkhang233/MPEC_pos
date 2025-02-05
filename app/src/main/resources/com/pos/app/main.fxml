@@ -47,13 +47,19 @@
                            <children>
                               <Pane onMouseClicked="#onSalesClicked" prefHeight="82.0" prefWidth="86.0">
                                  <children>
-                                    <Avatar layoutX="27.0" layoutY="14.0" onMouseClicked="#onSalesClicked" />
+                                    <Avatar layoutX="27.0" layoutY="14.0" onMouseClicked="#onSalesClicked">
+                                       <image>
+                                          <Image url="@../../../static/saleIcon.png" />
+                                       </image></Avatar>
                                     <Label alignment="CENTER" contentDisplay="CENTER" layoutX="1.0" layoutY="57.0" prefHeight="27.0" prefWidth="88.0" text="Sales" textAlignment="CENTER" textFill="#fbfcfc" />
                                  </children>
                               </Pane>
                               <Pane layoutX="10.0" layoutY="10.0" onMouseClicked="#onItemsClicked" prefHeight="100.0" prefWidth="89.0">
                                  <children>
-                                    <Avatar layoutX="27.0" layoutY="14.0" onMouseClicked="#onItemsClicked" />
+                                    <Avatar layoutX="27.0" layoutY="14.0" onMouseClicked="#onItemsClicked">
+                                       <image>
+                                          <Image url="@../../../static/itemIcon.png" />
+                                       </image></Avatar>
                                     <Label alignment="CENTER" contentDisplay="CENTER" layoutX="1.0" layoutY="57.0" prefHeight="27.0" prefWidth="88.0" text="Items" textAlignment="CENTER" textFill="#fbfcfc" />
                                  </children>
                               </Pane>
@@ -71,31 +77,34 @@
                               </Pane>
                               <Pane layoutX="279.0" layoutY="10.0" prefHeight="100.0" prefWidth="89.0">
                                  <children>
-                                    <Avatar layoutX="27.0" layoutY="14.0" />
+                                    <Avatar layoutX="27.0" layoutY="14.0" onMouseClicked="#onSupplierClicked" />
                                     <Label alignment="CENTER" contentDisplay="CENTER" layoutX="1.0" layoutY="57.0" prefHeight="27.0" prefWidth="88.0" text="Supplier" textAlignment="CENTER" textFill="#fbfcfc" />
                                  </children>
                               </Pane>
                               <Pane layoutX="368.0" layoutY="10.0" prefHeight="100.0" prefWidth="89.0">
                                  <children>
-                                    <Avatar layoutX="27.0" layoutY="14.0" />
+                                    <Avatar layoutX="27.0" layoutY="14.0" onMouseClicked="#onReceivingClicked" />
                                     <Label alignment="CENTER" contentDisplay="CENTER" layoutX="1.0" layoutY="57.0" prefHeight="27.0" prefWidth="88.0" text="Receiving" textAlignment="CENTER" textFill="#fbfcfc" />
                                  </children>
                               </Pane>
                               <Pane layoutX="458.0" layoutY="10.0" prefHeight="100.0" prefWidth="89.0">
                                  <children>
-                                    <Avatar layoutX="27.0" layoutY="14.0" />
+                                    <Avatar layoutX="27.0" layoutY="14.0" onMouseClicked="#onExpenseClicked" />
                                     <Label alignment="CENTER" contentDisplay="CENTER" layoutX="1.0" layoutY="57.0" prefHeight="27.0" prefWidth="88.0" text="Expense" textAlignment="CENTER" textFill="#fbfcfc" />
                                  </children>
                               </Pane>
                               <Pane layoutX="548.0" layoutY="10.0" prefHeight="100.0" prefWidth="89.0">
                                  <children>
-                                    <Avatar layoutX="27.0" layoutY="14.0" />
+                                    <Avatar layoutX="27.0" layoutY="14.0" onMouseClicked="#onCashupClicked" />
                                     <Label alignment="CENTER" contentDisplay="CENTER" layoutX="1.0" layoutY="57.0" prefHeight="27.0" prefWidth="88.0" text="Cashup" textAlignment="CENTER" textFill="#fbfcfc" />
                                  </children>
                               </Pane>
                               <Pane layoutX="727.0" layoutY="10.0" prefHeight="100.0" prefWidth="89.0">
                                  <children>
-                                    <Avatar layoutX="27.0" layoutY="14.0" />
+                                    <Avatar layoutX="27.0" layoutY="14.0" onMouseClicked="#onOfficeClicked">
+                                       <image>
+                                          <Image url="@../../../static/officeIcon.png" />
+                                       </image></Avatar>
                                     <Label alignment="CENTER" contentDisplay="CENTER" layoutX="1.0" layoutY="57.0" prefHeight="27.0" prefWidth="88.0" text="Office" textAlignment="CENTER" textFill="#fbfcfc" />
                                  </children>
                               </Pane>
@@ -111,6 +120,11 @@
                   <fx:include fx:id="itemsView" source="items.fxml" />
                   <fx:include fx:id="itemsKitsView" source="items_kits.fxml" />
                   <fx:include fx:id="customersView" source="customers.fxml" />
+                  <fx:include fx:id="supplierView" source="suppliers.fxml" />
+                  <fx:include fx:id="receivingView" source="receivings.fxml" />
+                  <fx:include fx:id="expenseView" source="expenses.fxml" />
+                  <fx:include fx:id="cashupView" source="cashups.fxml" />
+                  <fx:include fx:id="officeView" source="office.fxml" />
                </children>
             </StackPane>
          </center>

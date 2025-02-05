@@ -15,19 +15,19 @@
                   <PropertyValueFactory property="id" />
               </cellValueFactory>
           </TableColumn>
-            <TableColumn prefWidth="75.0" text="First Name" >
+            <TableColumn prefWidth="75.0" text="First Name">
                 <cellValueFactory>
                     <PropertyValueFactory property="firstName" />
                 </cellValueFactory>
             </TableColumn>
-            <TableColumn prefWidth="75.0" text="Last Name" >
+            <TableColumn prefWidth="75.0" text="Last Name">
                 <cellValueFactory>
-                    <PropertyValueFactory property="lastName"/>
+                    <PropertyValueFactory property="lastName" />
                 </cellValueFactory>
             </TableColumn>
-            <TableColumn prefWidth="75.0" text="Email" >
+            <TableColumn prefWidth="75.0" text="Email">
                 <cellValueFactory>
-                    <PropertyValueFactory property="email"/>
+                    <PropertyValueFactory property="email" />
                 </cellValueFactory>
             </TableColumn>
             <TableColumn prefWidth="75.0" text="Phone Number" />

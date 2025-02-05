@@ -1,10 +1,27 @@
 package com.pos.app.controller;
 
 import javafx.fxml.FXML;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 
 // Controller dung cho main view
 public class MainController {
+    @FXML
+    public Pane supplierView;
+
+    @FXML
+    public Pane expenseView;
+
+    @FXML
+    public Pane cashupView;
+
+    @FXML
+    public Pane officeView;
+
+    @FXML
+    public Pane receivingView;
+
     @FXML
     private Pane itemsView;
 
@@ -43,6 +60,25 @@ public class MainController {
         itemsView.setVisible(false);
         itemsKitsView.setVisible(false);
         customersView.setVisible(true);
-        System.out.println("Clicked");
+    }
+
+    @FXML
+    public void onReceivingClicked() {
+    }
+
+    @FXML
+    public void onExpenseClicked() {
+    }
+
+    @FXML
+    public void onCashupClicked() {
+    }
+
+    @FXML
+    public void onOfficeClicked() {
+    }
+
+    @FXML
+    public void onSupplierClicked() {
     }
 }
