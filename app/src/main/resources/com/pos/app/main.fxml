@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.pos.app.controller.MainController">
+<AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1400.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.pos.app.controller.MainController">
    <children>
       <BorderPane layoutY="-14.0" prefHeight="700.0" prefWidth="1280.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <top>
@@ -161,10 +161,10 @@
             </VBox>
          </top>
          <center>
-            <StackPane fx:id="wrapView" prefHeight="561.0" prefWidth="1356.0" BorderPane.alignment="CENTER">
+            <StackPane fx:id="wrapView" BorderPane.alignment="CENTER">
                <children>
-                  <fx:include fx:id="itemsKitsView" source="items_kits.fxml" />
-                  <fx:include fx:id="itemsView" source="items.fxml" />
+                  <fx:include fx:id="itemsKitsView" source="item_kit/items_kits.fxml" />
+                  <fx:include fx:id="itemsView" source="item/items.fxml" />
                </children>
             </StackPane>
          </center>

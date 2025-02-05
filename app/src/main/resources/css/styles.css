@@ -45,3 +45,7 @@
     -fx-background-color: #16a085;
     -fx-cursor: hand;
 }
+
+.close{
+    -fx-background-image:url("../static/close.png");
+}

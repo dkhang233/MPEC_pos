@@ -7,11 +7,16 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.util.Pair;
 
+import java.io.IOException;
 import java.util.Objects;
+import java.util.Optional;
 
 // Controller dung cho items view
 public class ItemsController {
@@ -30,61 +35,60 @@ public class ItemsController {
     @FXML
     private TableColumn<Item, String> updateItemCol;
 
-    @FXML
-    private TableColumn<Item, String> selectItemCol;
-
-    @FXML
-    private CheckBox selectAllCheckBox;
-
     private final String defaultAvatar = Objects.requireNonNull(getClass().getClassLoader().getResource("static/default-item.png")).toExternalForm(); // Avatar mặc định
 
     @FXML
     private Button deleteItemBtn;
 
     @FXML
+    private Pagination itemsPagination;
+
+    @FXML
+    private void createItem(){
+        // Tạo Dialog
+        Dialog<String> dialog = new Dialog<>();
+        dialog.setTitle("Nhập Tên");
+        dialog.setHeaderText("Vui lòng nhập tên của bạn:");
+
+// Tạo ô nhập dữ liệu
+        TextField textField = new TextField();
+        dialog.getDialogPane().setContent(textField);
+
+// Thêm nút OK và CANCEL
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+// Xử lý kết quả khi nhấn OK
+        dialog.setResultConverter(button -> {
+            if (button == ButtonType.OK) {
+                return textField.getText(); // Trả về giá trị nhập vào
+            }
+            return null; // Nếu bấm CANCEL hoặc đóng Dialog
+        });
+
+// Hiển thị Dialog và lấy kết quả
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(name -> System.out.println("Tên đã nhập: " + name));
+    }
+
+    // Xử lý khi người dùng chọn xóa item
+    @FXML
     private void deleteItem(){
         itemsTable.getSelectionModel().getSelectedItems().forEach(item -> System.out.println("Delete item with id: " + item.getId())); // In ra id của các dòng được chọn
         itemsTable.getSelectionModel().clearSelection(); // Bỏ chọn các dòng
     }
 
-    @FXML
-    private void selectAll(){
-        if(selectAllCheckBox.isSelected())
-            itemsTable.getSelectionModel().selectAll(); // Chọn tất cả các dòng
-        else
-            itemsTable.getSelectionModel().clearSelection(); // Bỏ chọn tất cả các dòng
-    }
 
+    // Hàm khởi tạo, chạy khi view được load
     @FXML
     public void initialize() {
-        // Tùy chỉnh cột select item để hiển thị checkbox thay vì text
-        selectItemCol.setCellFactory(col -> new TableCell<Item, String>() {
-            final CheckBox checkBox = new CheckBox();
+        setupItemsTable();
+        setupItemsPagination();
+        deleteItemBtn.disableProperty().bind(itemsTable.getSelectionModel().selectedItemProperty().isNull()); // Disable button delete nếu không có dòng nào được chọn
+    }
 
-            {
-                checkBox.setOnAction(event -> {
-                    if (checkBox.isSelected())
-                        itemsTable.getSelectionModel().select(getIndex());
-                    else
-                        itemsTable.getSelectionModel().clearSelection(getIndex());
-                });
 
-                itemsTable.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
-                    if(newValue.intValue() == getIndex() && !checkBox.isSelected()){
-                        checkBox.setSelected(true);
-                    }
-                });
-            }
-
-            @Override
-            protected void updateItem(String cell, boolean empty) {
-                super.updateItem(cell, empty);
-                if(super.isEmpty())
-                    setGraphic(null);
-                else
-                    setGraphic(checkBox);
-            }
-        });
+    // Khởi tạo bảng items
+    private void setupItemsTable(){
         // Tùy chỉnh cột avatar để hiển thị hỉnh ảnh thay vì text
         avatarCol.setCellFactory(col -> new TableCell<Item, String>() {
             private final ImageView imageView = new ImageView();
@@ -172,8 +176,6 @@ public class ItemsController {
             }
         });
 
-        deleteItemBtn.disableProperty().bind(itemsTable.getSelectionModel().selectedItemProperty().isNull()); // Disable button delete nếu không có dòng nào được chọn
-        
         // Tạo dữ liệu cho bảng
         ObservableList<Item> people = FXCollections.observableArrayList(
                 Item.builder()
@@ -218,5 +220,9 @@ public class ItemsController {
         int cols = itemsTable.getColumns().size(); // Số cột của bảng
         itemsTable.getColumns().forEach(col -> col.prefWidthProperty().bind(itemsTable.widthProperty().divide(cols).subtract(0.65))); // Tự động thay đổi kích thước cột khi thay đổi kích thước bảng
         itemsTable.setItems(people);  // Thêm dữ liệu vào bảng
+    }
+
+    private void setupItemsPagination(){
+        itemsPagination.setPageCount(10); // Số trang
     }
 }
