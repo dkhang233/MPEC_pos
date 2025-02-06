@@ -35,7 +35,13 @@ public class ItemsController {
     @FXML
     private TableColumn<Item, String> updateItemCol;
 
-    private final String defaultAvatar = Objects.requireNonNull(getClass().getClassLoader().getResource("static/default-item.png")).toExternalForm(); // Avatar mặc định
+    private final String defaultAvatar = Objects
+            
+                                                                                                                  // 
+                                                                                                                  // 
+            .requireNonNull(getClass().getClassLoader().getResource("static/default-item.png")).toExternalForm(); // Avatar
+                                                                                                                  // mặc
+                                                                                                                  // định
 
     @FXML
     private Button deleteItemBtn;
@@ -44,48 +50,45 @@ public class ItemsController {
     private Pagination itemsPagination;
 
     @FXML
-    private void createItem(){
+    private void createItem() {
         // Tạo Dialog
         Dialog<String> dialog = new Dialog<>();
         dialog.setTitle("Nhập Tên");
         dialog.setHeaderText("Vui lòng nhập tên của bạn:");
 
-// Tạo ô nhập dữ liệu
+
         TextField textField = new TextField();
         dialog.getDialogPane().setContent(textField);
 
-// Thêm nút OK và CANCEL
+                // Thêm nút OK và CANCEL
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
-// Xử lý kết quả khi nhấn OK
+        // Xử lý kết quả khi nhấn OK
         dialog.setResultConverter(button -> {
             if (button == ButtonType.OK) {
-                return textField.getText(); // Trả về giá trị nhập vào
+                    return null; // Nếu bấm CANCEL hoặc đóng Dialog
             }
-            return null; // Nếu bấm CANCEL hoặc đóng Dialog
+            return textField.getText();
         });
 
-// Hiển thị Dialog và lấy kết quả
+        // Hiển thị Dialog và lấy kết quả
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(name -> System.out.println("Tên đã nhập: " + name));
     }
-
+ 
     // Xử lý khi người dùng chọn xóa item
     @FXML
-    private void deleteItem(){
-        itemsTable.getSelectionModel().getSelectedItems().forEach(item -> System.out.println("Delete item with id: " + item.getId())); // In ra id của các dòng được chọn
+    private void deleteItem() {
         itemsTable.getSelectionModel().clearSelection(); // Bỏ chọn các dòng
     }
-
 
     // Hàm khởi tạo, chạy khi view được load
     @FXML
     public void initialize() {
-        setupItemsTable();
-        setupItemsPagination();
-        deleteItemBtn.disableProperty().bind(itemsTable.getSelectionModel().selectedItemProperty().isNull()); // Disable button delete nếu không có dòng nào được chọn
+        setupItemsTable(); // Khởi tạo bảng items
+        setupItemsPagination(); // Khởi tạo phân trang
+        deleteItemBtn.disableProperty().bind(itemsTable.getSelectionModel().selectedItemProperty().isNull()); // Disable button xóa khi không có dòng nào được chọn
     }
-
 
     // Khởi tạo bảng items
     private void setupItemsTable(){
@@ -175,9 +178,9 @@ public class ItemsController {
                     setGraphic(updateItemBtn);
             }
         });
-
-        // Tạo dữ liệu cho bảng
-        ObservableList<Item> people = FXCollections.observableArrayList(
+        
+        // Thêm dữ liệu vào bảng
+        ObservableList<Item> items = FXCollections.observableArrayList(
                 Item.builder()
                         .id(1)
                         .itemNumber("8982323213")
@@ -219,10 +222,11 @@ public class ItemsController {
         itemsTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE); // Cho phép chọn nhiều dòng
         int cols = itemsTable.getColumns().size(); // Số cột của bảng
         itemsTable.getColumns().forEach(col -> col.prefWidthProperty().bind(itemsTable.widthProperty().divide(cols).subtract(0.65))); // Tự động thay đổi kích thước cột khi thay đổi kích thước bảng
-        itemsTable.setItems(people);  // Thêm dữ liệu vào bảng
+        itemsTable.setItems(items);  // Thêm dữ liệu vào bảng
     }
-
+ 
     private void setupItemsPagination(){
         itemsPagination.setPageCount(10); // Số trang
     }
 }
+ 

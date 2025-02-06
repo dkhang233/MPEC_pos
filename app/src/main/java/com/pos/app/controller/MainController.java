@@ -1,9 +1,7 @@
 package com.pos.app.controller;
 
-import com.gluonhq.charm.glisten.control.Avatar;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 
 import java.io.IOException;
@@ -16,10 +14,28 @@ public class MainController {
     private Pane wrapView;
 
     @FXML
+    public Pane supplierView;
+
+    @FXML
+    public Pane expenseView;
+
+    @FXML
+    public Pane cashupView;
+
+    @FXML
+    public Pane officeView;
+
+    @FXML
+    public Pane receivingView;
+
+    @FXML
     private Pane itemsView;
 
     @FXML
     private Pane itemsKitsView;
+
+    @FXML
+    private Pane customersView;
 
     // Xu li khi nguoi dung chon sales
     @FXML
@@ -46,15 +62,31 @@ public class MainController {
             node.setVisible(false);
         }
     }
+    
+    //Xu li khi nguoi dung chon Customer
+    @FXML
+    public void onCustomerClicked(){
+        hideAllView();
+        customersView.setVisible(true);
+    }
 
-//    public void initialize(){
-//        // Set hình ảnh cho avatar
-//        try {
-//            avatar.setImage(new Image( Objects.requireNonNull(getClass().getClassLoader().getResource("static/default-item.png")).toExternalForm()));
-//
-//            System.out.println("----------Avatar set--------" + avatar.getImage().getUrl());
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
+    @FXML
+    public void onReceivingClicked() {
+    }
+
+    @FXML
+    public void onExpenseClicked() {
+    }
+
+    @FXML
+    public void onCashupClicked() {
+    }
+
+    @FXML
+    public void onOfficeClicked() {
+    }
+
+    @FXML
+    public void onSupplierClicked() {
+    }
 }

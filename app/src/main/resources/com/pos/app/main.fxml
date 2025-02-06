@@ -117,6 +117,7 @@
                                           <String fx:value="circular-pane" />
                                        </styleClass>
                                     </Pane>
+
                                     <Label alignment="CENTER" contentDisplay="CENTER" layoutX="1.0" layoutY="57.0" prefHeight="27.0" prefWidth="88.0" text="Receiving" textAlignment="CENTER" textFill="#fbfcfc" />
                                  </children>
                               </Pane>
@@ -163,8 +164,14 @@
          <center>
             <StackPane fx:id="wrapView" BorderPane.alignment="CENTER">
                <children>
-                  <fx:include fx:id="itemsKitsView" source="item_kit/items_kits.fxml" />
                   <fx:include fx:id="itemsView" source="item/items.fxml" />
+                  <fx:include fx:id="itemsKitsView" source="item_kit/items_kits.fxml" />
+                  <fx:include fx:id="customersView" source="customers.fxml" />
+                  <fx:include fx:id="supplierView" source="suppliers.fxml" />
+                  <fx:include fx:id="receivingView" source="receivings.fxml" />
+                  <fx:include fx:id="expenseView" source="expenses.fxml" />
+                  <fx:include fx:id="cashupView" source="cashups.fxml" />
+                  <fx:include fx:id="officeView" source="office.fxml" />
                </children>
             </StackPane>
          </center>
