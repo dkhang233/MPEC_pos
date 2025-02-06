@@ -49,3 +49,7 @@
 .close{
     -fx-background-image:url("../static/close.png");
 }
+
+.upload-image{
+    -fx-background-color: #16a085;
+}

@@ -1,20 +1,27 @@
 package com.pos.app.controller;
 
+import com.dlsc.formsfx.model.structure.Field;
+import com.dlsc.formsfx.model.structure.Form;
+import com.dlsc.formsfx.model.structure.Group;
+import com.dlsc.formsfx.model.structure.StringField;
+import com.dlsc.formsfx.model.util.BindingMode;
+import com.dlsc.formsfx.view.controls.SimpleControl;
+import com.dlsc.formsfx.view.controls.SimpleRadioButtonControl;
+import com.dlsc.formsfx.view.renderer.FormRenderer;
 import com.pos.app.model.Item;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.Property;
-import javafx.beans.property.SimpleBooleanProperty;
+import com.pos.app.model.BindingNewItem;
+import javafx.beans.binding.ObjectBinding;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.util.Pair;
+import javafx.scene.layout.Pane;
 
-import java.io.IOException;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -51,29 +58,130 @@ public class ItemsController {
 
     @FXML
     private void createItem() {
+        ObjectProperty<String> selectedType = new SimpleObjectProperty<>();
+        ListProperty<String> types = new SimpleListProperty<>(FXCollections.observableArrayList("Standard", "Kit"));
+        //Tạo và hiển thị form để nhập thông tin item mới
+        BindingNewItem newItemModel = new BindingNewItem();
+        Form newItemForm  = Form.of(
+                Group.of(
+                        Field.ofStringType(newItemModel.getBarcode())
+                                .label("Barcode"),
+
+                        Field.ofStringType(newItemModel.getName())
+                                .label("Name")
+                                .required("Name is required"),
+
+                        Field.ofStringType(newItemModel.getCategory())
+                                .label("Category")
+                                .required("Category is required"),
+
+                        Field.ofSingleSelectionType( newItemModel.getStockTypes(), newItemModel.getSelectedStockType())
+                                .label("Stock Item")
+                                .render(new SimpleRadioButtonControl<>()),
+
+                        Field.ofSingleSelectionType( newItemModel.getItemTypes(), newItemModel.getSelectedItemType())
+                                .label("Item type")
+                                .render(new SimpleRadioButtonControl<>()),
+
+                        Field.ofStringType(newItemModel.getSupplier())
+                                .label("Supplier"),
+
+                        Field.ofDoubleType(newItemModel.getWholesalePrice())
+                                .label("Wholesale Price")
+                                .required("Wholesale Price is required"),
+
+                        Field.ofDoubleType(newItemModel.getRetailPrice())
+                                .label("Retail Price")
+                                .required("Retail Price is required"),
+
+                        Field.ofDoubleType(newItemModel.getTax())
+                                .label("Tax"),
+
+                        Field.ofIntegerType(newItemModel.getStockQuantity())
+                                .label("Stock Quantity")
+                                .required("Stock Quantity is required"),
+
+                        Field.ofIntegerType(newItemModel.getReceivingQuantity())
+                                .label("Receiving Quantity")
+                                .required("Receiving Quantity is required"),
+
+                        Field.ofIntegerType(newItemModel.getReorderLevel())
+                                .label("Reorder Level")
+                                .required("Reorder Level is required"),
+
+                        Field.ofStringType(newItemModel.getDescription())
+                                .label("Description"),
+
+                        Field.ofStringType(newItemModel.getAvatar())
+                                .label("Avatar")
+                                .render(new SimpleControl<StringField>() {
+                                    private Button imageView;
+
+                                    @Override
+                                    public void initializeParts() {
+                                        super.initializeParts();
+                                        imageView = new Button();
+                                        imageView.setPrefWidth(50);
+                                        imageView.setPrefHeight(50);
+                                        imageView.getStyleClass().add("upload-image");
+                                    }
+
+                                    @Override
+                                    public void layoutParts() {
+                                        super.layoutParts();
+//                                        if (!getField().getValue().isEmpty()) {
+//                                            imageView.setImage(new Image(getField().getValue()));
+//                                        }
+                                        getChildren().addAll( imageView, new Label("ababbc"));
+                                    }
+                                }),
+
+                        Field.ofBooleanType(newItemModel.getDeleted())
+                                .label("Deleted")
+
+                )
+        );
+        FormRenderer formRenderer = new FormRenderer(newItemForm);
+        formRenderer.setPrefSize(600, 600);
+        ScrollPane scrollPane = new ScrollPane(formRenderer);
+
         // Tạo Dialog
-        Dialog<String> dialog = new Dialog<>();
-        dialog.setTitle("Nhập Tên");
-        dialog.setHeaderText("Vui lòng nhập tên của bạn:");
+        Dialog<Item> dialog = new Dialog<>();
+        dialog.setTitle("Create new item");
+        dialog.setWidth(650);
+        dialog.setHeight(600);
 
+        // Thêm form vào Dialog
+        dialog.getDialogPane().setContent(scrollPane);
 
-        TextField textField = new TextField();
-        dialog.getDialogPane().setContent(textField);
-
-                // Thêm nút OK và CANCEL
-        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+        // Thêm các button vào Dialog
+        ButtonType okButtonType = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(okButtonType, ButtonType.CANCEL);
+        Button okButton = (Button) dialog.getDialogPane().lookupButton(okButtonType);
+        okButton.addEventFilter(ActionEvent.ACTION, event -> {
+            if (!newItemForm.isValid()) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("Invalid data");
+                alert.setContentText("Please check your input data");
+                alert.showAndWait();
+                event.consume(); // Ngăn không cho đóng Dialog khi dữ liệu không hợp lệ
+            }
+        });
 
         // Xử lý kết quả khi nhấn OK
         dialog.setResultConverter(button -> {
-            if (button == ButtonType.OK) {
-                    return null; // Nếu bấm CANCEL hoặc đóng Dialog
+            // Kiểm tra dữ liệu nhập vào form nếu hợp lệ thì lưu vào model
+            if (button == okButtonType && newItemForm.isValid()) {
+                newItemForm.persist(); // Lưu dữ liệu từ form vào model
+                return newItemModel.mapToItem();  // Chuyển dữ liệu từ model sang Item
             }
-            return textField.getText();
+            return null;
         });
 
-        // Hiển thị Dialog và lấy kết quả
-        Optional<String> result = dialog.showAndWait();
-        result.ifPresent(name -> System.out.println("Tên đã nhập: " + name));
+        //Lấy kết quả
+        Optional<Item> result = dialog.showAndWait();
+        result.ifPresent(item -> System.out.println("Tên đã nhập: " + item + "- Item type: " + selectedType.get()));
     }
  
     // Xử lý khi người dùng chọn xóa item
@@ -224,7 +332,8 @@ public class ItemsController {
         itemsTable.getColumns().forEach(col -> col.prefWidthProperty().bind(itemsTable.widthProperty().divide(cols).subtract(0.65))); // Tự động thay đổi kích thước cột khi thay đổi kích thước bảng
         itemsTable.setItems(items);  // Thêm dữ liệu vào bảng
     }
- 
+
+    // Khởi tạo phân trang
     private void setupItemsPagination(){
         itemsPagination.setPageCount(10); // Số trang
     }

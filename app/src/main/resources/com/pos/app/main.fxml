@@ -164,8 +164,8 @@
          <center>
             <StackPane fx:id="wrapView" BorderPane.alignment="CENTER">
                <children>
-                  <fx:include fx:id="itemsView" source="item/items.fxml" />
-                  <fx:include fx:id="itemsKitsView" source="item_kit/items_kits.fxml" />
+                  <fx:include fx:id="itemsView" source="items.fxml" />
+                  <fx:include fx:id="itemsKitsView" source="items_kits.fxml" />
                   <fx:include fx:id="customersView" source="customers.fxml" />
                   <fx:include fx:id="supplierView" source="suppliers.fxml" />
                   <fx:include fx:id="receivingView" source="receivings.fxml" />
