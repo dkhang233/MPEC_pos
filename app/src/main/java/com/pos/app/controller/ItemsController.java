@@ -1,16 +1,13 @@
 package com.pos.app.controller;
 
-import com.dlsc.formsfx.model.structure.Field;
-import com.dlsc.formsfx.model.structure.Form;
-import com.dlsc.formsfx.model.structure.Group;
-import com.dlsc.formsfx.model.structure.StringField;
-import com.dlsc.formsfx.model.util.BindingMode;
+import com.dlsc.formsfx.model.structure.*;
 import com.dlsc.formsfx.view.controls.SimpleControl;
 import com.dlsc.formsfx.view.controls.SimpleRadioButtonControl;
 import com.dlsc.formsfx.view.renderer.FormRenderer;
 import com.pos.app.model.Item;
 import com.pos.app.model.BindingNewItem;
-import javafx.beans.binding.ObjectBinding;
+import com.pos.app.util.LocalizationHelper;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -19,16 +16,33 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Pane;
+import javafx.stage.FileChooser;
+import javafx.util.StringConverter;
+import javafx.util.converter.NumberStringConverter;
 
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.Optional;
+import java.io.File;
+import java.text.NumberFormat;
+import java.util.*;
 
 // Controller dung cho items view
 public class ItemsController {
+    // Danh sách các item
+    private final List<Item> items = new ArrayList<>();
+
+    // Danh sách các item hiển thị trên bảng
+    private final ObservableList<Item> visibleItems = FXCollections.observableArrayList(items);
+
+    // Đường dẫn mặc định của avatar
+    private final String defaultAvatar = Objects
+            .requireNonNull(getClass().getClassLoader().getResource("static/default-item.png")).toExternalForm();
+
+
+
     @FXML
     private TableView<Item> itemsTable;
+
+    @FXML
+    private TableColumn<Item, Double> wholeSalePriceCol;
 
     @FXML
     private TableColumn<Item, String> avatarCol;
@@ -42,19 +56,12 @@ public class ItemsController {
     @FXML
     private TableColumn<Item, String> updateItemCol;
 
-    private final String defaultAvatar = Objects
-            
-                                                                                                                  // 
-                                                                                                                  // 
-            .requireNonNull(getClass().getClassLoader().getResource("static/default-item.png")).toExternalForm(); // Avatar
-                                                                                                                  // mặc
-                                                                                                                  // định
-
     @FXML
     private Button deleteItemBtn;
 
     @FXML
     private Pagination itemsPagination;
+
 
     @FXML
     private void createItem() {
@@ -88,7 +95,35 @@ public class ItemsController {
 
                         Field.ofDoubleType(newItemModel.getWholesalePrice())
                                 .label("Wholesale Price")
-                                .required("Wholesale Price is required"),
+                                .required("Wholesale Price is required")
+                                .render(new SimpleControl<DoubleField>() {
+                                    private Label label;
+                                    private TextField textField;
+
+                                    @Override
+                                    public void initializeParts() {
+                                        super.initializeParts();
+                                        label = new Label("Wholesale Price");
+                                        textField = new TextField();
+                                        textField.addEventHandler(ActionEvent.ACTION, event -> {
+                                            try {
+                                                double value = NumberFormat.getInstance().parse(textField.getText()).doubleValue();
+                                                textField.setText(NumberFormat.getInstance().format(value));
+                                            } catch (Exception e) {
+                                                textField.setText("");
+                                            }
+                                        });
+                                        Bindings.bindBidirectional(textField.textProperty(), field.userInputProperty());
+                                    }
+
+                                    @Override
+                                    public void layoutParts() {
+                                        super.layoutParts();
+                                        setColumnIndex(textField,3);
+                                        setColumnSpan(textField, 3);
+                                        getChildren().addAll(label, textField);
+                                    }
+                                }),
 
                         Field.ofDoubleType(newItemModel.getRetailPrice())
                                 .label("Retail Price")
@@ -112,27 +147,82 @@ public class ItemsController {
                         Field.ofStringType(newItemModel.getDescription())
                                 .label("Description"),
 
+                        // Trường avatar cần tùy chỉnh để cho phép chọn và hiển thị hình ảnh
                         Field.ofStringType(newItemModel.getAvatar())
                                 .label("Avatar")
                                 .render(new SimpleControl<StringField>() {
-                                    private Button imageView;
+                                    private Label label;
 
+                                    private Button selectImageBtn;
+
+                                    private Button removeImageBtn;
+                                    
+                                    private ImageView image;
+
+                                    private FileChooser fileChooser;
+
+                                    // Khởi tạo các thành phần
                                     @Override
                                     public void initializeParts() {
                                         super.initializeParts();
-                                        imageView = new Button();
-                                        imageView.setPrefWidth(50);
-                                        imageView.setPrefHeight(50);
-                                        imageView.getStyleClass().add("upload-image");
+                                        setVgap(6);
+                                        try {
+                                            getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("css/styles.css")).toExternalForm());
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
+
+                                        label = new Label("Avatar");
+
+                                        selectImageBtn = new Button("Select");
+                                        selectImageBtn.getStyleClass().addAll("upload-btn");
+                                        selectImageBtn.setOnAction(event -> {
+                                            File file = fileChooser.showOpenDialog(getScene().getWindow());
+                                            if (file != null) {
+                                                newItemModel.getAvatar().set(file.toURI().toString());
+                                                image.setImage(new Image(file.toURI().toString()));
+                                                getChildren().add(image);
+                                                setRowIndex(selectImageBtn, 5);
+                                                getChildren().add(removeImageBtn);
+                                            }
+                                        });
+
+                                        removeImageBtn = new Button("Remove");
+                                        removeImageBtn.getStyleClass().addAll("remove-btn");
+                                        removeImageBtn.setOnAction(event -> {
+                                            newItemModel.getAvatar().set("");
+                                            getChildren().remove(image);
+                                            getChildren().remove(removeImageBtn);
+                                            setRowIndex(selectImageBtn, 0);
+                                        });
+
+                                        image = new ImageView();
+                                        image.setFitWidth(100);
+                                        image.setFitHeight(100);
+
+                                        fileChooser = new FileChooser();
+                                        fileChooser.getExtensionFilters().addAll(
+                                                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif")
+                                        );
                                     }
 
+                                    // Tùy chỉnh layout
                                     @Override
                                     public void layoutParts() {
                                         super.layoutParts();
-//                                        if (!getField().getValue().isEmpty()) {
-//                                            imageView.setImage(new Image(getField().getValue()));
-//                                        }
-                                        getChildren().addAll( imageView, new Label("ababbc"));
+                                        setColumnIndex(label, 0);
+                                        
+                                        setColumnIndex(selectImageBtn, 2);
+                                        setColumnSpan(selectImageBtn, 2);
+
+                                        setColumnIndex(removeImageBtn, 4);
+                                        setColumnSpan(removeImageBtn, 2);
+                                        setRowIndex(removeImageBtn, 5);
+                                        
+                                        setColumnIndex(image, 2);
+                                        setColumnSpan(image, 4);
+                                        setRowSpan(image, 4);
+                                        getChildren().addAll(label, selectImageBtn);
                                     }
                                 }),
 
@@ -141,6 +231,8 @@ public class ItemsController {
 
                 )
         );
+
+        // Set size và tạo scroll pane để làm container cho form (giữ cho form có kích thước phù hợp)
         FormRenderer formRenderer = new FormRenderer(newItemForm);
         formRenderer.setPrefSize(600, 600);
         ScrollPane scrollPane = new ScrollPane(formRenderer);
@@ -181,7 +273,10 @@ public class ItemsController {
 
         //Lấy kết quả
         Optional<Item> result = dialog.showAndWait();
-        result.ifPresent(item -> System.out.println("Tên đã nhập: " + item + "- Item type: " + selectedType.get()));
+        result.ifPresent(item -> {
+            items.add(item);
+            visibleItems.add(item);
+        });
     }
  
     // Xử lý khi người dùng chọn xóa item
@@ -200,6 +295,19 @@ public class ItemsController {
 
     // Khởi tạo bảng items
     private void setupItemsTable(){
+        // Tùy chỉnh cột Wholesale Price để hiển thị giá tiền
+        wholeSalePriceCol.setCellFactory(col -> new TableCell<Item, Double>() {
+            @Override
+            protected void updateItem(Double price, boolean empty) {
+                super.updateItem(price, empty);
+                if (empty || price == null) {
+                    setText(null);
+                } else {
+                    setText(LocalizationHelper.formatCurrency(price));
+                }
+            }
+        });
+
         // Tùy chỉnh cột avatar để hiển thị hỉnh ảnh thay vì text
         avatarCol.setCellFactory(col -> new TableCell<Item, String>() {
             private final ImageView imageView = new ImageView();
@@ -286,51 +394,52 @@ public class ItemsController {
                     setGraphic(updateItemBtn);
             }
         });
-        
+
         // Thêm dữ liệu vào bảng
-        ObservableList<Item> items = FXCollections.observableArrayList(
+        items.addAll(Arrays.asList(
                 Item.builder()
                         .id(1)
-                        .itemNumber("8982323213")
-                        .name("bim bim")
-                        .category("Thực phẩm")
+                        .itemNumber("893257823")
+                        .name("Coca Cola")
+                        .category("Đồ uống có gas")
                         .supplier("Coca Cola")
-                        .wholesalePrice(5000)
-                        .retailPrice(5000)
-                        .quantity(5)
-                        .taxPercent(0.1)
-                        .avatar("a-woman-working-on-a-laptop-6uAssP0vuPs")
+                        .wholesalePrice(90000)
+                        .retailPrice(10000)
+                        .quantity(20)
+                        .taxPercent(0)
+                        .avatar("")
                         .build(),
                 Item.builder()
                         .id(2)
                         .itemNumber("8982323213")
-                        .name("bim bim")
-                        .category("Thực phẩm siêu sạch đem từ Mỹ về, không chứa chất bảo quản, không chất tạo màu")
-                        .supplier("Coca Cola")
+                        .name("Snack bí đỏ")
+                        .category("Đồ ăn vặt")
+                        .supplier("Oishi")
                         .wholesalePrice(5000)
                         .retailPrice(5000)
-                        .quantity(5)
-                        .taxPercent(0.1)
-                        .avatar("a-woman-working-on-a-laptop-6uAssP0vuPs")
-                        .build() ,
+                        .quantity(10)
+                        .taxPercent(0)
+                        .avatar("")
+                        .build(),
                 Item.builder()
                         .id(3)
                         .itemNumber("8982323213")
-                        .name("bim bim")
-                        .category("Thực phẩm siêu sạch đem từ Mỹ về, không chứa chất bảo quản, không chất tạo màu")
-                        .supplier("Coca Cola")
+                        .name("Bánh mì")
+                        .category("Thực phẩm")
+                        .supplier("Kinh Đô")
                         .wholesalePrice(5000)
                         .retailPrice(5000)
                         .quantity(5)
-                        .taxPercent(0.1)
-                        .avatar("a-woman-working-on-a-laptop-6uAssP0vuPs")
+                        .taxPercent(0)
+                        .avatar("")
                         .build()
-        );
+        ));
+        visibleItems.addAll(items);
 
         itemsTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE); // Cho phép chọn nhiều dòng
         int cols = itemsTable.getColumns().size(); // Số cột của bảng
         itemsTable.getColumns().forEach(col -> col.prefWidthProperty().bind(itemsTable.widthProperty().divide(cols).subtract(0.65))); // Tự động thay đổi kích thước cột khi thay đổi kích thước bảng
-        itemsTable.setItems(items);  // Thêm dữ liệu vào bảng
+        itemsTable.setItems(visibleItems);  // Thêm dữ liệu vào bảng
     }
 
     // Khởi tạo phân trang

@@ -50,6 +50,16 @@
     -fx-background-image:url("../static/close.png");
 }
 
-.upload-image{
+.upload-btn{
     -fx-background-color: #16a085;
+    -fx-text-fill: white;
+    /*-fx-background-image: url("../static/add.png");*/
+    /*-fx-background-repeat: no-repeat;*/
 }
+
+.remove-btn{
+    -fx-background-color: #e74c3c;
+    -fx-text-fill: white;
+}
+
+

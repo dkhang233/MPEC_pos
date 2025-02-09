@@ -41,7 +41,7 @@
                     <PropertyValueFactory property="supplier" />
                 </cellValueFactory>
             </TableColumn>
-            <TableColumn prefWidth="125.60003662109375" resizable="false" styleClass="col" text="Wholesale price">
+            <TableColumn fx:id="wholeSalePriceCol" prefWidth="125.60003662109375" resizable="false" styleClass="col" text="Wholesale price">
                 <cellValueFactory>
                     <PropertyValueFactory property="wholesalePrice" />
                 </cellValueFactory>
