@@ -4,10 +4,10 @@ import com.dlsc.formsfx.model.structure.*;
 import com.dlsc.formsfx.view.controls.SimpleControl;
 import com.dlsc.formsfx.view.controls.SimpleRadioButtonControl;
 import com.dlsc.formsfx.view.renderer.FormRenderer;
+import com.pos.app.component.CurrencyInput;
 import com.pos.app.model.Item;
 import com.pos.app.model.BindingNewItem;
-import com.pos.app.util.LocalizationHelper;
-import javafx.beans.binding.Bindings;
+import com.pos.app.util.FormatHelper;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -17,11 +17,8 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
-import javafx.util.StringConverter;
-import javafx.util.converter.NumberStringConverter;
 
 import java.io.File;
-import java.text.NumberFormat;
 import java.util.*;
 
 // Controller dung cho items view
@@ -91,43 +88,19 @@ public class ItemsController {
                                 .render(new SimpleRadioButtonControl<>()),
 
                         Field.ofStringType(newItemModel.getSupplier())
-                                .label("Supplier"),
+                                .label("Supplier")
+                                .tooltip("Supplier"),
 
                         Field.ofDoubleType(newItemModel.getWholesalePrice())
                                 .label("Wholesale Price")
                                 .required("Wholesale Price is required")
-                                .render(new SimpleControl<DoubleField>() {
-                                    private Label label;
-                                    private TextField textField;
-
-                                    @Override
-                                    public void initializeParts() {
-                                        super.initializeParts();
-                                        label = new Label("Wholesale Price");
-                                        textField = new TextField();
-                                        textField.addEventHandler(ActionEvent.ACTION, event -> {
-                                            try {
-                                                double value = NumberFormat.getInstance().parse(textField.getText()).doubleValue();
-                                                textField.setText(NumberFormat.getInstance().format(value));
-                                            } catch (Exception e) {
-                                                textField.setText("");
-                                            }
-                                        });
-                                        Bindings.bindBidirectional(textField.textProperty(), field.userInputProperty());
-                                    }
-
-                                    @Override
-                                    public void layoutParts() {
-                                        super.layoutParts();
-                                        setColumnIndex(textField,3);
-                                        setColumnSpan(textField, 3);
-                                        getChildren().addAll(label, textField);
-                                    }
-                                }),
+//                                .tooltip("Wholesale Price")
+                                .render(new CurrencyInput(2)),
 
                         Field.ofDoubleType(newItemModel.getRetailPrice())
                                 .label("Retail Price")
-                                .required("Retail Price is required"),
+                                .required("Retail Price is required")
+                                .render(new CurrencyInput(2)),
 
                         Field.ofDoubleType(newItemModel.getTax())
                                 .label("Tax"),
@@ -166,14 +139,7 @@ public class ItemsController {
                                     public void initializeParts() {
                                         super.initializeParts();
                                         setVgap(6);
-                                        try {
-                                            getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("css/styles.css")).toExternalForm());
-                                        } catch (Exception e) {
-                                            e.printStackTrace();
-                                        }
-
                                         label = new Label("Avatar");
-
                                         selectImageBtn = new Button("Select");
                                         selectImageBtn.getStyleClass().addAll("upload-btn");
                                         selectImageBtn.setOnAction(event -> {
@@ -235,6 +201,12 @@ public class ItemsController {
         // Set size và tạo scroll pane để làm container cho form (giữ cho form có kích thước phù hợp)
         FormRenderer formRenderer = new FormRenderer(newItemForm);
         formRenderer.setPrefSize(600, 600);
+        try {
+            formRenderer.getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("css/styles.css")).toExternalForm());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         ScrollPane scrollPane = new ScrollPane(formRenderer);
 
         // Tạo Dialog
@@ -303,7 +275,7 @@ public class ItemsController {
                 if (empty || price == null) {
                     setText(null);
                 } else {
-                    setText(LocalizationHelper.formatCurrency(price));
+                    setText(FormatHelper.formatDecimalNumber(price));
                 }
             }
         });
@@ -415,7 +387,7 @@ public class ItemsController {
                         .name("Snack bí đỏ")
                         .category("Đồ ăn vặt")
                         .supplier("Oishi")
-                        .wholesalePrice(5000)
+                        .wholesalePrice(5000.93243432)
                         .retailPrice(5000)
                         .quantity(10)
                         .taxPercent(0)

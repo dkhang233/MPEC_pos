@@ -62,4 +62,13 @@
     -fx-text-fill: white;
 }
 
+.currency-symbol {
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-background-color: #16a085;
+    -fx-padding: 5px 10px;
+    -fx-border-radius: 0px 5px;
+}
+
 
