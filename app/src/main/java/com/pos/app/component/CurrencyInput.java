@@ -4,10 +4,10 @@ import com.dlsc.formsfx.model.structure.DataField;
 import com.dlsc.formsfx.view.controls.SimpleDoubleControl;
 import com.pos.app.util.FormatHelper;
 import javafx.scene.control.Label;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.util.StringConverter;
 
+// Custom component dùng để nhập số tiền với thư viện FormsFX
 public class CurrencyInput extends SimpleDoubleControl{
     private HBox container;
 

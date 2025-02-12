@@ -1,8 +1,5 @@
 package com.pos.app.model;
 
-import com.dlsc.formsfx.model.structure.Field;
-import com.dlsc.formsfx.model.structure.Form;
-import com.dlsc.formsfx.model.structure.Group;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import lombok.Data;
