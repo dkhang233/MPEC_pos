@@ -57,12 +57,6 @@ public class MainController {
         itemsKitsView.setVisible(true);
     }
 
-    private void hideAllView() {
-        for (Node node : wrapView.getChildren()) {
-            node.setVisible(false);
-        }
-    }
-    
     //Xu li khi nguoi dung chon Customer
     @FXML
     public void onCustomerClicked(){
@@ -72,21 +66,37 @@ public class MainController {
 
     @FXML
     public void onReceivingClicked() {
+        hideAllView();
+        receivingView.setVisible(true);
     }
 
     @FXML
     public void onExpenseClicked() {
+        hideAllView();
+        expenseView.setVisible(true);
     }
 
     @FXML
     public void onCashupClicked() {
+        hideAllView();
+        cashupView.setVisible(true);
     }
 
     @FXML
     public void onOfficeClicked() {
+        hideAllView();
+        officeView.setVisible(true);
     }
 
     @FXML
     public void onSupplierClicked() {
+        hideAllView();
+        supplierView.setVisible(true);
+    }
+
+    private void hideAllView() {
+        for (Node node : wrapView.getChildren()) {
+            node.setVisible(false);
+        }
     }
 }
