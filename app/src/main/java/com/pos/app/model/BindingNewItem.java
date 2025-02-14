@@ -10,6 +10,10 @@ public class BindingNewItem {
     private final StringProperty name = new SimpleStringProperty("");
     private final StringProperty barcode = new SimpleStringProperty("");
     private final StringProperty category = new SimpleStringProperty("");
+    private final ListProperty<String> stockTypes = new SimpleListProperty<>(FXCollections.observableArrayList("Stock", "Non-stock"));
+    private final ObjectProperty<String> selectedStockType = new SimpleObjectProperty<>("Stock");
+    private final ListProperty<String> itemTypes = new SimpleListProperty<>(FXCollections.observableArrayList("Standard", "Kit"));
+    private final ObjectProperty<String> selectedItemType = new SimpleObjectProperty<>("Standard");
     private final StringProperty supplier = new SimpleStringProperty("");
     private final DoubleProperty wholesalePrice = new SimpleDoubleProperty(0.0);
     private final DoubleProperty retailPrice = new SimpleDoubleProperty(0.0);
@@ -18,7 +22,7 @@ public class BindingNewItem {
     private final StringProperty tax2Name = new SimpleStringProperty("");
     private final DoubleProperty tax2 = new SimpleDoubleProperty(0.0);
     private final StringProperty hsnCode = new SimpleStringProperty("");
-    private final DoubleProperty stockQuantity = new SimpleDoubleProperty(0.0);
+    private final IntegerProperty stockQuantity = new SimpleIntegerProperty(0);
     private final IntegerProperty receivingQuantity = new SimpleIntegerProperty(0);
     private final IntegerProperty reorderLevel = new SimpleIntegerProperty(0);
     private final StringProperty description = new SimpleStringProperty("");
@@ -27,7 +31,7 @@ public class BindingNewItem {
     private final BooleanProperty hasSerialNumber = new SimpleBooleanProperty(false);
     private final BooleanProperty deleted = new SimpleBooleanProperty(false);
 
-
+    
 
     public Item mapToItem(){
         return Item.builder()

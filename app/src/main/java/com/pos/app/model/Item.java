@@ -3,6 +3,8 @@ package com.pos.app.model;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.HashMap;
+
 @Data
 @Builder
 public class Item {
@@ -10,6 +12,9 @@ public class Item {
     private String name;
     private String barcode;
     private String category;
+    private HashMap<String, ?> attributes ;
+    private String stockType;
+    private String itemType;
     private String supplier;
     private double wholesalePrice;
     private double retailPrice;
@@ -18,7 +23,7 @@ public class Item {
     private String tax2Name;
     private double tax2;
     private String hsnCode;
-    private double stockQuantity;
+    private int stockQuantity;
     private int receivingQuantity;
     private int reorderLevel;
     private String description;
