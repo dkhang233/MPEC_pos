@@ -13,13 +13,21 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.HorizontalDirection;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 
+import java.awt.*;
 import java.io.File;
 import java.util.*;
+import java.util.List;
 
 // Controller dung cho items view
 public class ItemsController {
@@ -66,6 +74,8 @@ public class ItemsController {
         ListProperty<String> types = new SimpleListProperty<>(FXCollections.observableArrayList("Standard", "Kit"));
         //Tạo và hiển thị form để nhập thông tin item mới
         BindingNewItem newItemModel = new BindingNewItem();
+        GridLayout grid = new GridLayout(2, 1);
+        HBox hBox = new HBox();
         Form newItemForm  = Form.of(
                 Group.of(
                         Field.ofStringType(newItemModel.getBarcode())
@@ -95,15 +105,29 @@ public class ItemsController {
                                 .label("Wholesale Price")
                                 .required("Wholesale Price is required")
 //                                .tooltip("Wholesale Price")
-                                .render(new CurrencyInput(2)),
+                                .render(new CurrencyInput(2, new Label("$"))),
 
                         Field.ofDoubleType(newItemModel.getRetailPrice())
                                 .label("Retail Price")
                                 .required("Retail Price is required")
-                                .render(new CurrencyInput(2)),
+                                .render(new CurrencyInput(2,new Label("$"))),
 
+
+
+                        Field.ofStringType(newItemModel.getTaxName())
+                                .label("Tax1")
+                                .placeholder("Name of Tax 1:"),
+                        Field.ofStringType(newItemModel.getTaxName())
+                                .label("Tax2")
+                                .placeholder("Name of Tax 2:"),
                         Field.ofDoubleType(newItemModel.getTax())
-                                .label("Tax"),
+                                .label("")
+                                .render(new CurrencyInput(2, new Label("%"))),
+                        Field.ofDoubleType(newItemModel.getTax())
+                                .label("")
+                                .render(new CurrencyInput(2, new Label("%"))),
+
+
 
                         Field.ofIntegerType(newItemModel.getStockQuantity())
                                 .label("Stock Quantity")

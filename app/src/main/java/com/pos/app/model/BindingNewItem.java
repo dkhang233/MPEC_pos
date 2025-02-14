@@ -15,6 +15,7 @@ public class BindingNewItem {
     private final StringProperty supplier = new SimpleStringProperty("");
     private final DoubleProperty wholesalePrice = new SimpleDoubleProperty();
     private final DoubleProperty retailPrice = new SimpleDoubleProperty();
+    private final StringProperty taxName = new SimpleStringProperty("");
     private final DoubleProperty tax = new SimpleDoubleProperty();
     private final IntegerProperty stockQuantity = new SimpleIntegerProperty();
     private final IntegerProperty receivingQuantity = new SimpleIntegerProperty();
