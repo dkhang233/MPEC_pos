@@ -11,17 +11,17 @@ import javafx.util.StringConverter;
 public class CurrencyInput extends SimpleDoubleControl{
     private HBox container;
 
-    private Label currencySymbol;
-    private int labelCol;
+    private final Label currencySymbol;
+    private final int labelCol;
 
-    public CurrencyInput(int labelCol) {
+    public CurrencyInput(int labelCol, Label label) {
         this.labelCol = labelCol;
+        this.currencySymbol = label;
     }
     @Override
     public void initializeParts() {
         super.initializeParts();
 
-        currencySymbol = new Label("$");
         currencySymbol.getStyleClass().add("currency-symbol");
         
         this.editableSpinner.getEditor().textProperty().bindBidirectional(field.userInputProperty(), new StringConverter<String>() {
