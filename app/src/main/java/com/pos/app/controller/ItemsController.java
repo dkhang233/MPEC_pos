@@ -14,9 +14,11 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 
 import java.util.*;
 
@@ -37,7 +39,8 @@ public class ItemsController {
     @FXML
     private TableView<Item> itemsTable;
 
-    private List<TableColumn<Item, ?>> columns = new ArrayList<>();
+    // Danh sách các cột trong bảng
+    private Map<Integer,TableColumn<Item, ?>> columns = new HashMap<>();
 
     @FXML
     private TableColumn<Item, Double> wholeSalePriceCol;
@@ -64,34 +67,30 @@ public class ItemsController {
     private Pagination itemsPagination;
 
     @FXML
-    private CheckBox hideNameCheckBox;
+    private VBox  columnsVisible;
+
+    @FXML
+    private ScrollPane  columnsVisibleContainer;
 
     // Hàm khởi tạo, chạy khi view được load
     @FXML
     public void initialize() {
+        columnsVisible.setSpacing(10);
         setupItemsTable(); // Khởi tạo bảng items
         setupItemsPagination(); // Khởi tạo phân trang
         this.deleteItemBtn.disableProperty().bind(this.itemsTable.getSelectionModel().selectedItemProperty().isNull()); // Disable button xóa khi không có dòng nào được chọn
 
 //        this.itemsTable.getColumns().
-        
-        hideNameCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue) {
-                itemsTable.getColumns().remove(2);
-            } else {
-                itemsTable.getColumns().add(2, nameCol);
-            }
-        });
+    }
+
+    // Khi người dùng ấn nút "Show/hide" thì hiển thị bảng checkbox để người dùng chọn cột
+    @FXML
+    private void showColVisible(){
+        columnsVisibleContainer.setVisible(!columnsVisibleContainer.isVisible());
     }
 
     // Khởi tạo bảng items
     private void setupItemsTable(){
-        Arrays.stream(Item.class.getDeclaredFields()).map(field -> {
-            TableColumn<Item, ?> column = new TableColumn<>(field.getName());
-            column.setCellValueFactory(new PropertyValueFactory<>(field.getName()));
-            return column;
-        }).forEach(columns::add);
-        itemsTable.getColumns().addAll(columns);
         // Tùy chỉnh cột Wholesale Price để hiển thị giá tiền
         wholeSalePriceCol.setCellFactory(col -> new TableCell<Item, Double>() {
             @Override
@@ -203,36 +202,58 @@ public class ItemsController {
                         .wholesalePrice(90000)
                         .retailPrice(10000)
                         .quantity(20)
-                        .taxPercent(0)
+                        .tax1Name("")
+                        .tax1(0)
+                        .tax2Name("")
+                        .tax2(0)
+                        .hsnCode("")
+                        .receivingQuantity("")
+                        .reorderLevel("")
+                        .description("")
                         .avatar("")
                         .build(),
                 Item.builder()
-                        .id(2)
-                        .itemNumber("8982323213")
-                        .name("Snack bí đỏ")
-                        .category("Đồ ăn vặt")
-                        .supplier("Oishi")
-                        .wholesalePrice(5000.93243432)
-                        .retailPrice(5000)
-                        .quantity(10)
-                        .taxPercent(0)
+                        .id(1)
+                        .itemNumber("893257823")
+                        .name("Coca Cola")
+                        .category("Đồ uống có gas")
+                        .supplier("Coca Cola")
+                        .wholesalePrice(90000)
+                        .retailPrice(10000)
+                        .quantity(20)
+                        .tax1Name("")
+                        .tax1(0)
+                        .tax2Name("")
+                        .tax2(0)
+                        .hsnCode("")
+                        .receivingQuantity("")
+                        .reorderLevel("")
+                        .description("")
                         .avatar("")
                         .build(),
                 Item.builder()
-                        .id(3)
-                        .itemNumber("8982323213")
-                        .name("Bánh mì")
-                        .category("Thực phẩm")
-                        .supplier("Kinh Đô")
-                        .wholesalePrice(5000)
-                        .retailPrice(5000)
-                        .quantity(5)
-                        .taxPercent(0)
+                        .id(1)
+                        .itemNumber("893257823")
+                        .name("Coca Cola")
+                        .category("Đồ uống có gas")
+                        .supplier("Coca Cola")
+                        .wholesalePrice(90000)
+                        .retailPrice(10000)
+                        .quantity(20)
+                        .tax1Name("")
+                        .tax1(0)
+                        .tax2Name("")
+                        .tax2(0)
+                        .hsnCode("")
+                        .receivingQuantity("")
+                        .reorderLevel("")
+                        .description("")
                         .avatar("")
                         .build()
         ));
         visibleItems.addAll(items);
 
+        setupColVisible(); // Khởi tạo các checkbox để chọn cột hiển thị
         itemsTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE); // Cho phép chọn nhiều dòng
         int cols = itemsTable.getColumns().size(); // Số cột của bảng
         itemsTable.getColumns().forEach(col -> col.prefWidthProperty().bind(itemsTable.widthProperty().divide(cols).subtract(0.65))); // Tự động thay đổi kích thước cột khi thay đổi kích thước bảng
@@ -259,6 +280,12 @@ public class ItemsController {
                                 .label("Category")
                                 .required("Category is required"),
 
+                        Field.ofStringType(newItemModel.getSupplier())
+                                .label("Supplier")
+                                .tooltip("Supplier"),
+
+                        
+
                         Field.ofSingleSelectionType( newItemModel.getStockTypes(), newItemModel.getSelectedStockType())
                                 .label("Stock Item")
                                 .render(new SimpleRadioButtonControl<>()),
@@ -267,9 +294,7 @@ public class ItemsController {
                                 .label("Item type")
                                 .render(new SimpleRadioButtonControl<>()),
 
-                        Field.ofStringType(newItemModel.getSupplier())
-                                .label("Supplier")
-                                .tooltip("Supplier"),
+
 
                         Field.ofDoubleType(newItemModel.getWholesalePrice())
                                 .label("Wholesale Price")
@@ -366,6 +391,32 @@ public class ItemsController {
     @FXML
     private void deleteItem() {
         itemsTable.getSelectionModel().clearSelection(); // Bỏ chọn các dòng
+    }
+
+    // Khởi tạo các checkbox để người dùng cột hiển thị
+    private void setupColVisible() {
+        // Tạo hiệu ứng đổ bóng
+        DropShadow dropShadow = new DropShadow();
+        dropShadow.setRadius(10);  // Độ mờ của bóng
+        dropShadow.setOffsetX(5);  // Độ lệch theo X
+        dropShadow.setOffsetY(5);  // Độ lệch theo Y
+        dropShadow.setColor(Color.GRAY); // Màu bóng
+
+        // Gán hiệu ứng vào Pane
+        columnsVisibleContainer.setEffect(dropShadow);
+        // Tạo các checkbox để chọn cột hiển thị
+        for (TableColumn<Item, ?> col : itemsTable.getColumns()) {
+            CheckBox checkBox = new CheckBox(col.getText());
+            checkBox.selectedProperty().bindBidirectional(col.visibleProperty());
+            columnsVisible.getChildren().add(checkBox);
+        }
+
+        // Ẩn container chứa các checkbox
+        columnsVisibleContainer.setVisible(false);
+    }
+
+    private void addColumn(){
+        
     }
 
     // Khởi tạo phân trang
