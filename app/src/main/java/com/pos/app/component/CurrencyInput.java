@@ -14,9 +14,9 @@ public class CurrencyInput extends SimpleDoubleControl{
     private final Label currencySymbol;
     private final int labelCol;
 
-    public CurrencyInput(int labelCol, Label label) {
+    public CurrencyInput(int labelCol, String label) {
         this.labelCol = labelCol;
-        this.currencySymbol = label;
+        this.currencySymbol = new Label(label);
     }
     @Override
     public void initializeParts() {

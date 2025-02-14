@@ -26,7 +26,7 @@
             </TableColumn>
             <TableColumn prefWidth="124.800048828125" resizable="false" styleClass="col" text="Barcode">
                 <cellValueFactory>
-                    <PropertyValueFactory property="itemNumber" />
+                    <PropertyValueFactory property="barcode" />
                 </cellValueFactory>
             </TableColumn>
             <TableColumn fx:id="nameCol" editable="false" prefWidth="100.80000305175781" resizable="false" styleClass="col" text="Name">
@@ -56,12 +56,12 @@
             </TableColumn>
             <TableColumn minWidth="0.0" prefWidth="91.2000732421875" resizable="false" styleClass="col" text="Quantity">
                 <cellValueFactory>
-                    <PropertyValueFactory property="quantity" />
+                    <PropertyValueFactory property="stockQuantity" />
                 </cellValueFactory>
             </TableColumn>
             <TableColumn prefWidth="95.20001220703125" resizable="false" styleClass="col" text="Tax percent">
                 <cellValueFactory>
-                    <PropertyValueFactory property="taxPercent" />
+                    <PropertyValueFactory property="tax1" />
                 </cellValueFactory>
             </TableColumn>
             <TableColumn fx:id="avatarCol" prefWidth="119.99993896484375" resizable="false" styleClass="col" text="Avatar">
