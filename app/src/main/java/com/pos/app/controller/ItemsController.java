@@ -1,14 +1,16 @@
 package com.pos.app.controller;
 
 import com.dlsc.formsfx.model.structure.*;
+import com.dlsc.formsfx.model.validators.*;
 import com.dlsc.formsfx.view.controls.SimpleRadioButtonControl;
 import com.dlsc.formsfx.view.renderer.FormRenderer;
 import com.pos.app.component.CurrencyInput;
 import com.pos.app.component.ImageUpload;
+import com.pos.app.model.BindingUpdateInventory;
+import com.pos.app.model.Inventory;
 import com.pos.app.model.Item;
 import com.pos.app.model.BindingNewItem;
 import com.pos.app.util.FormatHelper;
-import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -35,10 +37,13 @@ public class ItemsController {
     // Danh sách các item hiển thị trên bảng
     private final ObservableList<Item> visibleItems = FXCollections.observableArrayList(items);
 
+    private final List<Inventory> inventory = new ArrayList<>();
+
+    private final ObservableList<Inventory> visibleInventory = FXCollections.observableArrayList(inventory);
     // Đường dẫn mặc định của avatar
     private final String defaultAvatar = Objects
             .requireNonNull(getClass().getClassLoader().getResource("static/default-item.png")).toExternalForm();
-    
+
     @FXML
     private TableView<Item> itemsTable;
 
@@ -55,7 +60,7 @@ public class ItemsController {
     private TableColumn<Item, String> avatarCol;
 
     @FXML
-    private TableColumn<Item, String> updateStockCol;
+    private TableColumn<Item, String> updateInventoryCol;
 
     @FXML
     private TableColumn<Item, String> stockHistoryCol;
@@ -74,7 +79,13 @@ public class ItemsController {
 
     @FXML
     private ScrollPane  columnsVisibleContainer;
-    
+
+    private Dialog<Item> dialogItem;
+
+    private Dialog<Inventory> dialogInventory;
+
+    private ScrollPane scrollPane;
+
     // Hàm khởi tạo, chạy khi view được load
     @FXML
     public void initialize() {
@@ -90,7 +101,7 @@ public class ItemsController {
         columnsVisibleContainer.setVisible(!columnsVisibleContainer.isVisible());
     }
 
-    
+
 
     // Khởi tạo bảng items
     private void setupItemsTable(){
@@ -129,14 +140,15 @@ public class ItemsController {
         });
 
         // Tùy chỉnh cột update stock để hiển thị button thay vì text
-        updateStockCol.setCellFactory(col -> new TableCell<Item, String>() {
-            final Button updateStockColBtn = new Button("Update stock");
+        updateInventoryCol.setCellFactory(col -> new TableCell<Item, String>() {
+            final Button updateInventoryColBtn = new Button("Update inventory");
 
             {
-                updateStockColBtn.getStyleClass().addAll("btn-custom");
-                updateStockColBtn.setOnAction(event -> {
+                updateInventoryColBtn.getStyleClass().addAll("btn-custom");
+                updateInventoryColBtn.setOnAction(event -> {
                     Item item = getTableView().getItems().get(getIndex());
-                    System.out.println("Update stock for item has id: " + item.getId());
+                    System.out.println("Update inventory for item has id: " + item.getId());
+                    updateInventory(item);
                 });
             }
 
@@ -146,7 +158,7 @@ public class ItemsController {
                 if(super.isEmpty())
                     setGraphic(null);
                 else
-                    setGraphic(updateStockColBtn);
+                    setGraphic(updateInventoryColBtn);
             }
         });
 
@@ -181,6 +193,7 @@ public class ItemsController {
                 updateItemBtn.setOnAction(event -> {
                     Item item = getTableView().getItems().get(getIndex());
                     System.out.println("Update item for id: " + item.getId());
+                    UpdateItem(item,item);
                 });
             }
 
@@ -199,7 +212,7 @@ public class ItemsController {
                 // Mẫu 1: Điện thoại thông minh
                 Item.builder()
                         .id(2)
-                        .name("Smartphone ABC")
+                        .itemName("Smartphone ABC")
                         .barcode("9876543210987")
                         .category("Electronics")
                         .supplier("XYZ Supplier")
@@ -221,100 +234,100 @@ public class ItemsController {
                         .build(),
 
 // Mẫu 2: Máy giặt
-        Item.builder()
-                .id(3)
-                .name("Washing Machine 123")
-                .barcode("1928374650912")
-                .category("Home Appliances")
-                .supplier("HomeTech Supplier")
-                .wholesalePrice(200.00)
-                .retailPrice(350.00)
-                .tax1Name("VAT")
-                .tax1(12.0)
-                .tax2Name("Eco Tax")
-                .tax2(3.0)
-                .hsnCode("HSN9101")
-                .stockQuantity(30)
-                .receivingQuantity(5)
-                .reorderLevel(3)
-                .description("Energy-efficient washing machine with multiple modes")
-                .avatar("washing_machine_123.png")
-                .allowAlternateDescription(true)
-                .hasSerialNumber(true)
-                .deleted(false)
-                .build(),
+                Item.builder()
+                        .id(3)
+                        .itemType("Washing Machine 123")
+                        .barcode("1928374650912")
+                        .category("Home Appliances")
+                        .supplier("HomeTech Supplier")
+                        .wholesalePrice(200.00)
+                        .retailPrice(350.00)
+                        .tax1Name("VAT")
+                        .tax1(12.0)
+                        .tax2Name("Eco Tax")
+                        .tax2(3.0)
+                        .hsnCode("HSN9101")
+                        .stockQuantity(30)
+                        .receivingQuantity(5)
+                        .reorderLevel(3)
+                        .description("Energy-efficient washing machine with multiple modes")
+                        .avatar("washing_machine_123.png")
+                        .allowAlternateDescription(true)
+                        .hasSerialNumber(true)
+                        .deleted(false)
+                        .build(),
 
 // Mẫu 3: Sách
-        Item.builder()
-                .id(4)
-                .name("Programming in Java")
-                .barcode("5647382910123")
-                .category("Books")
-                .supplier("BookWorld")
-                .wholesalePrice(20.00)
-                .retailPrice(30.00)
-                .tax1Name("GST")
-                .tax1(5.0)
-                .tax2Name("Education Cess")
-                .tax2(1.0)
-                .hsnCode("HSN1122")
-                .stockQuantity(200)
-                .receivingQuantity(50)
-                .reorderLevel(20)
-                .description("Comprehensive guide to Java programming")
-                .avatar("programming_in_java.png")
-                .allowAlternateDescription(false)
-                .hasSerialNumber(false)
-                .deleted(false)
-                .build(),
+                Item.builder()
+                        .id(4)
+                        .itemName("Programming in Java")
+                        .barcode("5647382910123")
+                        .category("Books")
+                        .supplier("BookWorld")
+                        .wholesalePrice(20.00)
+                        .retailPrice(30.00)
+                        .tax1Name("GST")
+                        .tax1(5.0)
+                        .tax2Name("Education Cess")
+                        .tax2(1.0)
+                        .hsnCode("HSN1122")
+                        .stockQuantity(200)
+                        .receivingQuantity(50)
+                        .reorderLevel(20)
+                        .description("Comprehensive guide to Java programming")
+                        .avatar("programming_in_java.png")
+                        .allowAlternateDescription(false)
+                        .hasSerialNumber(false)
+                        .deleted(false)
+                        .build(),
 
 // Mẫu 4: Bàn làm việc
-         Item.builder()
-                .id(5)
-                .name("Ergonomic Office Desk")
-                .barcode("3216549870123")
-                .category("Furniture")
-                .supplier("FurniCo")
-                .wholesalePrice(150.00)
-                .retailPrice(250.00)
-                .tax1Name("VAT")
-                .tax1(10.0)
-                .tax2Name("Luxury Tax")
-                .tax2(2.0)
-                .hsnCode("HSN3344")
-                .stockQuantity(20)
-                .receivingQuantity(5)
-                .reorderLevel(2)
-                .description("Height-adjustable ergonomic office desk")
-                .avatar("ergonomic_office_desk.png")
-                .allowAlternateDescription(true)
-                .hasSerialNumber(false)
-                .deleted(false)
-                .build(),
+                Item.builder()
+                        .id(5)
+                        .itemType("Ergonomic Office Desk")
+                        .barcode("3216549870123")
+                        .category("Furniture")
+                        .supplier("FurniCo")
+                        .wholesalePrice(150.00)
+                        .retailPrice(250.00)
+                        .tax1Name("VAT")
+                        .tax1(10.0)
+                        .tax2Name("Luxury Tax")
+                        .tax2(2.0)
+                        .hsnCode("HSN3344")
+                        .stockQuantity(20)
+                        .receivingQuantity(5)
+                        .reorderLevel(2)
+                        .description("Height-adjustable ergonomic office desk")
+                        .avatar("ergonomic_office_desk.png")
+                        .allowAlternateDescription(true)
+                        .hasSerialNumber(false)
+                        .deleted(false)
+                        .build(),
 
 // Mẫu 5: Tai nghe
-        Item.builder()
-                .id(6)
-                .name("Wireless Headphones")
-                .barcode("4567891234567")
-                .category("Accessories")
-                .supplier("SoundTech")
-                .wholesalePrice(50.00)
-                .retailPrice(80.00)
-                .tax1Name("VAT")
-                .tax1(8.0)
-                .tax2Name("Import Duty")
-                .tax2(5.0)
-                .hsnCode("HSN7788")
-                .stockQuantity(150)
-                .receivingQuantity(30)
-                .reorderLevel(15)
-                .description("Noise-cancelling wireless headphones with long battery life")
-                .avatar("wireless_headphones.png")
-                .allowAlternateDescription(false)
-                .hasSerialNumber(true)
-                .deleted(false)
-                .build()
+                Item.builder()
+                        .id(6)
+                        .itemName("Wireless Headphones")
+                        .barcode("4567891234567")
+                        .category("Accessories")
+                        .supplier("SoundTech")
+                        .wholesalePrice(50.00)
+                        .retailPrice(80.00)
+                        .tax1Name("VAT")
+                        .tax1(8.0)
+                        .tax2Name("Import Duty")
+                        .tax2(5.0)
+                        .hsnCode("HSN7788")
+                        .stockQuantity(150)
+                        .receivingQuantity(30)
+                        .reorderLevel(15)
+                        .description("Noise-cancelling wireless headphones with long battery life")
+                        .avatar("wireless_headphones.png")
+                        .allowAlternateDescription(false)
+                        .hasSerialNumber(true)
+                        .deleted(false)
+                        .build()
         ));
         visibleItems.addAll(items);
 
@@ -337,9 +350,9 @@ public class ItemsController {
                         Field.ofStringType(newItemModel.getBarcode())
                                 .label("Barcode"),
 
-                        Field.ofStringType(newItemModel.getName())
-                                .label("Name")
-                                .required("Name is required"),
+                        Field.ofStringType(newItemModel.getItemName())
+                                .label("Item Name")
+                                .required("Item Name is required"),
 
                         Field.ofStringType(newItemModel.getCategory())
                                 .label("Category")
@@ -348,7 +361,7 @@ public class ItemsController {
                         Field.ofStringType(newItemModel.getSupplier())
                                 .label("Supplier")
                                 .tooltip("Supplier"),
-                        
+
                         Field.ofSingleSelectionType( newItemModel.getStockTypes(), newItemModel.getSelectedStockType())
                                 .label("Stock Item")
                                 .render(new SimpleRadioButtonControl<>()),
@@ -356,7 +369,7 @@ public class ItemsController {
                         Field.ofSingleSelectionType( newItemModel.getItemTypes(), newItemModel.getSelectedItemType())
                                 .label("Item type")
                                 .render(new SimpleRadioButtonControl<>()),
-                        
+
                         Field.ofDoubleType(newItemModel.getWholesalePrice())
                                 .label("Wholesale Price")
                                 .required("Wholesale Price is required")
@@ -415,21 +428,24 @@ public class ItemsController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        ScrollPane scrollPane = new ScrollPane(formRenderer);
+        scrollPane = new ScrollPane(formRenderer);
 
         // Tạo Dialog
-        Dialog<Item> dialog = new Dialog<>();
-        dialog.setTitle("Create new item");
-        dialog.setWidth(650);
-        dialog.setHeight(600);
+        dialogItem = new Dialog<>();
+        dialogItem.setTitle("Create new item");
+        dialogItem.setWidth(650);
+        dialogItem.setHeight(600);
 
         // Thêm form vào Dialog
-        dialog.getDialogPane().setContent(scrollPane);
+        dialogItem.getDialogPane().setContent(scrollPane);
 
         // Thêm các button vào Dialog
         ButtonType okButtonType = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(okButtonType, ButtonType.CANCEL);
-        Button okButton = (Button) dialog.getDialogPane().lookupButton(okButtonType);
+        ButtonType newButtonType = new ButtonType("New", ButtonBar.ButtonData.FINISH);
+        dialogItem.getDialogPane().getButtonTypes().addAll(okButtonType, ButtonType.CANCEL, newButtonType);
+
+        // Tham chiếu button
+        Button okButton = (Button) dialogItem.getDialogPane().lookupButton(okButtonType);
         okButton.addEventFilter(ActionEvent.ACTION, event -> {
             if (!newItemForm.isValid()) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -441,22 +457,117 @@ public class ItemsController {
             }
         });
 
-        // Xử lý kết quả khi nhấn OK
-        dialog.setResultConverter(button -> {
+        Button newButton = (Button) dialogItem.getDialogPane().lookupButton(newButtonType);
+        newButton.addEventFilter(ActionEvent.ACTION, event -> {
+            if (!newItemForm.isValid()) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("Invalid data");
+                alert.setContentText("Please check your input data");
+                alert.showAndWait();
+            } else {
+                newItemForm.persist();
+                items.add(newItemModel.mapToItem());
+                visibleItems.add(newItemModel.mapToItem());
+            }
+            event.consume();
+        });
+
+        // Xử lý kết quả khi nhấn OK, New
+        dialogItem.setResultConverter(button -> {
             // Kiểm tra dữ liệu nhập vào form nếu hợp lệ thì lưu vào model
             if (button == okButtonType && newItemForm.isValid()) {
                 newItemForm.persist(); // Lưu dữ liệu từ form vào model
                 return newItemModel.mapToItem();  // Chuyển dữ liệu từ model sang Item
             }
+
+            if (button == newButtonType && newItemForm.isValid()) {
+                newItemForm.persist();
+                System.out.println("Hello");
+                return newItemModel.mapToItem();
+            }
             return null;
         });
-
         //Lấy kết quả
-        Optional<Item> result = dialog.showAndWait();
+        Optional<Item> result = dialogItem.showAndWait();
         result.ifPresent(item -> {
             items.add(item);
             visibleItems.add(item);
         });
+    }
+
+    @FXML
+    private void updateInventory(Item item){
+        BindingUpdateInventory newUpdateInventoryModel = new BindingUpdateInventory();
+        Form newUpdateInventoryForm = Form.of(
+                Group.of(
+                        Field.ofStringType(item.getBarcode())
+                                .label("Barcode")
+                                .editable(false),
+
+                        Field.ofStringType(item.getItemType())
+                                .label("Item Name")
+                                .editable(false),
+
+                        Field.ofStringType(item.getCategory())
+                                .label("Category")
+                                .editable(false),
+
+                        Field.ofSingleSelectionType(newUpdateInventoryModel.getStockLocation())
+                                .label("Stock location"),
+
+                        Field.ofIntegerType(item.getStockQuantity())
+                                .label("Current Quantity")
+                                .editable(false),
+
+                        Field.ofIntegerType(newUpdateInventoryModel.getInventoryToAddOrSubtract())
+                                .label("Inventory to add or subtract")
+                                .required("Quantity is a required field")
+                                .validate(IntegerRangeValidator.atLeast(-newUpdateInventoryModel.getCurrentQuantity().get()
+                                                                                  ,"Can't add value smaller than current inventory")),
+
+                        Field.ofStringType(newUpdateInventoryModel.getComment())
+                                .label("Comment")
+                )
+
+        );
+        dialogInventory = new Dialog<>();
+
+        ButtonType submitButtonType = new ButtonType("Submit", ButtonBar.ButtonData.APPLY);
+        dialogInventory.getDialogPane().getButtonTypes().add(submitButtonType);
+
+        Button submitButton = (Button)dialogInventory.getDialogPane().lookupButton(submitButtonType);
+        submitButton.addEventFilter(ActionEvent.ACTION, event -> {
+            if (!newUpdateInventoryForm.isValid()) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("Invalid data");
+                alert.setContentText("Please check your input data");
+                alert.showAndWait();
+                event.consume();
+            }
+
+            dialogInventory.setResultConverter(button -> {
+                if(button == submitButtonType  && newUpdateInventoryForm.isValid()){
+                    newUpdateInventoryForm.persist();
+                    return newUpdateInventoryModel.mapToUpdateInventory(item);
+                }
+                return null;
+            });
+        });
+
+        scrollPane = new ScrollPane();
+
+        FormRenderer renderer = new FormRenderer(newUpdateInventoryForm);
+        renderer.setPrefSize(600, 600);
+        scrollPane.setContent(renderer);
+
+        dialogInventory.setWidth(600);
+        dialogInventory.setHeight(600);
+
+        dialogInventory.getDialogPane().setContent(scrollPane);
+        dialogInventory.showAndWait();
+
     }
 
 
@@ -490,10 +601,21 @@ public class ItemsController {
         columnsVisibleContainer.setVisible(false);
     }
 
+    private void UpdateItem(Item item, Item newItem){
+         createItem();
+
+        item.setBarcode(newItem.getBarcode());
+        item.setItemName(newItem.getItemType());
+        item.setCategory(newItem.getCategory());
+        item.setStockType(newItem.getStockType());
+        item.setItemType(newItem.getItemType());
+
+    }
+
 
 
     private void addColumn(){
-        
+
     }
 
 

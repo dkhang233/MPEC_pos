@@ -69,7 +69,7 @@
                     <PropertyValueFactory property="avatar" />
                 </cellValueFactory>
             </TableColumn>
-            <TableColumn fx:id="updateStockCol" prefWidth="62.39990234375" resizable="false" styleClass="col" text="">
+            <TableColumn fx:id="updateInventoryCol" prefWidth="62.39990234375" resizable="false" styleClass="col" text="">
             </TableColumn>
             <TableColumn fx:id="stockHistoryCol" minWidth="0.0" prefWidth="60.0" resizable="false" styleClass="col" text="">
             </TableColumn>
