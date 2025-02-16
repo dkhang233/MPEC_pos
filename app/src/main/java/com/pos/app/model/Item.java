@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.util.HashMap;
+import java.util.List;
 
 @Data
 @Builder
@@ -23,7 +24,7 @@ public class Item {
     private String tax2Name;
     private double tax2;
     private String hsnCode;
-    private int stockQuantity;
+    private List<ItemQuantity> quantityPerLocation;
     private int receivingQuantity;
     private int reorderLevel;
     private String description;

@@ -54,10 +54,8 @@
                     <PropertyValueFactory property="retailPrice" />
                 </cellValueFactory>
             </TableColumn>
-            <TableColumn minWidth="0.0" prefWidth="91.2000732421875" resizable="false" styleClass="col" text="Quantity">
-                <cellValueFactory>
-                    <PropertyValueFactory property="stockQuantity" />
-                </cellValueFactory>
+            <TableColumn fx:id="quantityCol" minWidth="0.0" prefWidth="91.2000732421875" resizable="false" styleClass="col" text="Quantity">
+
             </TableColumn>
             <TableColumn prefWidth="95.20001220703125" resizable="false" styleClass="col" text="Tax percent">
                 <cellValueFactory>
