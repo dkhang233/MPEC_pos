@@ -11,7 +11,7 @@ import java.util.*;
 @Data
 public class BindingNewItem {
     private final IntegerProperty id = new SimpleIntegerProperty();
-    private final StringProperty name = new SimpleStringProperty("");
+    private final StringProperty itemName = new SimpleStringProperty("");
     private final StringProperty barcode = new SimpleStringProperty("");
     private final StringProperty category = new SimpleStringProperty("");
     private final ListProperty<String> stockTypes = new SimpleListProperty<>(FXCollections.observableArrayList("Stock", "Non-stock"));
@@ -40,13 +40,15 @@ public class BindingNewItem {
 
     public Item mapToItem(){
         return Item.builder()
-                .name(name.get())
+                .name(itemName.get())
                 .barcode(barcode.get())
                 .category(category.get())
                 .stockType(selectedStockType.get())
                 .itemType(selectedItemType.get())
                 .supplier(supplier.get())
                 .wholesalePrice(wholesalePrice.get())
+                .itemType(selectedItemType.get())
+                .stockType(selectedStockType.get())
                 .retailPrice(retailPrice.get())
                 .tax1Name(tax1Name.get())
                 .tax1(tax1.get())

@@ -13,16 +13,16 @@ import java.util.List;
 @Data
 public class ItemStore {
     // Danh sách các item
-    private final List<Item> items = new ArrayList<>();
+    public static final List<Item> items = new ArrayList<>();
 
     // Danh sách các item hiển thị trên bảng
-    private final ObservableList<Item> visibleItems = FXCollections.observableArrayList(items);
+    public static final ObservableList<Item> visibleItems = FXCollections.observableArrayList(items);
 
-    private final List<String> locationNames = new ArrayList<>();
+    public static final List<String> locationNames = new ArrayList<>();
 
-    private String currentLocation;
+    public static String currentLocation;
 
-    public ItemStore(){
+    static {
         // Thêm dữ liệu vào bảng
         items.addAll(Arrays.asList(
                 // Mẫu 1: Điện thoại thông minh
