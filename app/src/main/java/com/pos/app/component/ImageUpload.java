@@ -37,7 +37,7 @@ public class ImageUpload extends SimpleControl<StringField> {
 
         this.fieldLabel = new Label(this.field.getLabel());
 
-        this.selectImageBtn = new Button("Select");
+        this.selectImageBtn = new Button("Select Image");
         this.selectImageBtn.getStyleClass().addAll("upload-btn");
         this.selectImageBtn.setOnAction(event -> {
             File file = this.fileChooser.showOpenDialog(getScene().getWindow());

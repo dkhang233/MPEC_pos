@@ -69,14 +69,13 @@
                     <PropertyValueFactory property="avatar" />
                 </cellValueFactory>
             </TableColumn>
-            <TableColumn fx:id="updateInventoryCol" prefWidth="62.39990234375" resizable="false" styleClass="col" text="">
+            <TableColumn fx:id="updateInventoryCol" prefWidth="62.39990234375" resizable="false" styleClass="col">
             </TableColumn>
-            <TableColumn fx:id="stockHistoryCol" minWidth="0.0" prefWidth="60.0" resizable="false" styleClass="col" text="">
+            <TableColumn fx:id="stockHistoryCol" minWidth="0.0" prefWidth="60.0" resizable="false" styleClass="col">
             </TableColumn>
-            <TableColumn fx:id="updateItemCol" minWidth="0.0" prefWidth="60.0" resizable="false" styleClass="col" text="">
+            <TableColumn fx:id="updateItemCol" minWidth="0.0" prefWidth="60.0" resizable="false" styleClass="col">
             </TableColumn>
-
-                                            </columns>
+        </columns>
       </TableView>
       <Pane layoutX="110.0" layoutY="68.0" AnchorPane.leftAnchor="110.0">
          <children>
@@ -93,12 +92,12 @@
                   <String fx:value="btn" />
                </styleClass></Button>
             <Button layoutX="98.0" layoutY="43.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="67.0" styleClass="btn" text="Bulk edit" />
-            <Button layoutY="45.0" mnemonicParsing="false" onAction="#createItem" text="New item">
+            <Button fx:id="newItem" layoutY="45.0" mnemonicParsing="false" text="New item" >
                <styleClass>
                   <String fx:value="btn" />
                   <String fx:value="btn-primary" />
                </styleClass></Button>
-            <Button layoutX="94.0" layoutY="-2.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="67.0" styleClass="btn" text="Import" />
+            <Button fx:id="importItemBtn" layoutX="94.0" layoutY="-2.0"  mnemonicParsing="false" prefHeight="27.0" prefWidth="67.0" styleClass="btn" text="Import"   />
             <Button layoutX="183.0" layoutY="-2.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="67.0" styleClass="btn" text="Export" />
          </children>
       </Pane>
