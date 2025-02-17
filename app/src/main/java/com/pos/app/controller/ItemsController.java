@@ -363,13 +363,13 @@ public class ItemsController {
         private ScrollPane scrollPane;
         private List<Item> items = new ArrayList<>();
         private final List<Item> visibleItems = new ArrayList<>();
-        private Form newItemForm = createForm();
+        private Form newItemForm = createForm(new Item());
         private BindingNewItem newItemModel = new BindingNewItem();
 
         // Xử lý khi người dùng chọn tạo item mới
         @FXML
         private void createItem() {
-                newItemForm = createForm();
+                newItemForm = createForm(new Item());
                 items = new ArrayList<>();
                 // Set size và tạo scroll pane để làm container cho form (giữ cho form có kích thước phù hợp)
                 FormRenderer formRenderer = new FormRenderer(newItemForm);
@@ -414,7 +414,7 @@ public class ItemsController {
 
         @FXML
         private void UpdateItem(Item item){
-            Form newItemForm = createForm();
+            Form newItemForm = createForm(item);
             FormRenderer formRenderer = new FormRenderer(newItemForm);
 
             dialogItem = new Dialog<>();
@@ -439,8 +439,9 @@ public class ItemsController {
 
         }
 
-        private Form createForm() {
-            newItemModel = new BindingNewItem();
+        private Form createForm(Item item) {
+            BindingNewItem newItemModel = new BindingNewItem();
+            newItemModel.mapFromItem(item);
             // Trường avatar cần tùy chỉnh để cho phép chọn và hiển thị hình ảnh
             return Form.of(
                     Group.of(
