@@ -1,13 +1,19 @@
 package com.pos.app.model;
 
+import com.pos.app.store.ItemStore;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Item {
     private int id;
     private String name;
@@ -24,7 +30,7 @@ public class Item {
     private String tax2Name;
     private double tax2;
     private String hsnCode;
-    private List<ItemQuantity> quantityPerLocation;
+    private List<ItemQuantity> quantityPerLocation = new ArrayList<>();
     private int receivingQuantity;
     private int reorderLevel;
     private String description;
@@ -32,4 +38,11 @@ public class Item {
     private boolean allowAlternateDescription;
     private boolean hasSerialNumber;
     private boolean deleted;
+
+    public ItemQuantity getQuantityAtCurrentLocation(){
+        return quantityPerLocation.stream()
+                .filter(quantity -> quantity.getLocationName().equals(ItemStore.currentLocation))
+                .findFirst()
+                .orElse(new ItemQuantity(0, "", 0));
+    }
 }

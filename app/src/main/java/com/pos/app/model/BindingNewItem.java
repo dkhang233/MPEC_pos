@@ -3,12 +3,16 @@ package com.pos.app.model;
 import javafx.beans.property.*;
 import javafx.beans.value.ObservableIntegerValue;
 import javafx.collections.FXCollections;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.lang.reflect.Array;
 import java.util.*;
 
 @Data
+@Builder
+@NoArgsConstructor
 public class BindingNewItem {
     private final IntegerProperty id = new SimpleIntegerProperty();
     private final StringProperty itemName = new SimpleStringProperty("");
@@ -64,5 +68,30 @@ public class BindingNewItem {
                 .hasSerialNumber(hasSerialNumber.get())
                 .deleted(deleted.get())
                 .build();
+    }
+
+    public void mapFromItem(Item item){
+        id.set(item.getId());
+        itemName.set(item.getName());
+        barcode.set(item.getBarcode());
+        category.set(item.getCategory());
+        supplier.set(item.getSupplier());
+        wholesalePrice.set(item.getWholesalePrice());
+        selectedItemType.set(item.getItemType());
+        selectedStockType.set(item.getStockType());
+        retailPrice.set(item.getRetailPrice());
+        tax1Name.set(item.getTax1Name());
+        tax1.set(item.getTax1());
+        tax2Name.set(item.getTax2Name());
+        tax2.set(item.getTax2());
+        hsnCode.set(item.getHsnCode());
+        receivingQuantity.set(item.getReceivingQuantity());
+        stockQuantity.set(item.getQuantityAtCurrentLocation().getQuantity());
+        reorderLevel.set(item.getReorderLevel());
+        description.set(item.getDescription());
+        avatar.set(item.getAvatar());
+        allowAlternateDescription.set(item.isAllowAlternateDescription());
+        hasSerialNumber.set(item.isHasSerialNumber());
+        deleted.set(item.isDeleted());
     }
 }
