@@ -44,7 +44,7 @@ public class BindingNewItem {
 
     public Item mapToItem(){
         return Item.builder()
-                .name(itemName.get())
+                .itemName(itemName.get())
                 .barcode(barcode.get())
                 .category(category.get())
                 .stockType(selectedStockType.get())
@@ -72,7 +72,7 @@ public class BindingNewItem {
 
     public void mapFromItem(Item item){
         id.set(item.getId());
-        itemName.set(item.getName());
+        itemName.set(item.getItemName());
         barcode.set(item.getBarcode());
         category.set(item.getCategory());
         supplier.set(item.getSupplier());

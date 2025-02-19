@@ -16,7 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 public class Item {
     private int id;
-    private String name;
+    private String itemName;
     private String barcode;
     private String category;
     private HashMap<String, ?> attributes ;

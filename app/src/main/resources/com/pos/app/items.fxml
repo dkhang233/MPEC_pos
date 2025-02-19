@@ -17,7 +17,7 @@
 
 <AnchorPane prefHeight="621.0" prefWidth="1657.0" style="-fx-background-color: #f8c471;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.pos.app.controller.ItemsController">
    <children>
-      <TableView fx:id="itemsTable" layoutX="110.4" layoutY="121.0" prefHeight="400.0" AnchorPane.leftAnchor="110.0" AnchorPane.rightAnchor="92.0">
+      <TableView fx:id="tableView" layoutX="110.4" layoutY="121.0" prefHeight="400.0" AnchorPane.leftAnchor="110.0" AnchorPane.rightAnchor="92.0">
         <columns>
             <TableColumn prefWidth="48.799983978271484" resizable="false" styleClass="col" text="ID">
                 <cellValueFactory>

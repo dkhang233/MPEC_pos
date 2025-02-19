@@ -10,6 +10,7 @@ import com.pos.app.util.FormatHelper;
 import com.pos.app.util.ItemManager;
 
 import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -32,7 +33,7 @@ public class ItemsController {
             .requireNonNull(getClass().getClassLoader().getResource("static/default-item.png")).toExternalForm();
 
     @FXML
-    private TableView<Item> itemsTable;
+    private TableView<Item> tableView;
     
     @FXML
     private TableColumn<Item, Double> wholeSalePriceCol;
@@ -78,9 +79,6 @@ public class ItemsController {
         setupItemsTable(); // Khởi tạo bảng items
         setupItemsPagination(); // Khởi tạo phân trang
     }
-
-
-
 
 
     // --------------------------------Phần liên quan đến bảng items--------------------------------//
@@ -136,7 +134,7 @@ public class ItemsController {
                 updateInventoryColBtn.setOnAction(event -> {
                     Item item = getTableView().getItems().get(getIndex());
                     System.out.println("Update inventory for item has id: " + item.getId());
-                    updateInventory(item);
+                    itemManager.updateInventory(item);
                 });
             }
 
@@ -159,6 +157,7 @@ public class ItemsController {
                 stockHistoryBtn.setOnAction(event -> {
                     Item item = getTableView().getItems().get(getIndex());
                     System.out.println("Display stock history for id: " + item.getId());
+                    itemManager.stockHistory(item);
                 });
             }
 
@@ -209,99 +208,22 @@ public class ItemsController {
         });
 
 
-        this.deleteItemBtn.disableProperty().bind(this.itemsTable.getSelectionModel().selectedItemProperty().isNull()); // Disable button xóa khi không có dòng nào được chọn
+        this.deleteItemBtn.disableProperty().bind(this.tableView.getSelectionModel().selectedItemProperty().isNull()); // Disable button xóa khi không có dòng nào được chọn
         setupColVisible(); // Khởi tạo các checkbox để chọn cột hiển thị
-        itemsTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE); // Cho phép chọn nhiều dòng
-        int cols = itemsTable.getColumns().size(); // Số cột của bảng
-        itemsTable.getColumns().forEach(col -> col.prefWidthProperty().bind(itemsTable.widthProperty().divide(cols).subtract(0.65))); // Tự động thay đổi kích thước cột khi thay đổi kích thước bảng
-        itemsTable.setItems(ItemStore.visibleItems);  // Thêm dữ liệu vào bảng
+        tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE); // Cho phép chọn nhiều dòng
+        int cols = tableView.getColumns().size(); // Số cột của bảng
+        tableView.getColumns().forEach(col -> col.prefWidthProperty().bind(tableView.widthProperty().divide(cols).subtract(0.65))); // Tự động thay đổi kích thước cột khi thay đổi kích thước bảng
+        tableView.setItems(ItemStore.visibleItems);  // Thêm dữ liệu vào bảng
     }
-
-
-    // Xử lý khi người dùng muốn cập nhật số lượng item
-    @FXML
-    private void updateInventory(Item item){
-        // Object để lưu dữ liệu nhập vào form
-        BindingUpdateInventory newUpdateInventoryModel = new BindingUpdateInventory();
-        
-        // Tạo form để nhập dữ liệu
-        Form newUpdateInventoryForm = Form.of(
-                Group.of(
-                        Field.ofStringType(item.getBarcode())
-                                .label("Barcode")
-                                .editable(false),
-
-                        Field.ofStringType(item.getName())
-                                .label("Item Name")
-                                .editable(false),
-
-                        Field.ofStringType(item.getCategory())
-                                .label("Category")
-                                .editable(false),
-
-                        Field.ofSingleSelectionType(newUpdateInventoryModel.getStockLocation())
-                                .label("Stock location"),
-
-                        Field.ofIntegerType(item.getQuantityAtCurrentLocation().getQuantity())
-                                .label("Current Quantity")
-                                .editable(false),
-
-                        Field.ofIntegerType(newUpdateInventoryModel.getInventoryToAddOrSubtract())
-                                .label("Inventory to add or subtract")
-                                .required("Quantity is a required field")
-                                .validate(IntegerRangeValidator.atLeast(-newUpdateInventoryModel.getCurrentQuantity().get()
-                                                                                  ,"Can't add value smaller than current inventory")),
-
-                        Field.ofStringType(newUpdateInventoryModel.getComment())
-                                .label("Comment")
-                )
-
-        );
-        dialogInventory = new Dialog<>();
-
-        ButtonType submitButtonType = new ButtonType("Submit", ButtonBar.ButtonData.APPLY);
-        dialogInventory.getDialogPane().getButtonTypes().add(submitButtonType);
-
-        Button submitButton = (Button)dialogInventory.getDialogPane().lookupButton(submitButtonType);
-        submitButton.addEventFilter(ActionEvent.ACTION, event -> {
-            if (!newUpdateInventoryForm.isValid()) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Error");
-                alert.setHeaderText("Invalid data");
-                alert.setContentText("Please check your input data");
-                alert.showAndWait();
-                event.consume();
-            }
-
-            dialogInventory.setResultConverter(button -> {
-                if(button == submitButtonType  && newUpdateInventoryForm.isValid()){
-                    newUpdateInventoryForm.persist();
-                    return newUpdateInventoryModel.mapToUpdateInventory(item);
-                }
-                return null;
-            });
-        });
-
-        ScrollPane scrollPane = new ScrollPane();
-
-        FormRenderer renderer = new FormRenderer(newUpdateInventoryForm);
-        renderer.setPrefSize(600, 600);
-        scrollPane.setContent(renderer);
-
-        dialogInventory.setWidth(600);
-        dialogInventory.setHeight(600);
-
-        dialogInventory.getDialogPane().setContent(scrollPane);
-        dialogInventory.showAndWait();
-    }
-
 
     // Xử lý khi người dùng chọn xóa item
     @FXML
     private void deleteItem() {
-        itemsTable.getSelectionModel().clearSelection(); // Bỏ chọn các dòng
+        ObservableList<Item> selectedItem = tableView.getSelectionModel().getSelectedItems(); // Bỏ chọn các dòng
+        if (selectedItem != null) {
+            selectedItem.remove();
+        }
     }
-
 
 
     private void addColumn(){
@@ -328,7 +250,7 @@ public class ItemsController {
         columnsVisibleContainer.setEffect(dropShadow);
         
         // Tạo các checkbox để chọn cột hiển thị
-        for (TableColumn<Item, ?> col : itemsTable.getColumns()) {
+        for (TableColumn<Item, ?> col : tableView.getColumns()) {
             CheckBox checkBox = new CheckBox(col.getText());
             checkBox.selectedProperty().bindBidirectional(col.visibleProperty());
             columnsVisible.getChildren().add(checkBox);

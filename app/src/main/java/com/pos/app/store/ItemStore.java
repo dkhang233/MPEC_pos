@@ -28,7 +28,7 @@ public class ItemStore {
                 // Mẫu 1: Điện thoại thông minh
                 Item.builder()
                         .id(2)
-                        .name("Smartphone ABC")
+                        .itemName("Smartphone ABC")
                         .barcode("9876543210987")
                         .category("Electronics")
                         .supplier("XYZ Supplier")
@@ -61,7 +61,7 @@ public class ItemStore {
 // Mẫu 2: Máy giặt
                 Item.builder()
                         .id(3)
-                        .name("Washing Machine 123")
+                        .itemName("Washing Machine 123")
                         .barcode("1928374650912")
                         .category("Home Appliances")
                         .supplier("HomeTech Supplier")
@@ -94,7 +94,7 @@ public class ItemStore {
 // Mẫu 3: Sách
                 Item.builder()
                         .id(4)
-                        .name("Programming in Java")
+                        .itemName("Programming in Java")
                         .barcode("5647382910123")
                         .category("Books")
                         .supplier("BookWorld")
@@ -127,7 +127,7 @@ public class ItemStore {
 // Mẫu 4: Bàn làm việc
                 Item.builder()
                         .id(5)
-                        .name("Ergonomic Office Desk")
+                        .itemName("Ergonomic Office Desk")
                         .barcode("3216549870123")
                         .category("Furniture")
                         .supplier("FurniCo")
@@ -160,7 +160,7 @@ public class ItemStore {
 // Mẫu 5: Tai nghe
                 Item.builder()
                         .id(6)
-                        .name("Wireless Headphones")
+                        .itemName("Wireless Headphones")
                         .barcode("4567891234567")
                         .category("Accessories")
                         .supplier("SoundTech")

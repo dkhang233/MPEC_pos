@@ -3,11 +3,13 @@ package com.pos.app.util;
 import com.dlsc.formsfx.model.structure.Field;
 import com.dlsc.formsfx.model.structure.Form;
 import com.dlsc.formsfx.model.structure.Group;
+import com.dlsc.formsfx.model.validators.IntegerRangeValidator;
 import com.dlsc.formsfx.view.controls.SimpleRadioButtonControl;
 import com.dlsc.formsfx.view.renderer.FormRenderer;
 import com.pos.app.component.CurrencyInput;
 import com.pos.app.component.ImageUpload;
 import com.pos.app.model.BindingNewItem;
+import com.pos.app.model.BindingUpdateInventory;
 import com.pos.app.model.Item;
 import com.pos.app.store.ItemStore;
 import javafx.event.ActionEvent;
@@ -24,13 +26,11 @@ import java.util.Optional;
 public class ItemManager {
     private final Dialog<Item> itemDialog;
 
-    private final VBox container;
-
-    private final HBox createButtonBox;
-
-    private final HBox updateButtonBox;
+    private VBox container;
 
     private final Form newItemForm;
+
+    private ScrollPane scrollPane;
 
     private BindingNewItem newItemModel;
 
@@ -47,14 +47,12 @@ public class ItemManager {
             e.printStackTrace();
         }
 
-
-        
         // Tạo container chứa form
         container = new VBox(10);
         container.getChildren().add(formRenderer);
 
         // Đưa VBox vào ScrollPane
-        ScrollPane scrollPane = new ScrollPane(container);
+        scrollPane = new ScrollPane(container);
         scrollPane.setFitToWidth(true);
         scrollPane.setFitToHeight(true);
         
@@ -64,11 +62,7 @@ public class ItemManager {
         itemDialog.setWidth(650);
         itemDialog.setHeight(600);
 
-        createButtonBox =  configDialogButtonNewItem(newItemForm, newItemModel);
-        updateButtonBox = configDialogButtonUpdateItemInfo(newItemForm, newItemModel);
     }
-
-
 
     // Xử lý khi người dùng chọn tạo item mới
     @FXML
@@ -76,7 +70,8 @@ public class ItemManager {
         newItemModel.clear(); // Clear dữ liêu cũ
         itemDialog.setTitle("Create new item");  //Set title phù hợp cho dialog
 
-        container.getChildren().remove(updateButtonBox); // Xóa nút cập nhật nếu có
+        HBox createButtonBox = configDialogButtonNewItem(newItemForm, newItemModel);
+
         container.getChildren().add(createButtonBox);    // Thêm nút tạo mới vào form
 
         // Xử lý dữ liệu khi bấm
@@ -92,7 +87,8 @@ public class ItemManager {
         newItemModel.mapFromItem(item);    // Map dữ liệu từ item vào model để hiển thị lên form
         itemDialog.setTitle("Update Item");   // Set title phù hợp cho dialog
 
-        container.getChildren().remove(createButtonBox); // Xóa nút tạo mới nếu có
+        HBox updateButtonBox = configDialogButtonUpdateItemInfo(newItemForm, newItemModel);
+
         container.getChildren().add(updateButtonBox);    // Thêm nút cập nhật vào form
 
         Optional<Item> result = itemDialog.showAndWait();
@@ -101,6 +97,118 @@ public class ItemManager {
             ItemStore.visibleItems.add(updateItem);
         });
     }
+
+    // Xử lý khi người dùng muốn cập nhật số lượng item
+    @FXML
+    public void updateInventory(Item item){
+        // Object để lưu dữ liệu nhập vào form
+        BindingUpdateInventory newUpdateInventoryModel = new BindingUpdateInventory();
+
+        // Tạo form để nhập dữ liệu
+        Form newUpdateInventoryForm = Form.of(
+                Group.of(
+                        Field.ofStringType(item.getBarcode())
+                                .label("Barcode")
+                                .editable(false),
+
+                        Field.ofStringType(item.getItemName())
+                                .label("Item Name")
+                                .editable(false),
+
+                        Field.ofStringType(item.getCategory())
+                                .label("Category")
+                                .editable(false),
+
+                        Field.ofSingleSelectionType(newUpdateInventoryModel.getStockLocation())
+                                .label("Stock location"),
+
+                        Field.ofIntegerType(item.getQuantityAtCurrentLocation().getQuantity())
+                                .label("Current Quantity")
+                                .editable(false),
+
+                        Field.ofIntegerType(newUpdateInventoryModel.getInventoryToAddOrSubtract())
+                                .label("Inventory to add or subtract")
+                                .required("Quantity is a required field")
+                                .validate(IntegerRangeValidator.atLeast(-newUpdateInventoryModel.getCurrentQuantity().get()
+                                        ,"Can't add value smaller than current inventory")),
+
+                        Field.ofStringType(newUpdateInventoryModel.getComment())
+                                .label("Comment")
+                )
+
+        );
+        Dialog dialogInventory = new Dialog<>();
+        dialogInventory.setTitle("Update Inventory");
+        HBox buttonBox = configDialogButtonUpdateInventory(newUpdateInventoryForm, newUpdateInventoryModel);
+
+        FormRenderer formRenderer = new FormRenderer(newUpdateInventoryForm);
+        formRenderer.setPrefSize(600, 600);
+        try {
+            formRenderer.getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("css/styles.css")).toExternalForm());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        container = new VBox(10);
+
+        container.getChildren().add(formRenderer);
+        container.getChildren().add(buttonBox);
+
+        scrollPane = new ScrollPane(container);
+
+        dialogInventory.getDialogPane().setContent(scrollPane);
+        dialogInventory.showAndWait();
+    }
+
+    @FXML
+    public void stockHistory(Item item) {
+        Form stockHistoryForm = Form.of(
+                Group.of(
+                        Field.ofStringType(item.getBarcode())
+                                .label("Barcode")
+                                .editable(false),
+
+                        Field.ofStringType(item.getItemName())
+                                .label("Item Name: ")
+                                .editable(false),
+
+                        Field.ofStringType(item.getCategory())
+                                .label("Category: ")
+                                .editable(false),
+
+                        Field.ofSingleSelectionType(item.getQuantityPerLocation())
+                                .label("Stock location: "),
+
+                        Field.ofIntegerType(item.getQuantityAtCurrentLocation().getQuantity())
+                                .label("Current Quantity: ")
+                                .editable(false)
+                )
+        );
+
+        Dialog dialogStock = new Dialog<>();
+        dialogStock.setTitle("Inventory Count Detail");
+
+        container = new VBox(10);
+
+        FormRenderer formRenderer = new FormRenderer(stockHistoryForm);
+        formRenderer.setPrefSize(600, 600);
+        try {
+            formRenderer.getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("css/styles.css")).toExternalForm());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        HBox button = configDialogButtonStockHistory(stockHistoryForm);
+
+        container.getChildren().add(formRenderer);
+        container.getChildren().add(button);
+
+        scrollPane = new ScrollPane(container);
+
+        dialogStock.getDialogPane().setContent(scrollPane);
+        dialogStock.showAndWait();
+    }
+
 
 
     // Tạo form để thêm mới và cập nhật item
@@ -204,15 +312,43 @@ public class ItemManager {
 
     private HBox configDialogButtonUpdateItemInfo(Form newItemForm, BindingNewItem newItemModel) {
         ButtonType submitButtonType = new ButtonType("Submit", ButtonBar.ButtonData.APPLY);
-        itemDialog.getDialogPane().getButtonTypes().addAll(submitButtonType);
+        ButtonType cancelButtonType = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+        itemDialog.getDialogPane().getButtonTypes().addAll(submitButtonType, cancelButtonType);
 
         Button submitButton = (Button) itemDialog.getDialogPane().lookupButton(submitButtonType);
+        Button cancelButton = (Button) itemDialog.getDialogPane().lookupButton(cancelButtonType);
 
         submitButton.addEventFilter(ActionEvent.ACTION, event -> handleUpdateItemInfo(event, newItemForm, newItemModel));
 
-        HBox buttonBox = new HBox(10.0, (Node) submitButton);
+        HBox buttonBox = new HBox(10.0, (Node) submitButton, (Node) cancelButton);
         buttonBox.setAlignment(Pos.CENTER);
         return buttonBox;
+    }
+
+    private HBox configDialogButtonUpdateInventory(Form newItemForm, BindingUpdateInventory updateInventory) {
+        ButtonType submitButtonType = new ButtonType("Submit", ButtonBar.ButtonData.APPLY);
+        ButtonType cancelButtonType = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+        itemDialog.getDialogPane().getButtonTypes().addAll(submitButtonType, cancelButtonType);
+
+        Button submitButton = (Button) itemDialog.getDialogPane().lookupButton(submitButtonType);
+        Button cancelButton = (Button) itemDialog.getDialogPane().lookupButton(cancelButtonType);
+
+        submitButton.addEventFilter(ActionEvent.ACTION, event -> handleUpdateItemInfo(event, newItemForm, newItemModel));
+
+        HBox buttonBox = new HBox(10.0, (Node) submitButton, (Node) cancelButton);
+        buttonBox.setAlignment(Pos.CENTER);
+        return buttonBox;
+    }
+
+    private HBox configDialogButtonStockHistory(Form form) {
+        ButtonType closeButtonType = new ButtonType("Close", ButtonBar.ButtonData.CANCEL_CLOSE);
+        itemDialog.getDialogPane().getButtonTypes().add(closeButtonType);
+
+        Button closeButton = (Button) itemDialog.getDialogPane().lookupButton(closeButtonType);
+
+        HBox button = new HBox(10.0, (Node) closeButton);
+        button.setAlignment(Pos.CENTER);
+        return button;
     }
 
     // Xử lý sự kiện bấm nút Ok
@@ -221,7 +357,6 @@ public class ItemManager {
             showAlert("Error", "Invalid Data", "Please check your input data.");
             event.consume();
         } else {
-
             newItemForm.persist();
             ItemStore.items.add(newItemModel.mapToItem());
             ItemStore.visibleItems.add(newItemModel.mapToItem());
@@ -247,8 +382,11 @@ public class ItemManager {
             event.consume();
         } else {
             form.persist();
+            ItemStore.items.add(model.mapToItem());
+            ItemStore.visibleItems.add(model.mapToItem());
         }
     }
+
 
     private void showAlert(String title, String header, String content) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
