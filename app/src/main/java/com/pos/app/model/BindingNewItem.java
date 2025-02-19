@@ -94,4 +94,29 @@ public class BindingNewItem {
         hasSerialNumber.set(item.isHasSerialNumber());
         deleted.set(item.isDeleted());
     }
+
+    public void clear(){
+        id.set(0);
+        itemName.set("");
+        barcode.set("");
+        category.set("");
+        supplier.set("");
+        wholesalePrice.set(0.0);
+        selectedItemType.set("Standard");
+        selectedStockType.set("Stock");
+        retailPrice.set(0.0);
+        tax1Name.set("");
+        tax1.set(0.0);
+        tax2Name.set("");
+        tax2.set(0.0);
+        hsnCode.set("");
+        receivingQuantity.set(0);
+        stockQuantity.set(0);
+        reorderLevel.set(0);
+        description.set("");
+        avatar.set("");
+        allowAlternateDescription.set(false);
+        hasSerialNumber.set(false);
+        deleted.set(false);
+    }
 }
