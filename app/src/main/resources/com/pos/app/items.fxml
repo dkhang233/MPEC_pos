@@ -95,7 +95,7 @@
                   <String fx:value="btn" />
                   <String fx:value="btn-primary" />
                </styleClass></Button>
-            <Button fx:id="importItemBtn" layoutX="94.0" layoutY="-2.0"  mnemonicParsing="false" prefHeight="27.0" prefWidth="67.0" styleClass="btn" text="Import"   />
+            <Button fx:id="importItemBtn" layoutX="94.0" layoutY="-2.0"  mnemonicParsing="false" prefHeight="27.0" prefWidth="67.0" styleClass="btn" text="Import" onAction="#importFile"   />
             <Button layoutX="183.0" layoutY="-2.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="67.0" styleClass="btn" text="Export" />
          </children>
       </Pane>

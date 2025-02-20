@@ -8,9 +8,7 @@ import com.dlsc.formsfx.view.controls.SimpleRadioButtonControl;
 import com.dlsc.formsfx.view.renderer.FormRenderer;
 import com.pos.app.component.CurrencyInput;
 import com.pos.app.component.ImageUpload;
-import com.pos.app.model.BindingNewItem;
-import com.pos.app.model.BindingUpdateInventory;
-import com.pos.app.model.Item;
+import com.pos.app.model.*;
 import com.pos.app.store.ItemStore;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -20,6 +18,8 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -139,7 +139,7 @@ public class ItemManager {
         );
         Dialog dialogInventory = new Dialog<>();
         dialogInventory.setTitle("Update Inventory");
-        HBox buttonBox = configDialogButtonUpdateInventory(newUpdateInventoryForm, newUpdateInventoryModel);
+        HBox buttonBox = configDialogButtonUpdateInventory(newUpdateInventoryForm, newUpdateInventoryModel, item);
 
         FormRenderer formRenderer = new FormRenderer(newUpdateInventoryForm);
         formRenderer.setPrefSize(600, 600);
@@ -325,7 +325,8 @@ public class ItemManager {
         return buttonBox;
     }
 
-    private HBox configDialogButtonUpdateInventory(Form newItemForm, BindingUpdateInventory updateInventory) {
+    private HBox configDialogButtonUpdateInventory(Form newIventoryForm, BindingUpdateInventory updateInventory, Item item) {
+
         ButtonType submitButtonType = new ButtonType("Submit", ButtonBar.ButtonData.APPLY);
         ButtonType cancelButtonType = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
         itemDialog.getDialogPane().getButtonTypes().addAll(submitButtonType, cancelButtonType);
@@ -333,7 +334,7 @@ public class ItemManager {
         Button submitButton = (Button) itemDialog.getDialogPane().lookupButton(submitButtonType);
         Button cancelButton = (Button) itemDialog.getDialogPane().lookupButton(cancelButtonType);
 
-        submitButton.addEventFilter(ActionEvent.ACTION, event -> handleUpdateItemInfo(event, newItemForm, newItemModel));
+        submitButton.addEventFilter(ActionEvent.ACTION, event -> handleUpdateInventory(event, newIventoryForm, updateInventory, item));
 
         HBox buttonBox = new HBox(10.0, (Node) submitButton, (Node) cancelButton);
         buttonBox.setAlignment(Pos.CENTER);
@@ -375,7 +376,7 @@ public class ItemManager {
         event.consume();
     }
 
-    // Xử lý sự kiện bấm nút Submit
+    // Xử lý sự kiện bấm nút Submit của New Item
     private void handleUpdateItemInfo(ActionEvent event, Form form,  BindingNewItem model) {
         if (!form.isValid()) {
             showAlert("Error", "Invalid Data", "Please check your input data.");
@@ -384,6 +385,17 @@ public class ItemManager {
             form.persist();
             ItemStore.items.add(model.mapToItem());
             ItemStore.visibleItems.add(model.mapToItem());
+        }
+    }
+
+    // Xử lý sự kiện bấm nút Submit của Update Inventory
+    private void handleUpdateInventory(ActionEvent event, Form form, BindingUpdateInventory updateInventory, Item item) {
+        if (!form.isValid()) {
+            showAlert("Error", "Invalid Data", "Please check your input data");
+            event.consume();
+        } else {
+            form.persist();
+            ItemStore.inventoryList.add(updateInventory.mapToUpdateInventory(item));
         }
     }
 

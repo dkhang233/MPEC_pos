@@ -31,7 +31,6 @@ public class BindingUpdateInventory {
                 .findFirst()
                 .orElse(new ItemQuantity(0, "", 0));
         itemQuantity.setQuantity(itemQuantity.getQuantity() + inventoryToAddOrSubtract.get());
-//        item.setStockQuantity(item.itemQuantity() + inventoryToAddOrSubtract.get());
         item.getQuantityPerLocation().removeIf(quantity -> quantity.getLocationName().equals(selectedStockLocation.get()));
         item.getQuantityPerLocation().add(itemQuantity);
         return Inventory.builder()

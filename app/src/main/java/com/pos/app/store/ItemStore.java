@@ -1,5 +1,6 @@
 package com.pos.app.store;
 
+import com.pos.app.model.Inventory;
 import com.pos.app.model.Item;
 import com.pos.app.model.ItemQuantity;
 import javafx.collections.FXCollections;
@@ -21,6 +22,8 @@ public class ItemStore {
     public static final List<String> locationNames = new ArrayList<>();
 
     public static String currentLocation;
+
+    public static final List<Inventory> inventoryList = new ArrayList<>();
 
     static {
         // Thêm dữ liệu vào bảng
@@ -193,6 +196,7 @@ public class ItemStore {
 
         // Thêm dữ liệu vào danh sách hiển thị
         visibleItems.addAll(items);
+
 
         // Thêm dữ liệu vào danh sách tên vị trí
         locationNames.addAll(List.of("Stock 1","Stock 2"));

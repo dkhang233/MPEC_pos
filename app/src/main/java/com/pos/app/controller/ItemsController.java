@@ -4,6 +4,7 @@ import com.dlsc.formsfx.model.structure.*;
 import com.dlsc.formsfx.model.validators.*;
 import com.dlsc.formsfx.view.renderer.FormRenderer;
 
+import com.pos.app.component.CSVFileSelector;
 import com.pos.app.model.*;
 import com.pos.app.store.ItemStore;
 import com.pos.app.util.FormatHelper;
@@ -219,10 +220,16 @@ public class ItemsController {
     // Xử lý khi người dùng chọn xóa item
     @FXML
     private void deleteItem() {
-        ObservableList<Item> selectedItem = tableView.getSelectionModel().getSelectedItems(); // Bỏ chọn các dòng
+        Item selectedItem = tableView.getSelectionModel().getSelectedItem(); // Bỏ chọn các dòng
         if (selectedItem != null) {
-            selectedItem.remove();
+            ItemStore.visibleItems.remove(selectedItem);
         }
+    }
+
+    @FXML
+    private void importFile() {
+       CSVFileSelector fileSelector = new CSVFileSelector();
+
     }
 
 
@@ -262,9 +269,11 @@ public class ItemsController {
 
     // Khi người dùng ấn nút "Show/hide" thì hiển thị bảng checkbox để người dùng chọn cột
     @FXML
-    private void showColVisible(){
+    private void showColVisible() {
         columnsVisibleContainer.setVisible(!columnsVisibleContainer.isVisible());
     }
+
+
     
 
 
