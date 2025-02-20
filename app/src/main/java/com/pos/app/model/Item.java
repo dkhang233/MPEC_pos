@@ -41,7 +41,7 @@ public class Item {
 
     public ItemQuantity getQuantityAtCurrentLocation(){
         return quantityPerLocation.stream()
-                .filter(quantity -> quantity.getLocationName().equals(ItemStore.currentLocation))
+                .filter(quantity -> quantity.getLocationName().equals(ItemStore.currentLocation.getName()))
                 .findFirst()
                 .orElse(new ItemQuantity(0, "", 0));
     }

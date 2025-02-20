@@ -31,7 +31,7 @@
             </TableColumn>
             <TableColumn fx:id="nameCol" editable="false" prefWidth="100.80000305175781" resizable="false" styleClass="col" text="Name">
                 <cellValueFactory>
-                    <PropertyValueFactory property="name" />
+                    <PropertyValueFactory property="itemName" />
                 </cellValueFactory>
             </TableColumn>
             <TableColumn fx:id="categoryCol" editable="false" prefWidth="88.0" resizable="false" styleClass="col" text="Category">

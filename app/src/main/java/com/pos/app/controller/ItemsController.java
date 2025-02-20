@@ -199,7 +199,7 @@ public class ItemsController {
         quantityCol.setCellValueFactory(cellData -> {
            int itemQuantity = 0;
            for(var quantity : cellData.getValue().getQuantityPerLocation()){
-               if (quantity.getLocationName().equals(ItemStore.currentLocation)){
+               if (quantity.getLocationName().equals(ItemStore.currentLocation.getName())){
                    itemQuantity = quantity.getQuantity();
                    break;
                }
@@ -221,7 +221,7 @@ public class ItemsController {
     private void deleteItem() {
         ObservableList<Item> selectedItem = tableView.getSelectionModel().getSelectedItems(); // Bỏ chọn các dòng
         if (selectedItem != null) {
-            selectedItem.remove();
+//            selectedItem.remove();
         }
     }
 

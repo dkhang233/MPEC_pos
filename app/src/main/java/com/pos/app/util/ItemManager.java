@@ -1,27 +1,27 @@
 package com.pos.app.util;
 
-import com.dlsc.formsfx.model.structure.Field;
-import com.dlsc.formsfx.model.structure.Form;
-import com.dlsc.formsfx.model.structure.Group;
+import com.dlsc.formsfx.model.structure.*;
+import com.pos.app.model.*;
+
 import com.dlsc.formsfx.model.validators.IntegerRangeValidator;
 import com.dlsc.formsfx.view.controls.SimpleRadioButtonControl;
 import com.dlsc.formsfx.view.renderer.FormRenderer;
 import com.pos.app.component.CurrencyInput;
 import com.pos.app.component.ImageUpload;
-import com.pos.app.model.BindingNewItem;
-import com.pos.app.model.BindingUpdateInventory;
-import com.pos.app.model.Item;
 import com.pos.app.store.ItemStore;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 public class ItemManager {
     private final Dialog<Item> itemDialog;
@@ -103,7 +103,7 @@ public class ItemManager {
     public void updateInventory(Item item){
         // Object để lưu dữ liệu nhập vào form
         BindingUpdateInventory newUpdateInventoryModel = new BindingUpdateInventory();
-
+        newUpdateInventoryModel.mapFromItem(item);
         // Tạo form để nhập dữ liệu
         Form newUpdateInventoryForm = Form.of(
                 Group.of(
@@ -119,7 +119,7 @@ public class ItemManager {
                                 .label("Category")
                                 .editable(false),
 
-                        Field.ofSingleSelectionType(newUpdateInventoryModel.getStockLocation())
+                        Field.ofSingleSelectionType(newUpdateInventoryModel.getStockLocation(), newUpdateInventoryModel.getSelectedStockLocation())
                                 .label("Stock location"),
 
                         Field.ofIntegerType(item.getQuantityAtCurrentLocation().getQuantity())
@@ -137,31 +137,71 @@ public class ItemManager {
                 )
 
         );
-        Dialog dialogInventory = new Dialog<>();
-        dialogInventory.setTitle("Update Inventory");
-        HBox buttonBox = configDialogButtonUpdateInventory(newUpdateInventoryForm, newUpdateInventoryModel);
+        Dialog<?> updateInventoryDialog = new Dialog<>();
+        updateInventoryDialog.setTitle("Update Inventory");
+        HBox buttonBox = configDialogButtonUpdateInventory(updateInventoryDialog,newUpdateInventoryForm, newUpdateInventoryModel);
 
         FormRenderer formRenderer = new FormRenderer(newUpdateInventoryForm);
-        formRenderer.setPrefSize(600, 600);
+        formRenderer.setPrefSize(600, 350);
         try {
             formRenderer.getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("css/styles.css")).toExternalForm());
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        container = new VBox(10);
+        VBox updateInventoryContainer = new VBox(10);
+        updateInventoryContainer.getChildren().add(formRenderer);
+        updateInventoryContainer.getChildren().add(buttonBox);
 
-        container.getChildren().add(formRenderer);
-        container.getChildren().add(buttonBox);
-
-        scrollPane = new ScrollPane(container);
-
-        dialogInventory.getDialogPane().setContent(scrollPane);
-        dialogInventory.showAndWait();
+        updateInventoryDialog.getDialogPane().setContent(updateInventoryContainer);
+        updateInventoryDialog.showAndWait();
     }
 
+
+    // Xử lý khi người dùng muốn xem lịch sử thay đổi số lượng item
     @FXML
     public void stockHistory(Item item) {
+        // Tạo danh sách lịch sử thay đổi số lượng item theo từng vị trí
+        Map<String, List<Inventory>> inventories = new HashMap<>();
+        ItemStore.inventories.get(item.getId()).forEach( inventory -> {
+            if(inventories.containsKey(inventory.getLocation())){
+                inventories.get(inventory.getLocation()).add(inventory);
+            }else{
+                List<Inventory> list = new ArrayList<>();
+                list.add(inventory);
+                inventories.put(inventory.getLocation(), list);
+            }
+        });
+
+        // Tạo TableView để hiển thị lịch sử số lượng item
+        TableView<Inventory> stockHistoryTable = new TableView<>();
+        stockHistoryTable.setPrefSize(650, 370);
+        TableColumn<Inventory, String> dateCol = new TableColumn<>("Date");
+        dateCol.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getTimestamp().toString()));
+        TableColumn<Inventory, String> userCol = new TableColumn<>("User");
+        userCol.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getUser() + ""));
+        TableColumn<Inventory, String> changeCol = new TableColumn<>("In/Out");
+        changeCol.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getInventory() + ""));
+        TableColumn<Inventory, String> quantityCol = new TableColumn<>("After quantity");
+        quantityCol.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getAfterInventory() + ""));
+        TableColumn<Inventory, String> commentCol = new TableColumn<>("Comment");
+        commentCol.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getComment()));
+        stockHistoryTable.getColumns().addAll(dateCol, userCol, changeCol ,  quantityCol, commentCol);
+        int cols = stockHistoryTable.getColumns().size(); // Số cột của bảng
+        stockHistoryTable.getColumns().forEach(col -> col.prefWidthProperty().bind(stockHistoryTable.widthProperty().divide(cols).subtract(0.65))); // Tự động thay đổi kích thước cột khi thay đổi kích thước bảng
+        
+        // Tạo trước field này để xử lý sự kiện khi thay đổi giá trị
+         SingleSelectionField<String> stockLocation =  Field.ofSingleSelectionType(inventories.keySet().stream().toList(),0)
+                .label("Stock location: ");
+         stockLocation.selectionProperty().addListener((observable, oldValue, newValue) -> {
+             stockHistoryTable.getItems().clear();
+             stockHistoryTable.getItems().addAll(inventories.get(newValue));
+         });
+
+         // Thêm dữ liệu vào TableView
+        stockHistoryTable.getItems().addAll(inventories.get(stockLocation.getSelection()));
+         
+        // Tạo form để hiển thị chi tiết số lượng item
         Form stockHistoryForm = Form.of(
                 Group.of(
                         Field.ofStringType(item.getBarcode())
@@ -175,38 +215,35 @@ public class ItemManager {
                         Field.ofStringType(item.getCategory())
                                 .label("Category: ")
                                 .editable(false),
-
-                        Field.ofSingleSelectionType(item.getQuantityPerLocation())
-                                .label("Stock location: "),
-
+                        stockLocation,  // thêm trường tạo ở trên vào form
                         Field.ofIntegerType(item.getQuantityAtCurrentLocation().getQuantity())
                                 .label("Current Quantity: ")
                                 .editable(false)
                 )
         );
 
-        Dialog dialogStock = new Dialog<>();
-        dialogStock.setTitle("Inventory Count Detail");
 
-        container = new VBox(10);
+
+        Dialog<Object> stockDialog = new Dialog<>();
+        stockDialog.setTitle("Inventory Count Detail");
+
+        VBox stockHistoryContainer = new VBox(10);
 
         FormRenderer formRenderer = new FormRenderer(stockHistoryForm);
-        formRenderer.setPrefSize(600, 600);
+        formRenderer.setPrefSize(650, 280);
         try {
             formRenderer.getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("css/styles.css")).toExternalForm());
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        HBox button = configDialogButtonStockHistory(stockHistoryForm);
+        HBox button = configDialogButtonStockHistory(stockDialog);
 
-        container.getChildren().add(formRenderer);
-        container.getChildren().add(button);
-
-        scrollPane = new ScrollPane(container);
-
-        dialogStock.getDialogPane().setContent(scrollPane);
-        dialogStock.showAndWait();
+        stockHistoryContainer.getChildren().add(formRenderer);
+        stockHistoryContainer.getChildren().add(stockHistoryTable);
+        stockHistoryContainer.getChildren().add(button);
+        stockDialog.getDialogPane().setContent(stockHistoryContainer);
+        stockDialog.showAndWait();
     }
 
 
@@ -325,13 +362,13 @@ public class ItemManager {
         return buttonBox;
     }
 
-    private HBox configDialogButtonUpdateInventory(Form newItemForm, BindingUpdateInventory updateInventory) {
+    private HBox configDialogButtonUpdateInventory(Dialog<?> updateInventoryDialog,Form newItemForm, BindingUpdateInventory updateInventory) {
         ButtonType submitButtonType = new ButtonType("Submit", ButtonBar.ButtonData.APPLY);
         ButtonType cancelButtonType = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
-        itemDialog.getDialogPane().getButtonTypes().addAll(submitButtonType, cancelButtonType);
+        updateInventoryDialog.getDialogPane().getButtonTypes().addAll(submitButtonType, cancelButtonType);
 
-        Button submitButton = (Button) itemDialog.getDialogPane().lookupButton(submitButtonType);
-        Button cancelButton = (Button) itemDialog.getDialogPane().lookupButton(cancelButtonType);
+        Button submitButton = (Button) updateInventoryDialog.getDialogPane().lookupButton(submitButtonType);
+        Button cancelButton = (Button) updateInventoryDialog.getDialogPane().lookupButton(cancelButtonType);
 
         submitButton.addEventFilter(ActionEvent.ACTION, event -> handleUpdateItemInfo(event, newItemForm, newItemModel));
 
@@ -340,15 +377,14 @@ public class ItemManager {
         return buttonBox;
     }
 
-    private HBox configDialogButtonStockHistory(Form form) {
+    private HBox configDialogButtonStockHistory(Dialog<?> stockDialog) {
         ButtonType closeButtonType = new ButtonType("Close", ButtonBar.ButtonData.CANCEL_CLOSE);
-        itemDialog.getDialogPane().getButtonTypes().add(closeButtonType);
+        stockDialog.getDialogPane().getButtonTypes().add(closeButtonType);
+        Button closeButton = (Button) stockDialog.getDialogPane().lookupButton(closeButtonType);
 
-        Button closeButton = (Button) itemDialog.getDialogPane().lookupButton(closeButtonType);
-
-        HBox button = new HBox(10.0, (Node) closeButton);
-        button.setAlignment(Pos.CENTER);
-        return button;
+        HBox buttonContainer = new HBox(10.0, closeButton);
+        buttonContainer.setAlignment(Pos.CENTER);
+        return buttonContainer;
     }
 
     // Xử lý sự kiện bấm nút Ok

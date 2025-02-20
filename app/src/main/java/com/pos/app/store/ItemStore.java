@@ -1,13 +1,17 @@
 package com.pos.app.store;
 
+import com.pos.app.model.Inventory;
 import com.pos.app.model.Item;
 import com.pos.app.model.ItemQuantity;
+import com.pos.app.model.Location;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 @Data
@@ -18,9 +22,11 @@ public class ItemStore {
     // Danh sách các item hiển thị trên bảng
     public static final ObservableList<Item> visibleItems = FXCollections.observableArrayList(items);
 
-    public static final List<String> locationNames = new ArrayList<>();
+    public static final List<Location> locations = new ArrayList<>();
 
-    public static String currentLocation;
+    public static Location currentLocation;
+
+    public static HashMap<Integer, List<Inventory>> inventories = new HashMap<>();
 
     static {
         // Thêm dữ liệu vào bảng
@@ -195,9 +201,75 @@ public class ItemStore {
         visibleItems.addAll(items);
 
         // Thêm dữ liệu vào danh sách tên vị trí
-        locationNames.addAll(List.of("Stock 1","Stock 2"));
+        locations.addAll(List.of( new Location(1,"Stock 1",false),
+                new Location(1,"Stock 2",false)
+        ));
 
         // Chọn vị trí hiện tại
-        currentLocation = locationNames.get(1);
+        currentLocation = locations.get(1);
+
+        // Thêm dữ liệu vào danh sách inventories
+        inventories.put(2, List.of(
+                Inventory.builder()
+                        .location("Stock 1")
+                        .user(1)
+                        .inventory(20)
+                        .afterInventory(20)
+                        .timestamp(LocalDate.now())
+                        .comment("Initial stock")
+                        .build(),
+                Inventory.builder()
+                        .location("Stock 2")
+                        .user(2)
+                        .inventory(30)
+                        .afterInventory(30)
+                        .timestamp(LocalDate.now())
+                        .comment("Initial stock")
+                        .build(),
+                Inventory.builder()
+                        .location("Stock 1")
+                        .user(3)
+                        .inventory(14)
+                        .afterInventory(25)
+                        .timestamp(LocalDate.now())
+                        .comment("Added 14 items")
+                        .build(),
+                Inventory.builder()
+                        .location("Stock 2")
+                        .user(4)
+                        .inventory(5)
+                        .afterInventory(15)
+                        .timestamp(LocalDate.now())
+                        .comment("Added 5 items")
+                        .build(),
+                Inventory.builder()
+                        .location("Stock 1")
+                        .user(5)
+                        .inventory(10)
+                        .afterInventory(15)
+                        .timestamp(LocalDate.now())
+                        .comment("Added 10 items")
+                        .build()
+        ));
+        inventories.put(3,new ArrayList<>());
+        for (int i = 0 ; i < 20; i++){
+            inventories.get(3).add(Inventory.builder()
+                    .location("Stock 1")
+                    .user(1)
+                    .inventory(5)
+                    .afterInventory(5)
+                    .timestamp(LocalDate.now())
+                    .comment("Initial stock")
+                    .build());
+            inventories.get(3).add(Inventory.builder()
+                    .location("Stock 2")
+                    .user(2)
+                    .inventory(5)
+                    .afterInventory(5)
+                    .timestamp(LocalDate.now())
+                    .comment("Initial stock")
+                    .build());
+        }
     }
+    
 }
