@@ -9,7 +9,7 @@ import com.pos.app.store.ItemStore;
 import com.pos.app.util.FormatHelper;
 import com.pos.app.util.ItemManager;
 
-import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.*;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -36,13 +36,13 @@ public class ItemsController {
     private TableView<Item> tableView;
     
     @FXML
-    private TableColumn<Item, Double> wholeSalePriceCol;
+    private TableColumn<Item, DoubleProperty> wholeSalePriceCol;
 
     @FXML
-    private TableColumn<Item, String> quantityCol;
+    private TableColumn<Item, IntegerProperty> quantityCol;
 
     @FXML
-    private TableColumn<Item, String> avatarCol;
+    private TableColumn<Item, StringProperty> avatarCol;
 
     @FXML
     private TableColumn<Item, String> updateInventoryCol;
@@ -94,12 +94,12 @@ public class ItemsController {
         // Tùy chỉnh cột Wholesale Price để hiển thị giá tiền
         wholeSalePriceCol.setCellFactory(col -> new TableCell<>() {
             @Override
-            protected void updateItem(Double price, boolean empty) {
+            protected void updateItem(DoubleProperty price, boolean empty) {
                 super.updateItem(price, empty);
                 if (empty || price == null) {
                     setText(null);
                 } else {
-                    setText(FormatHelper.formatDecimalNumber(price));
+                    setText(FormatHelper.formatDecimalNumber(price.getValue()));
                 }
             }
         });
@@ -108,13 +108,13 @@ public class ItemsController {
         avatarCol.setCellFactory(col -> new TableCell<>() {
             private final ImageView imageView = new ImageView();
             @Override
-            protected void updateItem(String avatar, boolean empty) {
+            protected void updateItem(StringProperty avatar, boolean empty) {
                 super.updateItem(avatar, empty);
                 if (empty || avatar == null) {
                     setGraphic(null);
                 } else {
                     try {
-                        imageView.setImage(new Image(avatar, true));
+                        imageView.setImage(new Image(avatar.getValue(), true));
                     } catch (Exception e) {
                         imageView.setImage(new Image(defaultAvatar));
                     }
@@ -196,16 +196,7 @@ public class ItemsController {
 
         
         // Tùy chỉnh cột quantity để hiển thị số lượng item tại vị trí hiện tại
-        quantityCol.setCellValueFactory(cellData -> {
-           int itemQuantity = 0;
-           for(var quantity : cellData.getValue().getQuantityPerLocation()){
-               if (quantity.getLocationName().equals(ItemStore.currentLocation.getName())){
-                   itemQuantity = quantity.getQuantity();
-                   break;
-               }
-           }
-           return new SimpleStringProperty(String.valueOf(itemQuantity));
-        });
+        quantityCol.setCellValueFactory(cellData -> cellData.getValue().getQuantityPerLocation().stream().filter(itemQuantity -> itemQuantity.getLocationName().equals(ItemStore.currentLocation.getName())).findFirst().orElse(new ItemQuantity(0,"",0)).getQuantity().getValue());
 
 
         this.deleteItemBtn.disableProperty().bind(this.tableView.getSelectionModel().selectedItemProperty().isNull()); // Disable button xóa khi không có dòng nào được chọn

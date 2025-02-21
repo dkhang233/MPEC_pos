@@ -11,13 +11,13 @@ import java.lang.reflect.Array;
 import java.util.*;
 
 @Data
-@Builder
 @NoArgsConstructor
 public class BindingNewItem {
     private final IntegerProperty id = new SimpleIntegerProperty();
     private final StringProperty itemName = new SimpleStringProperty("");
     private final StringProperty barcode = new SimpleStringProperty("");
     private final StringProperty category = new SimpleStringProperty("");
+    private ObjectProperty<HashMap<String, ?>> attributes = new SimpleObjectProperty<>();
     private final ListProperty<String> stockTypes = new SimpleListProperty<>(FXCollections.observableArrayList("Stock", "Non-stock"));
     private final ObjectProperty<String> selectedStockType = new SimpleObjectProperty<>();
     private final ListProperty<String> itemTypes = new SimpleListProperty<>(FXCollections.observableArrayList("Standard", "Kit"));
@@ -30,8 +30,7 @@ public class BindingNewItem {
     private final StringProperty tax2Name = new SimpleStringProperty("");
     private final DoubleProperty tax2 = new SimpleDoubleProperty(0.0);
     private final StringProperty hsnCode = new SimpleStringProperty("");
-    private final IntegerProperty stockQuantity = new SimpleIntegerProperty(0);
-    private final Map<String,IntegerProperty> quantitiesPerLocation = new HashMap<>();
+    private ListProperty<ItemQuantity> quantityPerLocation = new SimpleListProperty<>(FXCollections.observableArrayList());;
     private final IntegerProperty receivingQuantity = new SimpleIntegerProperty(0);
     private final IntegerProperty reorderLevel = new SimpleIntegerProperty(0);
     private final StringProperty description = new SimpleStringProperty("");
@@ -40,59 +39,32 @@ public class BindingNewItem {
     private final BooleanProperty hasSerialNumber = new SimpleBooleanProperty(false);
     private final BooleanProperty deleted = new SimpleBooleanProperty(false);
 
-
-
     public Item mapToItem(){
-        return Item.builder()
-                .itemName(itemName.get())
-                .barcode(barcode.get())
-                .category(category.get())
-                .stockType(selectedStockType.get())
-                .itemType(selectedItemType.get())
-                .supplier(supplier.get())
-                .wholesalePrice(wholesalePrice.get())
-                .itemType(selectedItemType.get())
-                .stockType(selectedStockType.get())
-                .retailPrice(retailPrice.get())
-                .tax1Name(tax1Name.get())
-                .tax1(tax1.get())
-                .tax2Name(tax2Name.get())
-                .tax2(tax2.get())
-                .quantityPerLocation(quantitiesPerLocation.entrySet().stream().map(entry -> ItemQuantity.builder().locationName(entry.getKey()).quantity(entry.getValue().get()).build()).toList())
-                .hsnCode(hsnCode.get())
-                .receivingQuantity(receivingQuantity.get())
-                .reorderLevel(reorderLevel.get())
-                .description(description.get())
-                .avatar(avatar.get())
-                .allowAlternateDescription(allowAlternateDescription.get())
-                .hasSerialNumber(hasSerialNumber.get())
-                .deleted(deleted.get())
-                .build();
-    }
-
-    public void mapFromItem(Item item){
-        id.set(item.getId());
-        itemName.set(item.getItemName());
-        barcode.set(item.getBarcode());
-        category.set(item.getCategory());
-        supplier.set(item.getSupplier());
-        wholesalePrice.set(item.getWholesalePrice());
-        selectedItemType.set(item.getItemType());
-        selectedStockType.set(item.getStockType());
-        retailPrice.set(item.getRetailPrice());
-        tax1Name.set(item.getTax1Name());
-        tax1.set(item.getTax1());
-        tax2Name.set(item.getTax2Name());
-        tax2.set(item.getTax2());
-        hsnCode.set(item.getHsnCode());
-        receivingQuantity.set(item.getReceivingQuantity());
-        stockQuantity.set(item.getQuantityAtCurrentLocation().getQuantity());
-        reorderLevel.set(item.getReorderLevel());
-        description.set(item.getDescription());
-        avatar.set(item.getAvatar());
-        allowAlternateDescription.set(item.isAllowAlternateDescription());
-        hasSerialNumber.set(item.isHasSerialNumber());
-        deleted.set(item.isDeleted());
+        Item item = new Item();
+        item.getId().set(id.getValue());
+        item.getItemName().set(itemName.getValue());
+        item.getBarcode().set(barcode.getValue());
+        item.getCategory().set(category.getValue());
+        item.getAttributes().set(attributes.getValue());
+        item.getStockType().set(selectedStockType.getValue());
+        item.getItemType().set(selectedItemType.getValue());
+        item.getSupplier().set(supplier.getValue());
+        item.getWholesalePrice().set(wholesalePrice.getValue());
+        item.getRetailPrice().set(retailPrice.getValue());
+        item.getTax1Name().set(tax1Name.getValue());
+        item.getTax1().set(tax1.getValue());
+        item.getTax2Name().set(tax2Name.getValue());
+        item.getTax2().set(tax2.getValue());
+        item.getHsnCode().set(hsnCode.getValue());
+        item.getQuantityPerLocation().setAll(quantityPerLocation);
+        item.getReceivingQuantity().set(receivingQuantity.getValue());
+        item.getReorderLevel().set(reorderLevel.getValue());
+        item.getDescription().set(description.getValue());
+        item.getAvatar().set(avatar.getValue());
+        item.getAllowAlternateDescription().set(allowAlternateDescription.getValue());
+        item.getHasSerialNumber().set(hasSerialNumber.getValue());
+        item.getDeleted().set(deleted.getValue());
+        return item;
     }
 
     public void clear(){
@@ -111,7 +83,6 @@ public class BindingNewItem {
         tax2.set(0.0);
         hsnCode.set("");
         receivingQuantity.set(0);
-        stockQuantity.set(0);
         reorderLevel.set(0);
         description.set("");
         avatar.set("");

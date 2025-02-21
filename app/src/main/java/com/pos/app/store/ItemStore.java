@@ -7,7 +7,9 @@ import com.pos.app.model.Location;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import lombok.Data;
+import net.datafaker.Faker;
 
+import java.lang.reflect.Array;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,233 +28,82 @@ public class ItemStore {
 
     public static Location currentLocation;
 
-    public static HashMap<Integer, List<Inventory>> inventories = new HashMap<>();
+    public static final HashMap<Integer, List<Inventory>> inventories = new HashMap<>();   // Lưu inventory cho mỗi item
 
+
+
+
+
+
+
+
+
+    // ---------------------- Khởi tạo dữ liệu mẫu ----------------------//
     static {
-        // Thêm dữ liệu vào bảng
-        items.addAll(Arrays.asList(
-                // Mẫu 1: Điện thoại thông minh
-                Item.builder()
-                        .id(2)
-                        .itemName("Smartphone ABC")
-                        .barcode("9876543210987")
-                        .category("Electronics")
-                        .supplier("XYZ Supplier")
-                        .wholesalePrice(300.00)
-                        .retailPrice(450.00)
-                        .tax1Name("VAT")
-                        .tax1(8.0)
-                        .tax2Name("Luxury Tax")
-                        .tax2(2.0)
-                        .hsnCode("HSN5678")
-                        .quantityPerLocation(List.of(
-                                        ItemQuantity.builder()
-                                                .locationName("Stock 1")
-                                                .quantity(20)
-                                                .build(),
-                                        ItemQuantity.builder()
-                                                .locationName("Stock 2")
-                                                .quantity(10)
-                                                .build()
-                        ))
-                        .receivingQuantity(20)
-                        .reorderLevel(10)
-                        .description("Latest model smartphone with advanced features")
-                        .avatar("smartphone_abc.png")
-                        .allowAlternateDescription(false)
-                        .hasSerialNumber(true)
-                        .deleted(false)
-                        .build(),
-
-// Mẫu 2: Máy giặt
-                Item.builder()
-                        .id(3)
-                        .itemName("Washing Machine 123")
-                        .barcode("1928374650912")
-                        .category("Home Appliances")
-                        .supplier("HomeTech Supplier")
-                        .wholesalePrice(200.00)
-                        .retailPrice(350.00)
-                        .tax1Name("VAT")
-                        .tax1(12.0)
-                        .tax2Name("Eco Tax")
-                        .tax2(3.0)
-                        .hsnCode("HSN9101")
-                        .quantityPerLocation(List.of(
-                                ItemQuantity.builder()
-                                        .locationName("Stock 1")
-                                        .quantity(10)
-                                        .build(),
-                                ItemQuantity.builder()
-                                        .locationName("Stock 2")
-                                        .quantity(10)
-                                        .build()
-                        ))
-                        .receivingQuantity(5)
-                        .reorderLevel(3)
-                        .description("Energy-efficient washing machine with multiple modes")
-                        .avatar("washing_machine_123.png")
-                        .allowAlternateDescription(true)
-                        .hasSerialNumber(true)
-                        .deleted(false)
-                        .build(),
-
-// Mẫu 3: Sách
-                Item.builder()
-                        .id(4)
-                        .itemName("Programming in Java")
-                        .barcode("5647382910123")
-                        .category("Books")
-                        .supplier("BookWorld")
-                        .wholesalePrice(20.00)
-                        .retailPrice(30.00)
-                        .tax1Name("GST")
-                        .tax1(5.0)
-                        .tax2Name("Education Cess")
-                        .tax2(1.0)
-                        .hsnCode("HSN1122")
-                        .quantityPerLocation(List.of(
-                                ItemQuantity.builder()
-                                        .locationName("Stock 1")
-                                        .quantity(10)
-                                        .build(),
-                                ItemQuantity.builder()
-                                        .locationName("Stock 2")
-                                        .quantity(30)
-                                        .build()
-                        ))
-                        .receivingQuantity(50)
-                        .reorderLevel(20)
-                        .description("Comprehensive guide to Java programming")
-                        .avatar("programming_in_java.png")
-                        .allowAlternateDescription(false)
-                        .hasSerialNumber(false)
-                        .deleted(false)
-                        .build(),
-
-// Mẫu 4: Bàn làm việc
-                Item.builder()
-                        .id(5)
-                        .itemName("Ergonomic Office Desk")
-                        .barcode("3216549870123")
-                        .category("Furniture")
-                        .supplier("FurniCo")
-                        .wholesalePrice(150.00)
-                        .retailPrice(250.00)
-                        .tax1Name("VAT")
-                        .tax1(10.0)
-                        .tax2Name("Luxury Tax")
-                        .tax2(2.0)
-                        .hsnCode("HSN3344")
-                        .quantityPerLocation(List.of(
-                                ItemQuantity.builder()
-                                        .locationName("Stock 1")
-                                        .quantity(10)
-                                        .build(),
-                                ItemQuantity.builder()
-                                        .locationName("Stock 2")
-                                        .quantity(8)
-                                        .build()
-                        ))
-                        .receivingQuantity(5)
-                        .reorderLevel(2)
-                        .description("Height-adjustable ergonomic office desk")
-                        .avatar("ergonomic_office_desk.png")
-                        .allowAlternateDescription(true)
-                        .hasSerialNumber(false)
-                        .deleted(false)
-                        .build(),
-
-// Mẫu 5: Tai nghe
-                Item.builder()
-                        .id(6)
-                        .itemName("Wireless Headphones")
-                        .barcode("4567891234567")
-                        .category("Accessories")
-                        .supplier("SoundTech")
-                        .wholesalePrice(50.00)
-                        .retailPrice(80.00)
-                        .tax1Name("VAT")
-                        .tax1(8.0)
-                        .tax2Name("Import Duty")
-                        .tax2(5.0)
-                        .hsnCode("HSN7788")
-                        .quantityPerLocation(List.of(
-                                ItemQuantity.builder()
-                                        .locationName("Stock 1")
-                                        .quantity(10)
-                                        .build(),
-                                ItemQuantity.builder()
-                                        .locationName("Stock 2")
-                                        .quantity(15)
-                                        .build()
-                        ))
-                        .receivingQuantity(30)
-                        .reorderLevel(15)
-                        .description("Noise-cancelling wireless headphones with long battery life")
-                        .avatar("wireless_headphones.png")
-                        .allowAlternateDescription(false)
-                        .hasSerialNumber(true)
-                        .deleted(false)
-                        .build()
-        ));
+        Faker faker = new Faker();
+        // Thêm dữ liệu vào danh sách item
+        for (int i = 0; i < 10; i++) {
+            Item item = new Item();
+            item.getId().set(faker.number().numberBetween(1, 1000));
+            item.getItemName().set(faker.commerce().productName());
+            item.getBarcode().set(faker.number().digits(12));
+            item.getCategory().set(faker.lorem().word());
+//            item.getAttributes().set(attributes.getValue());
+            item.getStockType().set("Stock");
+            item.getItemType().set("Standard");
+            item.getSupplier().set(faker.lorem().word());
+            item.getWholesalePrice().set(faker.number().randomDouble(2, 10, 100));
+            item.getRetailPrice().set(faker.number().randomDouble(2, 10, 100));
+            item.getTax1Name().set(faker.lorem().word());
+            item.getTax1().set(faker.number().randomDouble(2, 0, 20));
+            item.getTax2Name().set(faker.lorem().word());
+            item.getTax2().set(faker.number().randomDouble(2, 0, 20));
+            item.getHsnCode().set(faker.number().digits(3));
+            List<ItemQuantity> quantityPerLocation = new ArrayList<>();
+            quantityPerLocation.add(new ItemQuantity(1, "Stock 1", faker.number().numberBetween(0, 100)));
+            quantityPerLocation.add(new ItemQuantity(2, "Stock 2", faker.number().numberBetween(0, 100)));
+            item.getQuantityPerLocation().setAll(quantityPerLocation);
+            item.getReceivingQuantity().set(10);
+            item.getReorderLevel().set(10);
+            item.getDescription().set(faker.lorem().sentence());
+            item.getAvatar().set(faker.internet().domainName());
+            item.getAllowAlternateDescription().set(false);
+            item.getHasSerialNumber().set(false);
+            item.getDeleted().set(false);
+            items.add(item);
+        }
 
         // Thêm dữ liệu vào danh sách hiển thị
         visibleItems.addAll(items);
 
         // Thêm dữ liệu vào danh sách tên vị trí
-        locations.addAll(List.of( new Location(1,"Stock 1",false),
+        locations.addAll( new ArrayList<>( List.of( new Location(1,"Stock 1",false),
                 new Location(1,"Stock 2",false)
-        ));
+        )));
 
         // Chọn vị trí hiện tại
-        currentLocation = locations.get(1);
+        currentLocation = locations.get(0);
 
-        // Thêm dữ liệu vào danh sách inventories
-        inventories.put(2, List.of(
-                Inventory.builder()
-                        .location("Stock 1")
-                        .user(1)
-                        .inventory(20)
-                        .afterInventory(20)
-                        .timestamp(LocalDate.now())
-                        .comment("Initial stock")
-                        .build(),
-                Inventory.builder()
-                        .location("Stock 2")
-                        .user(2)
-                        .inventory(30)
-                        .afterInventory(30)
-                        .timestamp(LocalDate.now())
-                        .comment("Initial stock")
-                        .build(),
-                Inventory.builder()
-                        .location("Stock 1")
-                        .user(3)
-                        .inventory(14)
-                        .afterInventory(25)
-                        .timestamp(LocalDate.now())
-                        .comment("Added 14 items")
-                        .build(),
-                Inventory.builder()
-                        .location("Stock 2")
-                        .user(4)
-                        .inventory(5)
-                        .afterInventory(15)
-                        .timestamp(LocalDate.now())
-                        .comment("Added 5 items")
-                        .build(),
-                Inventory.builder()
-                        .location("Stock 1")
-                        .user(5)
-                        .inventory(10)
-                        .afterInventory(15)
-                        .timestamp(LocalDate.now())
-                        .comment("Added 10 items")
-                        .build()
-        ));
+        // Thêm dữ liệu vào bảng inventory
+        inventories.put(2,new ArrayList<>());
         inventories.put(3,new ArrayList<>());
         for (int i = 0 ; i < 20; i++){
+            inventories.get(2).add(Inventory.builder()
+                    .location("Stock 1")
+                    .user(1)
+                    .inventory(5)
+                    .afterInventory(5)
+                    .timestamp(LocalDate.now())
+                    .comment("Initial stock")
+                    .build());
+            inventories.get(2).add(Inventory.builder()
+                    .location("Stock 2")
+                    .user(2)
+                    .inventory(10)
+                    .afterInventory(10)
+                    .timestamp(LocalDate.now())
+                    .comment("Initial stock")
+                    .build());
             inventories.get(3).add(Inventory.builder()
                     .location("Stock 1")
                     .user(1)

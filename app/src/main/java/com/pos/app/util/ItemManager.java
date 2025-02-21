@@ -1,6 +1,7 @@
 package com.pos.app.util;
 
 import com.dlsc.formsfx.model.structure.*;
+import com.dlsc.formsfx.view.controls.SimpleTextControl;
 import com.pos.app.model.*;
 
 import com.dlsc.formsfx.model.validators.IntegerRangeValidator;
@@ -9,9 +10,9 @@ import com.dlsc.formsfx.view.renderer.FormRenderer;
 import com.pos.app.component.CurrencyInput;
 import com.pos.app.component.ImageUpload;
 import com.pos.app.store.ItemStore;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.*;
 import javafx.event.ActionEvent;
+import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -21,6 +22,8 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+
+import java.time.LocalDate;
 import java.util.*;
 
 public class ItemManager {
@@ -84,7 +87,7 @@ public class ItemManager {
 
     @FXML
     public void updateItemInfo(Item item){
-        newItemModel.mapFromItem(item);    // Map dữ liệu từ item vào model để hiển thị lên form
+        newItemModel = item.mapToBindingNewItem();    // Map dữ liệu từ item vào model để hiển thị lên form
         itemDialog.setTitle("Update Item");   // Set title phù hợp cho dialog
 
         HBox updateButtonBox = configDialogButtonUpdateItemInfo(newItemForm, newItemModel);
@@ -98,69 +101,22 @@ public class ItemManager {
         });
     }
 
-    // Xử lý khi người dùng muốn cập nhật số lượng item
-    @FXML
-    public void updateInventory(Item item){
-        // Object để lưu dữ liệu nhập vào form
-        BindingUpdateInventory newUpdateInventoryModel = new BindingUpdateInventory();
-        newUpdateInventoryModel.mapFromItem(item);
-        // Tạo form để nhập dữ liệu
-        Form newUpdateInventoryForm = Form.of(
-                Group.of(
-                        Field.ofStringType(item.getBarcode())
-                                .label("Barcode")
-                                .editable(false),
-
-                        Field.ofStringType(item.getItemName())
-                                .label("Item Name")
-                                .editable(false),
-
-                        Field.ofStringType(item.getCategory())
-                                .label("Category")
-                                .editable(false),
-
-                        Field.ofSingleSelectionType(newUpdateInventoryModel.getStockLocation(), newUpdateInventoryModel.getSelectedStockLocation())
-                                .label("Stock location"),
-
-                        Field.ofIntegerType(item.getQuantityAtCurrentLocation().getQuantity())
-                                .label("Current Quantity")
-                                .editable(false),
-
-                        Field.ofIntegerType(newUpdateInventoryModel.getInventoryToAddOrSubtract())
-                                .label("Inventory to add or subtract")
-                                .required("Quantity is a required field")
-                                .validate(IntegerRangeValidator.atLeast(-newUpdateInventoryModel.getCurrentQuantity().get()
-                                        ,"Can't add value smaller than current inventory")),
-
-                        Field.ofStringType(newUpdateInventoryModel.getComment())
-                                .label("Comment")
-                )
-
-        );
-        Dialog<?> updateInventoryDialog = new Dialog<>();
-        updateInventoryDialog.setTitle("Update Inventory");
-        HBox buttonBox = configDialogButtonUpdateInventory(updateInventoryDialog,newUpdateInventoryForm, newUpdateInventoryModel);
-
-        FormRenderer formRenderer = new FormRenderer(newUpdateInventoryForm);
-        formRenderer.setPrefSize(600, 350);
-        try {
-            formRenderer.getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("css/styles.css")).toExternalForm());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        VBox updateInventoryContainer = new VBox(10);
-        updateInventoryContainer.getChildren().add(formRenderer);
-        updateInventoryContainer.getChildren().add(buttonBox);
-
-        updateInventoryDialog.getDialogPane().setContent(updateInventoryContainer);
-        updateInventoryDialog.showAndWait();
-    }
-
 
     // Xử lý khi người dùng muốn xem lịch sử thay đổi số lượng item
     @FXML
-    public void stockHistory(Item item) {
+    public void stockHistory(Item item){
+
+    }
+
+
+
+    // Xử lý khi người dùng muốn cập nhật số lượng item
+    @FXML
+    public void updateInventory(Item item) {
+        IntegerProperty currentQuantity = new SimpleIntegerProperty(item.getQuantityAtCurrentLocation().getQuantity().getValue());
+        IntegerProperty inOutQuantity = new SimpleIntegerProperty(0);
+        StringProperty comment = new SimpleStringProperty("");
+        
         // Tạo danh sách lịch sử thay đổi số lượng item theo từng vị trí
         Map<String, List<Inventory>> inventories = new HashMap<>();
         ItemStore.inventories.get(item.getId()).forEach( inventory -> {
@@ -175,7 +131,7 @@ public class ItemManager {
 
         // Tạo TableView để hiển thị lịch sử số lượng item
         TableView<Inventory> stockHistoryTable = new TableView<>();
-        stockHistoryTable.setPrefSize(650, 370);
+        stockHistoryTable.setPrefSize(650, 500);
         TableColumn<Inventory, String> dateCol = new TableColumn<>("Date");
         dateCol.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getTimestamp().toString()));
         TableColumn<Inventory, String> userCol = new TableColumn<>("User");
@@ -189,17 +145,41 @@ public class ItemManager {
         stockHistoryTable.getColumns().addAll(dateCol, userCol, changeCol ,  quantityCol, commentCol);
         int cols = stockHistoryTable.getColumns().size(); // Số cột của bảng
         stockHistoryTable.getColumns().forEach(col -> col.prefWidthProperty().bind(stockHistoryTable.widthProperty().divide(cols).subtract(0.65))); // Tự động thay đổi kích thước cột khi thay đổi kích thước bảng
-        
-        // Tạo trước field này để xử lý sự kiện khi thay đổi giá trị
-         SingleSelectionField<String> stockLocation =  Field.ofSingleSelectionType(inventories.keySet().stream().toList(),0)
-                .label("Stock location: ");
-         stockLocation.selectionProperty().addListener((observable, oldValue, newValue) -> {
-             stockHistoryTable.getItems().clear();
-             stockHistoryTable.getItems().addAll(inventories.get(newValue));
-         });
+
+        // Tạo trường nhập số lượng để thêm vào hoặc trừ ra khỏi số lượng item
+        IntegerField inOutQuantityField = Field.ofIntegerType(inOutQuantity)
+                .label("In/Out")
+                .tooltip("Input positive value to add to inventory, negative value to subtract")
+                .required("Quantity is a required field")
+                .validate(IntegerRangeValidator.atLeast(-currentQuantity.get()
+                        ,"Can't add value smaller than current inventory"));
+
+        // Tạo trường hiển thị số lượng hiện tại của item
+        IntegerField currentQuantityField = Field.ofIntegerType(currentQuantity)
+                .label("Quantity")
+                .editable(false);
+
+        // Thay đổi điều kiện của trường nhập số lượng (thêm vào hoặc trừ ra khỏi số lượng item)  khi số lượng hiện tại thay đổi
+        currentQuantityField.valueProperty().addListener((observable, oldValue, newValue) -> {
+            inOutQuantityField.validate(IntegerRangeValidator.atLeast(-newValue.intValue()
+                    ,"Can't add value smaller than current inventory"));
+        });
+
+        // Tạo trường chọn vị trí để xem lịch sử, và hiển thị số lượng hiện tại của item tương ứng với vị trí
+        SingleSelectionField<String> stockLocationField =  Field.ofSingleSelectionType(inventories.keySet().stream().toList(),0)
+        .label("Location: ");
+        stockLocationField.selectionProperty().addListener((observable, oldValue, newValue) -> {
+            stockHistoryTable.getItems().clear();
+            stockHistoryTable.getItems().addAll(inventories.get(newValue));
+            currentQuantity.set(item.getQuantityPerLocation().stream()
+                    .filter(quantity -> quantity.getLocationName().getValue().equals(newValue))
+                    .findFirst()
+                    .orElse(new ItemQuantity(item.getId().getValue(),newValue,0)).getQuantity().getValue());
+        });
+
 
          // Thêm dữ liệu vào TableView
-        stockHistoryTable.getItems().addAll(inventories.get(stockLocation.getSelection()));
+        stockHistoryTable.getItems().addAll(inventories.get(stockLocationField.getSelection()));
          
         // Tạo form để hiển thị chi tiết số lượng item
         Form stockHistoryForm = Form.of(
@@ -215,10 +195,13 @@ public class ItemManager {
                         Field.ofStringType(item.getCategory())
                                 .label("Category: ")
                                 .editable(false),
-                        stockLocation,  // thêm trường tạo ở trên vào form
-                        Field.ofIntegerType(item.getQuantityAtCurrentLocation().getQuantity())
-                                .label("Current Quantity: ")
-                                .editable(false)
+                        stockLocationField,  // thêm trường tạo ở trên vào form
+                        currentQuantityField,
+                        inOutQuantityField,
+
+                        Field.ofStringType(comment)
+                                .label("Comment")
+                                .multiline(true)
                 )
         );
 
@@ -228,20 +211,21 @@ public class ItemManager {
         stockDialog.setTitle("Inventory Count Detail");
 
         VBox stockHistoryContainer = new VBox(10);
+        HBox body = new HBox(10);
 
         FormRenderer formRenderer = new FormRenderer(stockHistoryForm);
-        formRenderer.setPrefSize(650, 280);
+        formRenderer.setPrefSize(500, 280);
         try {
             formRenderer.getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("css/styles.css")).toExternalForm());
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        HBox button = configDialogButtonStockHistory(stockDialog);
+        configDialogButtonUpdateInventory(stockDialog, stockHistoryForm ,item, currentQuantity ,stockLocationField, inOutQuantity, comment, stockHistoryTable);
 
-        stockHistoryContainer.getChildren().add(formRenderer);
-        stockHistoryContainer.getChildren().add(stockHistoryTable);
-        stockHistoryContainer.getChildren().add(button);
+        body.getChildren().add(formRenderer);
+        body.getChildren().add(stockHistoryTable);
+        stockHistoryContainer.getChildren().addAll(body);
         stockDialog.getDialogPane().setContent(stockHistoryContainer);
         stockDialog.showAndWait();
     }
@@ -299,7 +283,7 @@ public class ItemManager {
                                 .label("")
                                 .render(new CurrencyInput(2, "%")),
 
-                        Field.ofIntegerType(newItemModel.getStockQuantity())
+                        Field.ofIntegerType(1)
                                 .label("Quantity Stock")
                                 .required("Quantity Stock is required"),
 
@@ -362,29 +346,40 @@ public class ItemManager {
         return buttonBox;
     }
 
-    private HBox configDialogButtonUpdateInventory(Dialog<?> updateInventoryDialog,Form newItemForm, BindingUpdateInventory updateInventory) {
-        ButtonType submitButtonType = new ButtonType("Submit", ButtonBar.ButtonData.APPLY);
-        ButtonType cancelButtonType = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
-        updateInventoryDialog.getDialogPane().getButtonTypes().addAll(submitButtonType, cancelButtonType);
 
-        Button submitButton = (Button) updateInventoryDialog.getDialogPane().lookupButton(submitButtonType);
-        Button cancelButton = (Button) updateInventoryDialog.getDialogPane().lookupButton(cancelButtonType);
-
-        submitButton.addEventFilter(ActionEvent.ACTION, event -> handleUpdateItemInfo(event, newItemForm, newItemModel));
-
-        HBox buttonBox = new HBox(10.0, (Node) submitButton, (Node) cancelButton);
-        buttonBox.setAlignment(Pos.CENTER);
-        return buttonBox;
-    }
-
-    private HBox configDialogButtonStockHistory(Dialog<?> stockDialog) {
-        ButtonType closeButtonType = new ButtonType("Close", ButtonBar.ButtonData.CANCEL_CLOSE);
-        stockDialog.getDialogPane().getButtonTypes().add(closeButtonType);
-        Button closeButton = (Button) stockDialog.getDialogPane().lookupButton(closeButtonType);
-
-        HBox buttonContainer = new HBox(10.0, closeButton);
-        buttonContainer.setAlignment(Pos.CENTER);
-        return buttonContainer;
+    private void configDialogButtonUpdateInventory(Dialog<?> stockDialog, Form form ,Item item, IntegerProperty currentQuantity, SingleSelectionField<String> stockLocationField, IntegerProperty inOutQuantity, StringProperty comment, TableView<Inventory> stockHistoryTable) {
+        ButtonType applyButtonType = new ButtonType("Apply", ButtonBar.ButtonData.APPLY);
+        stockDialog.getDialogPane().getButtonTypes().addAll(applyButtonType, ButtonType.CLOSE);
+        Button applyButton = (Button) stockDialog.getDialogPane().lookupButton(applyButtonType);
+        applyButton.addEventFilter(ActionEvent.ACTION, event -> {
+            if(!form.isValid()){
+                showAlert("Error", "Invalid Data", "Please check your input data.");
+                event.consume();
+                return;
+            }
+            form.persist();
+            Inventory inventory = Inventory.builder()
+                    .item(item.getId().getValue())
+                    .user(1)
+                    .timestamp(LocalDate.now())
+                    .location(stockLocationField.getSelection())
+                    .inventory(inOutQuantity.get())
+                    .afterInventory(currentQuantity.get() + inOutQuantity.get())
+                    .comment(comment.get())
+                    .build();
+            ItemStore.inventories.get(item.getId()).add(inventory);
+            stockHistoryTable.getItems().add(inventory);
+            
+            ItemQuantity itemQuantity = item.getQuantityPerLocation().stream()
+                    .filter(quantity -> quantity.getLocationName().equals(stockLocationField.getSelection()))
+                    .findFirst()
+                    .orElse(new ItemQuantity(0,"",0));
+            itemQuantity.getQuantity().set(itemQuantity.getQuantity().getValue() + inOutQuantity.get());
+            item.getQuantityPerLocation().removeIf(quantity -> quantity.getLocationName().equals(stockLocationField.getSelection()));
+            item.getQuantityPerLocation().add(itemQuantity);
+            currentQuantity.set(itemQuantity.getQuantity().getValue());
+            event.consume();
+        });
     }
 
     // Xử lý sự kiện bấm nút Ok
@@ -420,6 +415,17 @@ public class ItemManager {
             form.persist();
             ItemStore.items.add(model.mapToItem());
             ItemStore.visibleItems.add(model.mapToItem());
+        }
+    }
+
+    // Xử lí sự kiện khi người dùng bấm nút submit trong update inventory  form
+    private void handleUpdateInventory(ActionEvent event, Form form, BindingUpdateInventory model) {
+        if (!form.isValid()) {
+            showAlert("Error", "Invalid Data", "Please check your input data.");
+            event.consume();
+        } else {
+            form.persist();
+
         }
     }
 

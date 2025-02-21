@@ -47,9 +47,9 @@ public class BindingUpdateInventory {
 //    }
 
     public void mapFromItem(Item item){
-        barcode.set(item.getBarcode());
-        itemName.set(item.getItemName());
-        category.set(item.getCategory());
+        barcode.set(item.getBarcode().getValue());
+        itemName.set(item.getItemName().getValue());
+        category.set(item.getCategory().getValue());
         stockLocation.clear();
         stockLocation.addAll(item.getQuantityPerLocation().stream()
                 .map(ItemQuantity::getLocationName)
