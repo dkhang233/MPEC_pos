@@ -27,34 +27,7 @@ public class BindingUpdateInventory {
     }
 
 
-//    public Inventory mapToUpdateInventory(Item item){
-//        ItemQuantity itemQuantity = item.getQuantityPerLocation().stream()
-//                .filter(quantity -> quantity.getLocationName().equals(selectedStockLocation.get()))
-//                .findFirst()
-//                .orElse(new ItemQuantity(0, "", 0));
-//        itemQuantity.setQuantity(itemQuantity.getQuantity() + inventoryToAddOrSubtract.get());
-//        item.getQuantityPerLocation().removeIf(quantity -> quantity.getLocationName().equals(selectedStockLocation.get()));
-//        item.getQuantityPerLocation().add(itemQuantity);
-//        return Inventory.builder()
-//                .location(
-//                        locations.stream()
-//                                .filter(location -> location.getName().equals(selectedStockLocation.get()))
-//                                .findFirst()
-//                                .orElse(new Location(0, "", false)))
-//                .inventory(inventoryToAddOrSubtract.get())
-//                .comment(comment.get())
-//                .build();
-//    }
 
-    public void mapFromItem(Item item){
-        barcode.set(item.getBarcode().getValue());
-        itemName.set(item.getItemName().getValue());
-        category.set(item.getCategory().getValue());
-        stockLocation.clear();
-        stockLocation.addAll(item.getQuantityPerLocation().stream()
-                .map(ItemQuantity::getLocationName)
-                .toList());
-        selectedStockLocation.set(stockLocation.get(0));
-        currentQuantity.set(item.getQuantityAtCurrentLocation().getQuantity());
-    }
+
+ 
 }

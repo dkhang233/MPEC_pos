@@ -18,67 +18,11 @@
 <AnchorPane prefHeight="621.0" prefWidth="1657.0" style="-fx-background-color: #f8c471;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.pos.app.controller.ItemsController">
    <children>
       <TableView fx:id="tableView" layoutX="110.4" layoutY="121.0" prefHeight="400.0" AnchorPane.leftAnchor="110.0" AnchorPane.rightAnchor="92.0">
-        <columns>
-            <TableColumn prefWidth="48.799983978271484" resizable="false" styleClass="col" text="ID">
-                <cellValueFactory>
-                    <PropertyValueFactory property="id" />
-                </cellValueFactory>
-            </TableColumn>
-            <TableColumn prefWidth="124.800048828125" resizable="false" styleClass="col" text="Barcode">
-                <cellValueFactory>
-                    <PropertyValueFactory property="barcode" />
-                </cellValueFactory>
-            </TableColumn>
-            <TableColumn fx:id="nameCol" editable="false" prefWidth="100.80000305175781" resizable="false" styleClass="col" text="Name">
-                <cellValueFactory>
-                    <PropertyValueFactory property="itemName" />
-                </cellValueFactory>
-            </TableColumn>
-            <TableColumn fx:id="categoryCol" editable="false" prefWidth="88.0" resizable="false" styleClass="col" text="Category">
-                <cellValueFactory>
-                    <PropertyValueFactory property="category" />
-                </cellValueFactory>
-            </TableColumn>
-            <TableColumn fx:id="companyCol" minWidth="0.0" prefWidth="92.79998779296875" resizable="false" styleClass="col" text="Company">
-                <cellValueFactory>
-                    <PropertyValueFactory property="supplier" />
-                </cellValueFactory>
-            </TableColumn>
-            <TableColumn fx:id="wholeSalePriceCol" prefWidth="125.60003662109375" resizable="false" styleClass="col" text="Wholesale price">
-                <cellValueFactory>
-                    <PropertyValueFactory property="wholesalePrice" />
-                </cellValueFactory>
-            </TableColumn>
-            <TableColumn minWidth="0.0" prefWidth="109.60003662109375" resizable="false" styleClass="col" text="Retail price">
-                <cellValueFactory>
-                    <PropertyValueFactory property="retailPrice" />
-                </cellValueFactory>
-            </TableColumn>
-            <TableColumn fx:id="quantityCol" minWidth="0.0" prefWidth="91.2000732421875" resizable="false" styleClass="col" text="Quantity">
-
-            </TableColumn>
-            <TableColumn prefWidth="95.20001220703125" resizable="false" styleClass="col" text="Tax percent">
-                <cellValueFactory>
-                    <PropertyValueFactory property="tax1" />
-                </cellValueFactory>
-            </TableColumn>
-            <TableColumn fx:id="avatarCol" prefWidth="119.99993896484375" resizable="false" styleClass="col" text="Avatar">
-                <cellValueFactory>
-                    <PropertyValueFactory property="avatar" />
-                </cellValueFactory>
-            </TableColumn>
-            <TableColumn fx:id="updateInventoryCol" prefWidth="62.39990234375" resizable="false" styleClass="col">
-            </TableColumn>
-            <TableColumn fx:id="stockHistoryCol" minWidth="0.0" prefWidth="60.0" resizable="false" styleClass="col">
-            </TableColumn>
-            <TableColumn fx:id="updateItemCol" minWidth="0.0" prefWidth="60.0" resizable="false" styleClass="col">
-            </TableColumn>
-        </columns>
       </TableView>
       <Pane layoutX="110.0" layoutY="68.0" AnchorPane.leftAnchor="110.0">
          <children>
             <DatePicker layoutX="209.99999237060547" />
-            <ChoiceBox layoutX="418.99999237060547" prefWidth="150.0" />
+            <ChoiceBox fx:id="locationChoices" layoutX="418.99999237060547" prefWidth="150.0" />
             <TextField layoutY="1.0" prefHeight="26.0" prefWidth="175.0" promptText="Search" />
          </children>
       </Pane>

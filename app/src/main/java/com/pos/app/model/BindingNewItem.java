@@ -10,10 +10,12 @@ import lombok.NoArgsConstructor;
 import java.lang.reflect.Array;
 import java.util.*;
 
+
+// BindingNewItem là một class dùng để binding dữ liệu giữa các trường trong form và Item
 @Data
 @NoArgsConstructor
 public class BindingNewItem {
-    private final IntegerProperty id = new SimpleIntegerProperty();
+    private final IntegerProperty id = new SimpleIntegerProperty(0);
     private final StringProperty itemName = new SimpleStringProperty("");
     private final StringProperty barcode = new SimpleStringProperty("");
     private final StringProperty category = new SimpleStringProperty("");
@@ -39,6 +41,8 @@ public class BindingNewItem {
     private final BooleanProperty hasSerialNumber = new SimpleBooleanProperty(false);
     private final BooleanProperty deleted = new SimpleBooleanProperty(false);
 
+
+    // Chuyển từ BindingNewItem sang Item
     public Item mapToItem(){
         Item item = new Item();
         item.getId().set(id.getValue());
@@ -65,29 +69,5 @@ public class BindingNewItem {
         item.getHasSerialNumber().set(hasSerialNumber.getValue());
         item.getDeleted().set(deleted.getValue());
         return item;
-    }
-
-    public void clear(){
-        id.set(0);
-        itemName.set("");
-        barcode.set("");
-        category.set("");
-        supplier.set("");
-        wholesalePrice.set(0.0);
-        selectedItemType.set("Standard");
-        selectedStockType.set("Stock");
-        retailPrice.set(0.0);
-        tax1Name.set("");
-        tax1.set(0.0);
-        tax2Name.set("");
-        tax2.set(0.0);
-        hsnCode.set("");
-        receivingQuantity.set(0);
-        reorderLevel.set(0);
-        description.set("");
-        avatar.set("");
-        allowAlternateDescription.set(false);
-        hasSerialNumber.set(false);
-        deleted.set(false);
     }
 }

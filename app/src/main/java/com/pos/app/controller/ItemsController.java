@@ -34,24 +34,6 @@ public class ItemsController {
 
     @FXML
     private TableView<Item> tableView;
-    
-    @FXML
-    private TableColumn<Item, DoubleProperty> wholeSalePriceCol;
-
-    @FXML
-    private TableColumn<Item, IntegerProperty> quantityCol;
-
-    @FXML
-    private TableColumn<Item, StringProperty> avatarCol;
-
-    @FXML
-    private TableColumn<Item, String> updateInventoryCol;
-
-    @FXML
-    private TableColumn<Item, String> stockHistoryCol;
-
-    @FXML
-    private TableColumn<Item, String> updateItemCol;
 
     @FXML
     private Button deleteItemBtn;
@@ -73,9 +55,13 @@ public class ItemsController {
     @FXML
     private Button newItem;
 
+    @FXML
+    private ChoiceBox<String> locationChoices;
+
     // Hàm khởi tạo, chạy khi view được load
     @FXML
     public void initialize() {
+        setupLocationChoices(); // Khởi tạo danh sách các cửa hàng
         setupItemsTable(); // Khởi tạo bảng items
         setupItemsPagination(); // Khởi tạo phân trang
     }
@@ -91,15 +77,39 @@ public class ItemsController {
         // Xử lý sự kiện khi người dùng ấn nút "New Item"
         newItem.setOnAction(event -> itemManager.createItem());
 
+        TableColumn<Item, Number> idCol = new TableColumn<>("ID");
+        TableColumn<Item, String> barcodeCol = new TableColumn<>("Barcode");
+        TableColumn<Item, String> itemNameCol = new TableColumn<>("Item Name");
+        TableColumn<Item, String> categoryCol = new TableColumn<>("Category");
+        TableColumn<Item, String> supplierCol = new TableColumn<>("Supplier");
+        TableColumn<Item, Number> wholeSalePriceCol = new TableColumn<>("Wholesale Price");
+        TableColumn<Item, Number> retailPriceCol = new TableColumn<>("Retail Price");
+        TableColumn<Item, Number> quantityAtCurrentLocationCol = new TableColumn<>("Quantity");
+        TableColumn<Item, String> avatarCol = new TableColumn<>("Avatar");
+        TableColumn<Item, String> updateInventoryCol = new TableColumn<>("");
+        TableColumn<Item, String> stockHistoryCol = new TableColumn<>("");
+        TableColumn<Item, String> updateItemCol = new TableColumn<>("");
+
+
+        idCol.setCellValueFactory(cellData -> cellData.getValue().getId());
+        barcodeCol.setCellValueFactory(cellData -> cellData.getValue().getBarcode());
+        itemNameCol.setCellValueFactory(cellData -> cellData.getValue().getItemName());
+        categoryCol.setCellValueFactory(cellData -> cellData.getValue().getCategory());
+        supplierCol.setCellValueFactory(cellData -> cellData.getValue().getSupplier());
+        wholeSalePriceCol.setCellValueFactory(cellData -> cellData.getValue().getWholesalePrice());
+        retailPriceCol.setCellValueFactory(cellData -> cellData.getValue().getRetailPrice());
+        quantityAtCurrentLocationCol.setCellValueFactory(cellData -> cellData.getValue().getQuantityAtCurrentLocation());
+        avatarCol.setCellValueFactory(cellData -> cellData.getValue().getAvatar());
+
         // Tùy chỉnh cột Wholesale Price để hiển thị giá tiền
         wholeSalePriceCol.setCellFactory(col -> new TableCell<>() {
             @Override
-            protected void updateItem(DoubleProperty price, boolean empty) {
+            protected void updateItem(Number price, boolean empty) {
                 super.updateItem(price, empty);
                 if (empty || price == null) {
                     setText(null);
                 } else {
-                    setText(FormatHelper.formatDecimalNumber(price.getValue()));
+                    setText(FormatHelper.formatDecimalNumber(price.doubleValue()));
                 }
             }
         });
@@ -108,13 +118,13 @@ public class ItemsController {
         avatarCol.setCellFactory(col -> new TableCell<>() {
             private final ImageView imageView = new ImageView();
             @Override
-            protected void updateItem(StringProperty avatar, boolean empty) {
+            protected void updateItem(String avatar, boolean empty) {
                 super.updateItem(avatar, empty);
                 if (empty || avatar == null) {
                     setGraphic(null);
                 } else {
                     try {
-                        imageView.setImage(new Image(avatar.getValue(), true));
+                        imageView.setImage(new Image(avatar, true));
                     } catch (Exception e) {
                         imageView.setImage(new Image(defaultAvatar));
                     }
@@ -179,7 +189,7 @@ public class ItemsController {
                 updateItemBtn.getStyleClass().addAll("btn-custom");
                 updateItemBtn.setOnAction(event -> {
                     Item item = getTableView().getItems().get(getIndex());
-                    System.out.println("Update item for id: " + item.getId());
+                    System.out.println("Update item for id: " + item.getId().getValue());
                     itemManager.updateItemInfo(item);
                 });
             }
@@ -193,17 +203,18 @@ public class ItemsController {
                     setGraphic(updateItemBtn);
             }
         });
-
-        
-        // Tùy chỉnh cột quantity để hiển thị số lượng item tại vị trí hiện tại
-        quantityCol.setCellValueFactory(cellData -> cellData.getValue().getQuantityPerLocation().stream().filter(itemQuantity -> itemQuantity.getLocationName().equals(ItemStore.currentLocation.getName())).findFirst().orElse(new ItemQuantity(0,"",0)).getQuantity().getValue());
+        tableView.getColumns().addAll(idCol, barcodeCol, itemNameCol, categoryCol, supplierCol, wholeSalePriceCol, retailPriceCol, quantityAtCurrentLocationCol, avatarCol, updateInventoryCol, stockHistoryCol, updateItemCol);
 
 
         this.deleteItemBtn.disableProperty().bind(this.tableView.getSelectionModel().selectedItemProperty().isNull()); // Disable button xóa khi không có dòng nào được chọn
         setupColVisible(); // Khởi tạo các checkbox để chọn cột hiển thị
         tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE); // Cho phép chọn nhiều dòng
         int cols = tableView.getColumns().size(); // Số cột của bảng
-        tableView.getColumns().forEach(col -> col.prefWidthProperty().bind(tableView.widthProperty().divide(cols).subtract(0.65))); // Tự động thay đổi kích thước cột khi thay đổi kích thước bảng
+        tableView.getColumns().forEach((col) -> {
+            col.prefWidthProperty().bind(tableView.widthProperty().divide(cols).subtract(0.65));
+            col.getStyleClass().add("col");
+        });
+        tableView.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY); // Không cho phép thay đổi kích thước cột
         tableView.setItems(ItemStore.visibleItems);  // Thêm dữ liệu vào bảng
     }
 
@@ -222,7 +233,14 @@ public class ItemsController {
     }
 
 
-
+    private void setupLocationChoices(){
+        ItemStore.locations.forEach(location -> locationChoices.getItems().add(location.getName().getValue()));
+        locationChoices.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            ItemStore.visibleItems.setAll(ItemStore.itemsPerLocation.get(newValue));
+        });
+        locationChoices.getSelectionModel().selectFirst();
+        
+    }
 
 
     //--------------------------------Phần liên quan đến ẩn/hiện cột--------------------------------//
