@@ -32,7 +32,7 @@ public class BindingNewItem {
     private final StringProperty tax2Name = new SimpleStringProperty("");
     private final DoubleProperty tax2 = new SimpleDoubleProperty(0.0);
     private final StringProperty hsnCode = new SimpleStringProperty("");
-    private ListProperty<ItemQuantity> quantityPerLocation = new SimpleListProperty<>(FXCollections.observableArrayList());;
+//    private ListProperty<ItemQuantity> quantityPerLocation = new SimpleListProperty<>(FXCollections.observableArrayList());;
     private final IntegerProperty receivingQuantity = new SimpleIntegerProperty(0);
     private final IntegerProperty reorderLevel = new SimpleIntegerProperty(0);
     private final StringProperty description = new SimpleStringProperty("");
@@ -60,7 +60,6 @@ public class BindingNewItem {
         item.getTax2Name().set(tax2Name.getValue());
         item.getTax2().set(tax2.getValue());
         item.getHsnCode().set(hsnCode.getValue());
-        item.getQuantityPerLocation().setAll(quantityPerLocation);
         item.getReceivingQuantity().set(receivingQuantity.getValue());
         item.getReorderLevel().set(reorderLevel.getValue());
         item.getDescription().set(description.getValue());

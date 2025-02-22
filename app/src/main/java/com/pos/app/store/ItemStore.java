@@ -2,30 +2,30 @@ package com.pos.app.store;
 
 import com.pos.app.model.Inventory;
 import com.pos.app.model.Item;
-import com.pos.app.model.ItemQuantity;
 import com.pos.app.model.Location;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import lombok.Data;
 import net.datafaker.Faker;
 
-import java.lang.reflect.Array;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
 @Data
 public class ItemStore {
-    // Danh sách các item
+    // Danh sách các item theo vị trí
     public static final Map<String, List<Item>> itemsPerLocation = new HashMap<>();
     
     // Danh sách các item hiển thị trên bảng
-    public static final ObservableList<Item> visibleItems = FXCollections.observableArrayList();
+    public static final ObservableList<Item> visibleItems =  FXCollections.observableArrayList(new ArrayList<>());
 
+    // Danh sách các vị trí
     public static final List<Location> locations = new ArrayList<>();
 
+    // Vị trí hiện tại
     public static Location currentLocation;
 
+    // Danh sách inventory
     public static final HashMap<Integer, List<Inventory>> inventories = new HashMap<>();   // Lưu inventory cho mỗi item
 
 
@@ -38,17 +38,9 @@ public class ItemStore {
 
         // Thêm dữ liệu vào danh sách tên vị trí
         locations.addAll( new ArrayList<>( List.of( new Location(1,"Stock 1",false),
-                new Location(2,"Stock 2",false)
+                new Location(2,"Stock 2",false),
+                new Location(3,"Stock 3",false)
         )));
-
-        // Chọn vị trí hiện tại
-        currentLocation = new Location(0,"",false);
-        currentLocation.getName().addListener((observable, oldValue, newValue) -> {
-            visibleItems.forEach(item -> {
-               item.setQuantityAtCurrentLocation(item.getQuantityPerLocation().stream().filter(itemQuantity -> itemQuantity.getLocationName().getValue().equals(newValue)).findFirst().orElse(new ItemQuantity(0,"",0)).getQuantity().getValue());
-            });
-        });
-        currentLocation.getName().set(locations.get(0).getName().get());
 
         // Thêm dữ liệu vào danh sách item
         for (Location location : locations){
@@ -69,10 +61,7 @@ public class ItemStore {
                 item.getTax2Name().set(faker.lorem().word());
                 item.getTax2().set(faker.number().randomDouble(2, 0, 20));
                 item.getHsnCode().set(faker.number().digits(3));
-                List<ItemQuantity> quantityPerLocation = new ArrayList<>();
-                quantityPerLocation.add(new ItemQuantity(1, "Stock 1", faker.number().numberBetween(0, 100)));
-                quantityPerLocation.add(new ItemQuantity(2, "Stock 2", faker.number().numberBetween(0, 100)));
-                item.getQuantityPerLocation().setAll(quantityPerLocation);
+                item.getQuantityAtCurrentLocation().set(10);
                 item.getReceivingQuantity().set(10);
                 item.getReorderLevel().set(10);
                 item.getDescription().set(faker.lorem().sentence());
@@ -85,7 +74,20 @@ public class ItemStore {
             itemsPerLocation.put(location.getName().get(), items);
         }
 
-        visibleItems.addAll(itemsPerLocation.get(currentLocation.getName().get()));
+        locations.add(new Location(0,"Stock 4",true));
+
+        // Vị trí hiện tại
+        currentLocation = new Location(0,"",false);
+
+        // Nếu giá trị của vị trí hiện tại thay đổi thì cập nhật danh sách item tương ứng để hiển thị trên bảng
+        currentLocation.getName().addListener((observable, oldValue, newValue) -> {
+            visibleItems.clear();
+            if(itemsPerLocation.containsKey(newValue))
+                visibleItems.addAll(itemsPerLocation.get(newValue));
+        });
+
+        // Chọn vị trí hiện tại là vị trí đầu tiên
+        currentLocation.getName().set(locations.get(0).getName().get());
 
         // Thêm dữ liệu vào bảng inventory
         inventories.put(1,new ArrayList<>());

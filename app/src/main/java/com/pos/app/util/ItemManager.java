@@ -51,6 +51,9 @@ public class ItemManager {
 
         // Tạo danh sách lịch sử thay đổi số lượng item theo từng vị trí
         Map<String, List<Inventory>> inventoriesForThisItem = new HashMap<>();
+        if (!ItemStore.inventories.containsKey(item.getId().getValue())) {
+            ItemStore.inventories.put(item.getId().getValue(), new ArrayList<>());
+        }
         ItemStore.inventories.get(item.getId().getValue()).forEach( inventory -> {
             if(inventoriesForThisItem.containsKey(inventory.getLocation().getValue())){
                 inventoriesForThisItem.get(inventory.getLocation().getValue()).add(inventory);
@@ -108,16 +111,28 @@ public class ItemManager {
                 break;
             }
         }
+
+        // Tạo trường chọn vị trí
         SingleSelectionField<String> stockLocationField =  Field.ofSingleSelectionType(ItemStore.locations.stream().map(location -> location.getName().getValue()).toList(),selectedLocationIndex)
         .label("Location: ");
+
+        // Khi người dùng chọn vị trí khác thì cập nhật lại số lượng hiện tại và lịch sử thay đổi số lượng item
         stockLocationField.selectionProperty().addListener((observable, oldValue, newValue) -> {
-            stockHistoryTable.getItems().clear();
-            if (inventoriesForThisItem.containsKey(newValue))
-                stockHistoryTable.getItems().addAll(inventoriesForThisItem.get(newValue));
-            currentQuantity.set(item.getQuantityPerLocation().stream()
-                    .filter(quantity -> quantity.getLocationName().getValue().equals(newValue))
-                    .findFirst()
-                    .orElse(new ItemQuantity(0,"",0)).getQuantity().getValue());
+            stockHistoryTable.getItems().clear();  // Xoá dữ liệu cũ
+            if (!inventoriesForThisItem.containsKey(newValue)) { // Nếu không có lịch sử -> tạo mới
+                inventoriesForThisItem.put(newValue, new ArrayList<>());
+            }
+            stockHistoryTable.getItems().addAll(inventoriesForThisItem.get(newValue));
+
+            // Nếu có item tại vị trí này -> hiển thị số lượng hiện tại, nếu không thì hiển thị 0
+            if (ItemStore.itemsPerLocation.containsKey(newValue)) { // Để cho chăc chắn, kiểm tra xem đã khởi tạo danh sách item tại vị trí này chưa, nếu rồi thì thao tác tiếp
+                Optional<Item> quantity = ItemStore.itemsPerLocation.get(newValue).stream().filter(i -> i.getId().getValue().equals(item.getId().getValue())).findFirst();
+                if (quantity.isPresent()) {
+                    currentQuantity.set(quantity.get().getQuantityAtCurrentLocation().getValue());
+                    return;
+                }
+            }
+            currentQuantity.set(0);
         });
 
 
@@ -166,7 +181,7 @@ public class ItemManager {
             e.printStackTrace();
         }
 
-        configDialogButtonUpdateInventory(stockDialog, stockHistoryForm ,item, currentQuantity ,stockLocationField, inOutQuantity, comment, stockHistoryTable);
+        configDialogButtonUpdateInventory(stockDialog, stockHistoryForm ,item, currentQuantity ,stockLocationField, inOutQuantity, comment, inventoriesForThisItem, stockHistoryTable);
 
         body.getChildren().add(formRenderer);
         body.getChildren().add(stockHistoryTable);
@@ -373,28 +388,52 @@ public class ItemManager {
     }
 
 
-    private void configDialogButtonUpdateInventory(Dialog<?> stockDialog, Form form ,Item item, IntegerProperty currentQuantity, SingleSelectionField<String> stockLocationField, IntegerProperty inOutQuantity, StringProperty comment, TableView<Inventory> stockHistoryTable) {
+    private void configDialogButtonUpdateInventory(Dialog<?> stockDialog, Form form ,Item item, IntegerProperty currentQuantity, SingleSelectionField<String> stockLocationField, IntegerProperty inOutQuantity, StringProperty comment, Map<String, List<Inventory>> inventoriesForThisItem, TableView<Inventory> stockHistoryTable) {
         ButtonType applyButtonType = new ButtonType("Apply", ButtonBar.ButtonData.APPLY);
         stockDialog.getDialogPane().getButtonTypes().addAll(applyButtonType, ButtonType.CLOSE);
         Button applyButton = (Button) stockDialog.getDialogPane().lookupButton(applyButtonType);
+
+
+        // Xử lý khi người dùng bấm nút Apply
         applyButton.addEventFilter(ActionEvent.ACTION, event -> {
+            // Kiểm tra dữ liệu nhập vào có hợp lệ không, nếu không hiển thị thông báo lỗi
             if(!form.isValid()){
                 showAlert("Error", "Invalid Data", "Please check your input data.");
                 event.consume();
                 return;
             }
+            // Nếu dữ liệu hợp lệ
             form.persist();
             currentQuantity.set(currentQuantity.get() + inOutQuantity.get());
+
+            // Tạo inventory mới ->  thêm vào danh sách inventory trong ItemStore và bảng lịch sử
             Inventory inventory = new Inventory(1,item.getId().getValue(),"abc", LocalDateTime.now(), stockLocationField.getSelection(),inOutQuantity.get(), currentQuantity.get(),comment.get());
             ItemStore.inventories.get(item.getId().getValue()).add(inventory);
+            if(!inventoriesForThisItem.containsKey(stockLocationField.getSelection())){
+                inventoriesForThisItem.put(stockLocationField.getSelection(), new ArrayList<>());
+            }
+            inventoriesForThisItem.get(stockLocationField.getSelection()).add(inventory);
             stockHistoryTable.getItems().add(inventory);
-            
-            ItemQuantity itemQuantity = ItemStore.itemsPerLocation.get(stockLocationField.getSelection()).stream();
-            itemQuantity.getQuantity().set(currentQuantity.get());
-            item.getQuantityPerLocation().removeIf(quantity -> quantity.getLocationName().getValue().equals(stockLocationField.getSelection()));
-            item.getQuantityPerLocation().add(itemQuantity);
-            if(stockLocationField.getSelection().equals(ItemStore.currentLocation.getName().getValue()))
-                item.getQuantityAtCurrentLocation().set(currentQuantity.get());
+
+            // Kiểm tra xem item đã tồn tại tại vị trí này chưa, nếu chưa thì thêm vào danh sách item tại vị trí này, nếu có rồi thì cập nhật số lượng
+            if(ItemStore.itemsPerLocation.containsKey(stockLocationField.getSelection())) { // Để cho chắc chắn, kiểm tra xem đã khởi tạo danh sách item tại vị trí này chưa, nếu rồi thì không cần thêm mới
+                Optional<Item> quantity = ItemStore.itemsPerLocation.get(stockLocationField.getSelection()).stream().filter(i -> i.getId().getValue().equals(item.getId().getValue())).findFirst();
+                if (quantity.isPresent()) {
+                    quantity.get().getQuantityAtCurrentLocation().set(currentQuantity.get());
+                } else {
+                    Item newItem = new Item();
+                    newItem.copyFromOtherItem(item);
+                    newItem.getQuantityAtCurrentLocation().set(currentQuantity.get());
+                    ItemStore.itemsPerLocation.get(stockLocationField.getSelection()).add(newItem);
+                }
+            }else { // Nếu chưa khởi tạo danh sách item tại vị trí này thì thêm mới
+                Item newItem = new Item();
+                newItem.copyFromOtherItem(item);
+                newItem.getQuantityAtCurrentLocation().set(currentQuantity.get());
+                List<Item> items = new ArrayList<>();
+                items.add(newItem);
+                ItemStore.itemsPerLocation.put(stockLocationField.getSelection(), items);
+            }
             event.consume();
         });
     }

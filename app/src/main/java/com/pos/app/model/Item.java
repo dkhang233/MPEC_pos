@@ -1,8 +1,6 @@
 package com.pos.app.model;
 
-import com.pos.app.store.ItemStore;
 import javafx.beans.property.*;
-import javafx.collections.FXCollections;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

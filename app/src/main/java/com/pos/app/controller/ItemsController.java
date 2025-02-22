@@ -233,11 +233,15 @@ public class ItemsController {
     }
 
 
+    // Khởi tạo danh sách các vị trí
     private void setupLocationChoices(){
+        // Thêm các vi trí vào danh sách
         ItemStore.locations.forEach(location -> locationChoices.getItems().add(location.getName().getValue()));
+        // Khi người dùng chọn một vị trí thì cập nhật vị trí hiện tại = vị trí được chọn
         locationChoices.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            ItemStore.visibleItems.setAll(ItemStore.itemsPerLocation.get(newValue));
+            ItemStore.currentLocation.getName().set(newValue);
         });
+        // Khởi tạo
         locationChoices.getSelectionModel().selectFirst();
         
     }
