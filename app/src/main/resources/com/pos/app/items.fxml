@@ -4,26 +4,22 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ChoiceBox?>
-<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Pagination?>
 <?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.cell.PropertyValueFactory?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane prefHeight="621.0" prefWidth="1657.0" style="-fx-background-color: #f8c471;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.pos.app.controller.ItemsController">
+<AnchorPane prefHeight="649.0" prefWidth="1657.0" style="-fx-background-color: #f8c471;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.pos.app.controller.ItemsController">
    <children>
       <TableView fx:id="tableView" layoutX="110.4" layoutY="121.0" prefHeight="400.0" AnchorPane.leftAnchor="110.0" AnchorPane.rightAnchor="92.0">
       </TableView>
       <Pane layoutX="110.0" layoutY="68.0" AnchorPane.leftAnchor="110.0">
          <children>
-            <DatePicker layoutX="209.99999237060547" />
-            <ChoiceBox fx:id="locationChoices" layoutX="418.99999237060547" prefWidth="150.0" />
-            <TextField layoutY="1.0" prefHeight="26.0" prefWidth="175.0" promptText="Search" />
+            <ChoiceBox fx:id="locationChoices" layoutX="285.0" layoutY="1.0" prefHeight="25.0" prefWidth="85.0" />
+            <TextField layoutY="1.0" prefHeight="27.0" prefWidth="234.0" promptText="Search" />
          </children>
       </Pane>
       <Pane layoutX="1317.0" layoutY="32.0" prefWidth="247.0" AnchorPane.rightAnchor="92.79999999999995">
@@ -34,18 +30,18 @@
                   <String fx:value="btn" />
                </styleClass></Button>
             <Button layoutX="98.0" layoutY="43.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="67.0" styleClass="btn" text="Bulk edit" />
-            <Button fx:id="newItem" layoutY="45.0" mnemonicParsing="false" text="New item" >
+            <Button fx:id="newItem" layoutY="45.0" mnemonicParsing="false" text="New item">
                <styleClass>
                   <String fx:value="btn" />
                   <String fx:value="btn-primary" />
                </styleClass></Button>
-            <Button fx:id="importItemBtn" layoutX="94.0" layoutY="-2.0"  mnemonicParsing="false" prefHeight="27.0" prefWidth="67.0" styleClass="btn" text="Import"   />
+            <Button fx:id="importItemBtn" layoutX="94.0" layoutY="-2.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="67.0" styleClass="btn" text="Import" />
             <Button layoutX="183.0" layoutY="-2.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="67.0" styleClass="btn" text="Export" />
          </children>
       </Pane>
-      <Pagination fx:id="itemsPagination" layoutX="653.0" layoutY="533.0" prefHeight="51.0" prefWidth="175.0" styleClass="pagination" AnchorPane.leftAnchor="650.0" AnchorPane.rightAnchor="650.0" />
-      <Button layoutX="715.0" layoutY="69.0" mnemonicParsing="false" onAction="#showColVisible" text="Show / Hide " />
-      <ScrollPane fx:id="columnsVisibleContainer" layoutX="748.0" layoutY="98.0" prefHeight="191.0" prefWidth="158.0">
+      <Pagination fx:id="itemsPagination" layoutX="714.0" layoutY="583.0" prefHeight="51.0" prefWidth="247.0" styleClass="pagination" AnchorPane.bottomAnchor="12.0" AnchorPane.leftAnchor="714.0" AnchorPane.rightAnchor="695.5999999999999" />
+      <Button layoutX="523.0" layoutY="69.0" mnemonicParsing="false" onAction="#showColVisible" text="Show / Hide " />
+      <ScrollPane fx:id="columnsVisibleContainer" layoutX="555.0" layoutY="96.0" prefHeight="191.0" prefWidth="158.0">
          <content>
             <VBox fx:id="columnsVisible" prefHeight="170.0" prefWidth="120.0" />
          </content>

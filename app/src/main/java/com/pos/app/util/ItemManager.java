@@ -12,6 +12,7 @@ import com.pos.app.component.ImageUpload;
 import com.pos.app.store.ItemStore;
 import javafx.beans.property.*;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -194,14 +195,33 @@ public class ItemManager {
 
 
     // Xử lý khi người dùng muốn xem lịch sử thay đổi số lượng item
-    @FXML
-    public void stockHistory(Item item){
-
-    }
+//    @FXML
+//    public void stockHistory(Item item){
+//
+//    }
 
     // Khởi tạo các thành phần cần thiết để tạo mới hoặc cập nhật item
     private void initItemForm(int type, Item item) {
-        BindingNewItem newItemModel =  item.mapToBindingNewItem();   // Khởi tạo model
+        final BindingNewItem newItemModel =  item.mapToBindingNewItem();   // Khởi tạo model
+
+        // Kiểm tra item là mới hay đã có dựa trên tên item
+        if (item.getItemName().getValue().isBlank()){
+            // Nếu item mới thì số lượng tại mỗi vị trí sẽ là 0
+            ItemStore.locations.forEach(location -> newItemModel.getQuantityPerLocation().put(location.getName().getValue(), new SimpleIntegerProperty(0)));
+        } else {
+            // Nếu item đã có thì lấy số lượng tại mỗi vị trí từ danh sách item tại vị trí đó
+            ItemStore.locations.forEach(location ->{
+                if (!ItemStore.itemsPerLocation.containsKey(location.getName().getValue())) {
+                    ItemStore.itemsPerLocation.put(location.getName().getValue(), new ArrayList<>());
+                }
+                Optional<Item> quantity = ItemStore.itemsPerLocation.get(location.getName().getValue()).stream().filter(i -> i.getId().getValue().equals(item.getId().getValue())).findFirst();
+                if (quantity.isPresent()) {
+                    newItemModel.getQuantityPerLocation().put(location.getName().getValue(), new SimpleIntegerProperty(quantity.get().getQuantityAtCurrentLocation().getValue()));
+                } else {
+                    newItemModel.getQuantityPerLocation().put(location.getName().getValue(), new SimpleIntegerProperty(0));
+                }
+            });
+        }
         Form newItemForm = createItemForm(newItemModel);      // Tạo form
 
         // Tạo renderer cho form
@@ -243,6 +263,12 @@ public class ItemManager {
 
     // Tạo form để thêm mới và cập nhật item
     private Form createItemForm(BindingNewItem newItemModel) {
+        final List<IntegerField> quantityFields = new ArrayList<>();
+        newItemModel.getQuantityPerLocation().forEach((location, quantity) -> {
+            IntegerField quantityField = Field.ofIntegerType(quantity)
+                    .label(location);
+            quantityFields.add(quantityField);
+        });
         return Form.of(
                 Group.of(
                         Field.ofStringType(newItemModel.getBarcode())
@@ -290,13 +316,12 @@ public class ItemManager {
                                 .render(new CurrencyInput(2, "%")),
                         Field.ofDoubleType(newItemModel.getTax2())
                                 .label("")
-                                .render(new CurrencyInput(2, "%")),
+                                .render(new CurrencyInput(2, "%"))
+                ),
 
-                        Field.ofIntegerType(1)
-                                .label("Quantity Stock")
-                                .required("Quantity Stock is required"),
+                Group.of(quantityFields.toArray(new IntegerField[0])),
 
-                        Field.ofIntegerType(newItemModel.getReceivingQuantity())
+                Group.of(Field.ofIntegerType(newItemModel.getReceivingQuantity())
                                 .label("Receiving Quantity")
                                 .required("Receiving Quantity is required"),
 
@@ -315,6 +340,7 @@ public class ItemManager {
                         Field.ofBooleanType(newItemModel.getDeleted())
                                 .label("Deleted")
                 )
+
         );
     }
     
@@ -331,24 +357,10 @@ public class ItemManager {
 
         // Thêm sự kiện nút bấm
         okButton.addEventFilter(ActionEvent.ACTION, (event) -> {
-            if (!form.isValid()) {
-                showAlert("Error", "Invalid Data", "Please check your input data.");
-                event.consume();
-            } else {
-                form.persist();
-                ItemStore.itemsPerLocation.get(ItemStore.currentLocation.getName().getValue()).add(model.mapToItem());
-                ItemStore.visibleItems.setAll(ItemStore.itemsPerLocation.get(ItemStore.currentLocation.getName().getValue()));
-            }
+            saveNewItem(event, form, model, true);
         });
         newButton.addEventFilter(ActionEvent.ACTION, (event) -> {
-            if (!form.isValid()) {
-                showAlert("Error", "Invalid Data", "Please check your input data.");
-            } else {
-                form.persist();
-                ItemStore.itemsPerLocation.get(ItemStore.currentLocation.getName().getValue()).add(model.mapToItem());
-                ItemStore.visibleItems.setAll(ItemStore.itemsPerLocation.get(ItemStore.currentLocation.getName().getValue()));
-            }
-            event.consume();
+            saveNewItem(event, form, model, false);
         });
 
         // Tạo HBox chứa các nút
@@ -357,7 +369,32 @@ public class ItemManager {
         return buttonBox;
     }
 
+    private void saveNewItem(Event event, Form form, BindingNewItem model, Boolean closeForm) {
+        if (!form.isValid()) {
+            showAlert("Error", "Invalid Data", "Please check your input data.");
+            event.consume();
+        }else {
+            form.persist();
 
+            // Trong BindingNewItem, số lượng item tại mỗi vị trí được lưu trong một map, nên cần duyệt qua từng cặp key-value để lưu item tại mỗi vị trí
+            model.getQuantityPerLocation().forEach((location, quantity) -> {
+                ItemStore.itemsPerLocation.computeIfAbsent(location, k -> new ArrayList<>());  // Nếu chưa có danh sách item tại vị trí này thì tạo mới
+                Item newItem = model.mapToItem();  // Chuyển từ BindingNewItem sang Item
+                newItem.setQuantityAtCurrentLocation(quantity.getValue()); // Set quantity cho item
+                ItemStore.itemsPerLocation.get(location).add(newItem); // Thêm item mới vào danh sách item tại vị trí này
+                if (ItemStore.currentLocation.getName().getValue().equals(location)) {
+                    ItemStore.visibleItems.add(newItem); // Nếu vị trí này đang được hiển thị trên bảng thì cần thêm vào visibleItems để item mới được hiển thị
+                }
+            });
+        }
+        // Nếu closeForm = true thì đóng form, ngược lại thì không đóng
+        if (!closeForm) {
+            event.consume();
+        }
+    }
+
+
+    // Cấu hình nút bấm cho việc cập nhật thông tin item
     private HBox configDialogButtonUpdateItemInfo(Dialog<?> dialog,Form form, BindingNewItem model) {
         ButtonType submitButtonType = new ButtonType("Submit", ButtonBar.ButtonData.APPLY);
         ButtonType cancelButtonType = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
@@ -372,13 +409,18 @@ public class ItemManager {
                 event.consume();
             } else {
                 form.persist();
-                Item item = model.mapToItem();
-                ItemStore.itemsPerLocation.get(ItemStore.currentLocation.getName().getValue()).forEach((i) -> {
-                    if (i.getId().getValue().equals(item.getId().getValue())) {
-                        i.copyFromOtherItem(item);
+                Item item = model.mapToItem();   // Chuyển từ BindingNewItem sang Item
+                // Trong BindingNewItem, số lượng item tại mỗi vị trí được lưu trong một map, nên cần duyệt qua từng cặp key-value để lưu item tại mỗi vị trí
+                model.getQuantityPerLocation().forEach((location, quantity) -> {
+                    ItemStore.itemsPerLocation.computeIfAbsent(location, k -> new ArrayList<>());   // Nếu chưa có danh sách item tại vị trí này thì tạo mới
+                    Optional<Item> itemOptional = ItemStore.itemsPerLocation.get(location).stream().filter(i -> i.getId().getValue().equals(item.getId().getValue())).findFirst();  // Kiểm tra xem item đã tồn tại tại vị trí này chưa
+                    item.setQuantityAtCurrentLocation(quantity.getValue()); // Set quantity cho item
+                    if (itemOptional.isPresent()) {
+                        itemOptional.get().copyFromOtherItem(item); // Nếu đã tồn tại thì cập nhật thông tin
+                    }else {
+                        ItemStore.itemsPerLocation.get(location).add(item); // Nếu chưa tồn tại thì thêm mới
                     }
                 });
-                ItemStore.visibleItems.setAll(ItemStore.itemsPerLocation.get(ItemStore.currentLocation.getName().getValue()));
             }
         });
 
@@ -409,9 +451,7 @@ public class ItemManager {
             // Tạo inventory mới ->  thêm vào danh sách inventory trong ItemStore và bảng lịch sử
             Inventory inventory = new Inventory(1,item.getId().getValue(),"abc", LocalDateTime.now(), stockLocationField.getSelection(),inOutQuantity.get(), currentQuantity.get(),comment.get());
             ItemStore.inventories.get(item.getId().getValue()).add(inventory);
-            if(!inventoriesForThisItem.containsKey(stockLocationField.getSelection())){
-                inventoriesForThisItem.put(stockLocationField.getSelection(), new ArrayList<>());
-            }
+            inventoriesForThisItem.computeIfAbsent(stockLocationField.getSelection(), k -> new ArrayList<>());
             inventoriesForThisItem.get(stockLocationField.getSelection()).add(inventory);
             stockHistoryTable.getItems().add(inventory);
 
@@ -437,7 +477,6 @@ public class ItemManager {
             event.consume();
         });
     }
-
 
     // Hiển thị thông báo lỗi
     private void showAlert(String title, String header, String content) {

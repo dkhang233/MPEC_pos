@@ -32,7 +32,7 @@ public class BindingNewItem {
     private final StringProperty tax2Name = new SimpleStringProperty("");
     private final DoubleProperty tax2 = new SimpleDoubleProperty(0.0);
     private final StringProperty hsnCode = new SimpleStringProperty("");
-//    private ListProperty<ItemQuantity> quantityPerLocation = new SimpleListProperty<>(FXCollections.observableArrayList());;
+    private MapProperty<String, IntegerProperty> quantityPerLocation = new SimpleMapProperty<>(FXCollections.observableMap(new LinkedHashMap<>()));
     private final IntegerProperty receivingQuantity = new SimpleIntegerProperty(0);
     private final IntegerProperty reorderLevel = new SimpleIntegerProperty(0);
     private final StringProperty description = new SimpleStringProperty("");

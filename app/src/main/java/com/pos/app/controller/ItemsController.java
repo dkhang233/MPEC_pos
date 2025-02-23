@@ -1,17 +1,13 @@
 package com.pos.app.controller;
 
-import com.dlsc.formsfx.model.structure.*;
-import com.dlsc.formsfx.model.validators.*;
-import com.dlsc.formsfx.view.renderer.FormRenderer;
-
 import com.pos.app.model.*;
 import com.pos.app.store.ItemStore;
 import com.pos.app.util.FormatHelper;
 import com.pos.app.util.ItemManager;
 
-import javafx.beans.property.*;
+
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.effect.DropShadow;
@@ -50,8 +46,6 @@ public class ItemsController {
     @FXML
     private ScrollPane  columnsVisibleContainer;
 
-    private Dialog<Inventory> dialogInventory;
-    
     @FXML
     private Button newItem;
 
@@ -87,7 +81,7 @@ public class ItemsController {
         TableColumn<Item, Number> quantityAtCurrentLocationCol = new TableColumn<>("Quantity");
         TableColumn<Item, String> avatarCol = new TableColumn<>("Avatar");
         TableColumn<Item, String> updateInventoryCol = new TableColumn<>("");
-        TableColumn<Item, String> stockHistoryCol = new TableColumn<>("");
+//        TableColumn<Item, String> stockHistoryCol = new TableColumn<>("");
         TableColumn<Item, String> updateItemCol = new TableColumn<>("");
 
 
@@ -151,7 +145,7 @@ public class ItemsController {
             @Override
             protected void updateItem(String cell, boolean empty) {
                 super.updateItem(cell, empty);
-                if(super.isEmpty())
+                if(empty)
                     setGraphic(null);
                 else
                     setGraphic(updateInventoryColBtn);
@@ -159,27 +153,27 @@ public class ItemsController {
         });
 
         // Tùy chỉnh cột stock history để hiển thị button thay vì text
-        stockHistoryCol.setCellFactory(col -> new TableCell<>() {
-            final Button stockHistoryBtn = new Button("Stock history");
-
-            {
-                stockHistoryBtn.getStyleClass().addAll("btn-custom");
-                stockHistoryBtn.setOnAction(event -> {
-                    Item item = getTableView().getItems().get(getIndex());
-                    System.out.println("Display stock history for id: " + item.getId());
-                    itemManager.stockHistory(item);
-                });
-            }
-
-            @Override
-            protected void updateItem(String cell, boolean empty) {
-                super.updateItem(cell, empty);
-                if(super.isEmpty())
-                    setGraphic(null);
-                else
-                    setGraphic(stockHistoryBtn);
-            }
-        });
+//        stockHistoryCol.setCellFactory(col -> new TableCell<>() {
+//            final Button stockHistoryBtn = new Button("Stock history");
+//
+//            {
+//                stockHistoryBtn.getStyleClass().addAll("btn-custom");
+//                stockHistoryBtn.setOnAction(event -> {
+//                    Item item = getTableView().getItems().get(getIndex());
+//                    System.out.println("Display stock history for id: " + item.getId());
+//                    itemManager.stockHistory(item);
+//                });
+//            }
+//
+//            @Override
+//            protected void updateItem(String cell, boolean empty) {
+//                super.updateItem(cell, empty);
+//                if(super.isEmpty())
+//                    setGraphic(null);
+//                else
+//                    setGraphic(stockHistoryBtn);
+//            }
+//        });
 
         // Tùy chỉnh cột update item để hiển thị button thay vì text
         updateItemCol.setCellFactory(col -> new TableCell<>() {
@@ -203,7 +197,7 @@ public class ItemsController {
                     setGraphic(updateItemBtn);
             }
         });
-        tableView.getColumns().addAll(idCol, barcodeCol, itemNameCol, categoryCol, supplierCol, wholeSalePriceCol, retailPriceCol, quantityAtCurrentLocationCol, avatarCol, updateInventoryCol, stockHistoryCol, updateItemCol);
+        tableView.getColumns().addAll(idCol, barcodeCol, itemNameCol, categoryCol, supplierCol, wholeSalePriceCol, retailPriceCol, quantityAtCurrentLocationCol, avatarCol, updateInventoryCol, updateItemCol);
 
 
         this.deleteItemBtn.disableProperty().bind(this.tableView.getSelectionModel().selectedItemProperty().isNull()); // Disable button xóa khi không có dòng nào được chọn
@@ -227,12 +221,7 @@ public class ItemsController {
         }
     }
 
-
-    private void addColumn(){
-
-    }
-
-
+    
     // Khởi tạo danh sách các vị trí
     private void setupLocationChoices(){
         // Thêm các vi trí vào danh sách
@@ -286,7 +275,18 @@ public class ItemsController {
     //--------------------------------Phần liên quan đến phân trang--------------------------------//
     // Khởi tạo phân trang
     private void setupItemsPagination(){
-        itemsPagination.setPageCount(10); // Số trang
+        itemsPagination.pageCountProperty().bind(ItemStore.pageCount);     // Khi pageCount thay đồi thì pageCount của pagination cũng thay đổi
+        // Khi người dùng chuyển trang thì cập nhật dữ liệu hiển thị trên bảng
+        itemsPagination.setPageFactory(pageIndex -> {
+            int fromIndex = Math.min(pageIndex * ItemStore.pageSize.getValue(), ItemStore.visibleItems.size());
+            int toIndex = Math.min(fromIndex + ItemStore.pageSize.getValue(), ItemStore.visibleItems.size());
+            if ((fromIndex + toIndex) != 0)
+                tableView.setItems(FXCollections.observableList(ItemStore.visibleItems.subList(fromIndex, toIndex)));
+            else
+                tableView.setItems(FXCollections.observableList(new ArrayList<>()));
+            return new VBox();
+        });
+        
     }
 }
  
