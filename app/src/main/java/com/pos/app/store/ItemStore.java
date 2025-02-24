@@ -3,6 +3,7 @@ package com.pos.app.store;
 import com.pos.app.model.Inventory;
 import com.pos.app.model.Item;
 import com.pos.app.model.ItemQuantity;
+import com.pos.app.model.Location;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import lombok.Data;

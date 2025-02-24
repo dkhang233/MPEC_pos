@@ -1,17 +1,11 @@
 package com.pos.app.controller;
 
-import com.dlsc.formsfx.model.structure.*;
-import com.dlsc.formsfx.model.validators.*;
-import com.dlsc.formsfx.view.renderer.FormRenderer;
-
-import com.pos.app.component.CSVFileSelector;
 import com.pos.app.model.*;
 import com.pos.app.store.ItemStore;
 import com.pos.app.util.FormatHelper;
 import com.pos.app.util.ItemManager;
 
 import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -69,8 +63,15 @@ public class ItemsController {
     @FXML
     private ScrollPane  columnsVisibleContainer;
 
+    @FXML
+    private ComboBox<String> exportFileBtn;
+
     private Dialog<Inventory> dialogInventory;
-    
+
+    // Khởi tạo ItemManager để xử lý các sự kiện liên quan đến item
+    ItemManager itemManager = new ItemManager();
+
+
     @FXML
     private Button newItem;
 
@@ -79,6 +80,7 @@ public class ItemsController {
     public void initialize() {
         setupItemsTable(); // Khởi tạo bảng items
         setupItemsPagination(); // Khởi tạo phân trang
+        itemManager.exportFileForm(exportFileBtn); // Khởi tạo comboBox
     }
 
 
@@ -86,8 +88,8 @@ public class ItemsController {
     
     // Khởi tạo bảng items
     private void setupItemsTable(){
-        // Khởi tạo ItemManager để xử lý các sự kiện liên quan đến item
-        ItemManager itemManager = new ItemManager();
+//        // Khởi tạo ItemManager để xử lý các sự kiện liên quan đến item
+//        ItemManager itemManager = new ItemManager();
 
         // Xử lý sự kiện khi người dùng ấn nút "New Item"
         newItem.setOnAction(event -> itemManager.createItem());
@@ -208,7 +210,6 @@ public class ItemsController {
            return new SimpleStringProperty(String.valueOf(itemQuantity));
         });
 
-
         this.deleteItemBtn.disableProperty().bind(this.tableView.getSelectionModel().selectedItemProperty().isNull()); // Disable button xóa khi không có dòng nào được chọn
         setupColVisible(); // Khởi tạo các checkbox để chọn cột hiển thị
         tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE); // Cho phép chọn nhiều dòng
@@ -226,10 +227,10 @@ public class ItemsController {
         }
     }
 
+    // Xử lý khi ng dùng chon Import
     @FXML
-    private void importFile() {
-       CSVFileSelector fileSelector = new CSVFileSelector();
-
+    private void importCSVFile() {
+        itemManager.openImportForm(importItemBtn);
     }
 
 
@@ -284,5 +285,7 @@ public class ItemsController {
     private void setupItemsPagination(){
         itemsPagination.setPageCount(10); // Số trang
     }
+
+
 }
  

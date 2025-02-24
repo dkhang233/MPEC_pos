@@ -14,33 +14,38 @@ public class BindingUpdateInventory {
     private final ObjectProperty<String> selectedStockLocation = new SimpleObjectProperty<>();
     private final IntegerProperty currentQuantity = new SimpleIntegerProperty();
     private final IntegerProperty inventoryToAddOrSubtract = new SimpleIntegerProperty();
-    private final StringProperty comment = new SimpleStringProperty();
+    private final StringProperty comment = new SimpleStringProperty("");
     private final ObservableList<Location> locations = FXCollections.observableArrayList();
 
+public Inventory mapToUpdateInventory(Item item) {
+    String selectedLocation = selectedStockLocation.get();
 
+    // Tìm ItemQuantity theo location, nếu không tìm thấy thì khởi tạo với location đã chọn
+    ItemQuantity itemQuantity = item.getQuantityPerLocation().stream()
+            .filter(quantity -> quantity.getLocationName().equals(selectedLocation))
+            .findFirst()
+            .orElse(new ItemQuantity(0, selectedLocation, 0));
 
-    public BindingUpdateInventory() {
-        locations.add(new Location(1,"abc",false));
-        stockLocation.getValue().add("abc");
-    }
+    // Cập nhật số lượng
+    itemQuantity.setQuantity(itemQuantity.getQuantity() + inventoryToAddOrSubtract.get());
 
+    // Loại bỏ các ItemQuantity cũ theo location
+    item.getQuantityPerLocation().removeIf(quantity -> quantity.getLocationName().equals(selectedLocation));
 
-    public Inventory mapToUpdateInventory(Item item){
-        ItemQuantity itemQuantity = item.getQuantityPerLocation().stream()
-                .filter(quantity -> quantity.getLocationName().equals(selectedStockLocation.get()))
-                .findFirst()
-                .orElse(new ItemQuantity(0, "", 0));
-        itemQuantity.setQuantity(itemQuantity.getQuantity() + inventoryToAddOrSubtract.get());
-        item.getQuantityPerLocation().removeIf(quantity -> quantity.getLocationName().equals(selectedStockLocation.get()));
-        item.getQuantityPerLocation().add(itemQuantity);
-        return Inventory.builder()
-                .location(
-                        locations.stream()
-                                .filter(location -> location.getName().equals(selectedStockLocation.get()))
-                                .findFirst()
-                                .orElse(new Location(0, "", false)))
-                .inventory(inventoryToAddOrSubtract.get())
-                .comment(comment.get())
-                .build();
-    }
+    // Thêm đối tượng đã cập nhật vào danh sách
+    item.getQuantityPerLocation().add(itemQuantity);
+
+    // Xây dựng đối tượng Inventory từ location và các thông tin khác
+    Location location = locations.stream()
+            .filter(loc -> loc.getName().equals(selectedLocation))
+            .findFirst()
+            .orElse(new Location(0, "", false));
+
+    return Inventory.builder()
+            .location(location)
+            .inventory(inventoryToAddOrSubtract.get())
+            .comment(comment.get())
+            .build();
+}
+
 }

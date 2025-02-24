@@ -39,6 +39,11 @@ public class Item {
     private boolean hasSerialNumber;
     private boolean deleted;
 
+    public Item( String barcode, String itemName) {
+        this.itemName = itemName;
+        this.barcode = barcode;
+    }
+
     public ItemQuantity getQuantityAtCurrentLocation(){
         return quantityPerLocation.stream()
                 .filter(quantity -> quantity.getLocationName().equals(ItemStore.currentLocation))

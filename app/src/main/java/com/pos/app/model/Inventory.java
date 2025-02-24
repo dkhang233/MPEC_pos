@@ -1,5 +1,7 @@
 package com.pos.app.model;
 
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.StringProperty;
 import lombok.Builder;
 import lombok.Data;
 

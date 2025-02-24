@@ -10,198 +10,118 @@ import javafx.stage.FileChooser;
 
 import java.io.File;
 
-
-// Custom component dùng để upload hình ảnh với thư viện FormsFX
 public class ImageUpload extends SimpleControl<StringField> {
 
-    // Nhãn của trường
+    // Thành phần giao diện
     private Label fieldLabel;
-
-    // Nút chọn hình ảnh
     private Button selectImageBtn;
-
-    // Nút xóa hình ảnh
     private Button removeImageBtn;
-
-    // Hình ảnh
     private ImageView image;
-
-    // Hỗ trợ chọn hình ảnh
     private FileChooser fileChooser;
 
-    // Khởi tạo các thành phần
     @Override
     public void initializeParts() {
         super.initializeParts();
         setVgap(6);
 
-        this.fieldLabel = new Label(this.field.getLabel());
+        // Khởi tạo nhãn của trường
+        fieldLabel = new Label(field.getLabel());
 
-        this.selectImageBtn = new Button("Select Image");
-        this.selectImageBtn.getStyleClass().addAll("upload-btn");
-        this.selectImageBtn.setOnAction(event -> {
-            File file = this.fileChooser.showOpenDialog(getScene().getWindow());
-            if (file != null) {
-                this.field.valueProperty().set(file.toURI().toString());
-                this.image.setImage(new Image(file.toURI().toString()));
-                getChildren().add(this.image);
-                setRowIndex(this.selectImageBtn, 5);
-                getChildren().add(this.removeImageBtn);
-            }
-        });
+        // Nút chọn hình ảnh
+        selectImageBtn = new Button("Select Image");
+        selectImageBtn.getStyleClass().addAll("upload-btn");
+        selectImageBtn.setOnAction(event -> handleSelectImage());
 
-        this.removeImageBtn = new Button("Remove");
-        this.removeImageBtn.getStyleClass().addAll("remove-btn");
-        this.removeImageBtn.setOnAction(event -> {
-            this.field.valueProperty().set("");
-            getChildren().remove(this.image);
-            getChildren().remove(this.removeImageBtn);
-            setRowIndex(this.selectImageBtn, 0);
-        });
+        // Nút xóa hình ảnh
+        removeImageBtn = new Button("Remove");
+        removeImageBtn.getStyleClass().addAll("remove-btn");
+        removeImageBtn.setOnAction(event -> handleRemoveImage());
 
-        this.image = new ImageView();
-        this.image.setFitWidth(100);
-        this.image.setFitHeight(100);
+        // Khởi tạo ImageView để hiển thị hình ảnh
+        image = new ImageView();
+        image.setFitWidth(100);
+        image.setFitHeight(100);
 
-        this.fileChooser = new FileChooser();
-        this.fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif")
-        );
+        // Khởi tạo FileChooser và thiết lập bộ lọc file
+        fileChooser = createFileChooser();
     }
 
-    // Tùy chỉnh layout
+    /**
+     * Tạo đối tượng FileChooser với bộ lọc chỉ hiển thị các file hình ảnh.
+     */
+    private FileChooser createFileChooser() {
+        FileChooser fc = new FileChooser();
+        fc.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif")
+        );
+        return fc;
+    }
+
+    /**
+     * Xử lý sự kiện khi nhấn nút chọn hình ảnh.
+     */
+    private void handleSelectImage() {
+        File file = fileChooser.showOpenDialog(getScene().getWindow());
+        if (file != null) {
+            updateImage(file);
+            updateUIAfterImageSelected();
+        }
+    }
+
+    /**
+     * Cập nhật dữ liệu và hiển thị hình ảnh từ file được chọn.
+     *
+     * @param file File hình ảnh được chọn.
+     */
+    private void updateImage(File file) {
+        String fileUri = file.toURI().toString();
+        field.valueProperty().set(fileUri);
+        image.setImage(new Image(fileUri));
+    }
+
+    /**
+     * Cập nhật giao diện sau khi hình ảnh được chọn.
+     */
+    private void updateUIAfterImageSelected() {
+        if (!getChildren().contains(image)) {
+            getChildren().add(image);
+        }
+        // Đưa nút chọn hình ảnh xuống hàng 5 khi có hình ảnh
+        setRowIndex(selectImageBtn, 5);
+        if (!getChildren().contains(removeImageBtn)) {
+            getChildren().add(removeImageBtn);
+        }
+    }
+
+    /**
+     * Xử lý sự kiện khi nhấn nút xóa hình ảnh.
+     */
+    private void handleRemoveImage() {
+        field.valueProperty().set("");
+        getChildren().remove(image);
+        getChildren().remove(removeImageBtn);
+        // Đặt lại vị trí ban đầu cho nút chọn hình ảnh
+        setRowIndex(selectImageBtn, 0);
+    }
+
     @Override
     public void layoutParts() {
         super.layoutParts();
-        setColumnIndex(this.fieldLabel, 0);
-        setColumnSpan(this.fieldLabel, 2);
-        
-        setColumnIndex(this.selectImageBtn, 2);
-        setColumnSpan(this.selectImageBtn, 2);
+        setColumnIndex(fieldLabel, 0);
+        setColumnSpan(fieldLabel, 2);
 
-        setColumnIndex(this.removeImageBtn, 4);
-        setColumnSpan(this.removeImageBtn, 2);
-        setRowIndex(this.removeImageBtn, 5);
+        setColumnIndex(selectImageBtn, 2);
+        setColumnSpan(selectImageBtn, 2);
 
-        setColumnIndex(this.image, 2);
-        setColumnSpan(this.image, 4);
-        setRowSpan(this.image, 4);
-        getChildren().addAll(this.fieldLabel,this.selectImageBtn);
+        setColumnIndex(removeImageBtn, 4);
+        setColumnSpan(removeImageBtn, 2);
+        setRowIndex(removeImageBtn, 5);
+
+        setColumnIndex(image, 2);
+        setColumnSpan(image, 4);
+        setRowSpan(image, 4);
+
+        getChildren().addAll(fieldLabel, selectImageBtn);
     }
 }
-
-//public class ImageUpload extends SimpleControl<StringField> {
-//
-//    // Thành phần giao diện
-//    private Label fieldLabel;
-//    private Button selectImageBtn;
-//    private Button removeImageBtn;
-//    private ImageView image;
-//    private FileChooser fileChooser;
-//
-//    @Override
-//    public void initializeParts() {
-//        super.initializeParts();
-//        setVgap(6);
-//
-//        // Khởi tạo nhãn của trường
-//        fieldLabel = new Label(field.getLabel());
-//
-//        // Nút chọn hình ảnh
-//        selectImageBtn = new Button("Select Image");
-//        selectImageBtn.getStyleClass().addAll("upload-btn");
-//        selectImageBtn.setOnAction(event -> handleSelectImage());
-//
-//        // Nút xóa hình ảnh
-//        removeImageBtn = new Button("Remove");
-//        removeImageBtn.getStyleClass().addAll("remove-btn");
-//        removeImageBtn.setOnAction(event -> handleRemoveImage());
-//
-//        // Khởi tạo ImageView để hiển thị hình ảnh
-//        image = new ImageView();
-//        image.setFitWidth(100);
-//        image.setFitHeight(100);
-//
-//        // Khởi tạo FileChooser và thiết lập bộ lọc file
-//        fileChooser = createFileChooser();
-//    }
-//
-//    /**
-//     * Tạo đối tượng FileChooser với bộ lọc chỉ hiển thị các file hình ảnh.
-//     */
-//    private FileChooser createFileChooser() {
-//        FileChooser fc = new FileChooser();
-//        fc.getExtensionFilters().addAll(
-//                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif")
-//        );
-//        return fc;
-//    }
-//
-//    /**
-//     * Xử lý sự kiện khi nhấn nút chọn hình ảnh.
-//     */
-//    private void handleSelectImage() {
-//        File file = fileChooser.showOpenDialog(getScene().getWindow());
-//        if (file != null) {
-//            updateImage(file);
-//            updateUIAfterImageSelected();
-//        }
-//    }
-//
-//    /**
-//     * Cập nhật dữ liệu và hiển thị hình ảnh từ file được chọn.
-//     *
-//     * @param file File hình ảnh được chọn.
-//     */
-//    private void updateImage(File file) {
-//        String fileUri = file.toURI().toString();
-//        field.valueProperty().set(fileUri);
-//        image.setImage(new Image(fileUri));
-//    }
-//
-//    /**
-//     * Cập nhật giao diện sau khi hình ảnh được chọn.
-//     */
-//    private void updateUIAfterImageSelected() {
-//        if (!getChildren().contains(image)) {
-//            getChildren().add(image);
-//        }
-//        // Đưa nút chọn hình ảnh xuống hàng 5 khi có hình ảnh
-//        setRowIndex(selectImageBtn, 5);
-//        if (!getChildren().contains(removeImageBtn)) {
-//            getChildren().add(removeImageBtn);
-//        }
-//    }
-//
-//    /**
-//     * Xử lý sự kiện khi nhấn nút xóa hình ảnh.
-//     */
-//    private void handleRemoveImage() {
-//        field.valueProperty().set("");
-//        getChildren().remove(image);
-//        getChildren().remove(removeImageBtn);
-//        // Đặt lại vị trí ban đầu cho nút chọn hình ảnh
-//        setRowIndex(selectImageBtn, 0);
-//    }
-//
-//    @Override
-//    public void layoutParts() {
-//        super.layoutParts();
-//        setColumnIndex(fieldLabel, 0);
-//        setColumnSpan(fieldLabel, 2);
-//
-//        setColumnIndex(selectImageBtn, 2);
-//        setColumnSpan(selectImageBtn, 2);
-//
-//        setColumnIndex(removeImageBtn, 4);
-//        setColumnSpan(removeImageBtn, 2);
-//        setRowIndex(removeImageBtn, 5);
-//
-//        setColumnIndex(image, 2);
-//        setColumnSpan(image, 4);
-//        setRowSpan(image, 4);
-//
-//        getChildren().addAll(fieldLabel, selectImageBtn);
-//    }
-//}
 

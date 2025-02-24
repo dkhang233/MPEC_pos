@@ -15,6 +15,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 
+<?import javafx.scene.control.ComboBox?>
 <AnchorPane prefHeight="621.0" prefWidth="1657.0" style="-fx-background-color: #f8c471;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.pos.app.controller.ItemsController">
    <children>
       <TableView fx:id="tableView" layoutX="110.4" layoutY="121.0" prefHeight="400.0" AnchorPane.leftAnchor="110.0" AnchorPane.rightAnchor="92.0">
@@ -31,7 +32,7 @@
             </TableColumn>
             <TableColumn fx:id="nameCol" editable="false" prefWidth="100.80000305175781" resizable="false" styleClass="col" text="Name">
                 <cellValueFactory>
-                    <PropertyValueFactory property="name" />
+                    <PropertyValueFactory property="itemName" />
                 </cellValueFactory>
             </TableColumn>
             <TableColumn fx:id="categoryCol" editable="false" prefWidth="88.0" resizable="false" styleClass="col" text="Category">
@@ -95,8 +96,10 @@
                   <String fx:value="btn" />
                   <String fx:value="btn-primary" />
                </styleClass></Button>
-            <Button fx:id="importItemBtn" layoutX="94.0" layoutY="-2.0"  mnemonicParsing="false" prefHeight="27.0" prefWidth="67.0" styleClass="btn" text="Import" onAction="#importFile"   />
-            <Button layoutX="183.0" layoutY="-2.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="67.0" styleClass="btn" text="Export" />
+            <Button fx:id="importItemBtn" layoutX="94.0" layoutY="-2.0"  mnemonicParsing="false" prefHeight="27.0" prefWidth="67.0" styleClass="btn" text="Import" onAction="#importCSVFile" />
+
+            <ComboBox fx:id="exportFileBtn" layoutX="200.0" layoutY="-2.0" prefHeight="30.0" prefWidth="80.0" promptText="Export"  />
+
          </children>
       </Pane>
       <Pagination fx:id="itemsPagination" layoutX="653.0" layoutY="533.0" prefHeight="51.0" prefWidth="175.0" styleClass="pagination" AnchorPane.leftAnchor="650.0" AnchorPane.rightAnchor="650.0" />
