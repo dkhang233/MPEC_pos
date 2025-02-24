@@ -5,7 +5,6 @@ import com.pos.app.model.Item;
 import com.pos.app.model.Location;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import lombok.Data;
 import net.datafaker.Faker;
 

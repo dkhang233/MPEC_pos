@@ -1,7 +1,6 @@
 package com.pos.app.util;
 
 import com.dlsc.formsfx.model.structure.*;
-import com.dlsc.formsfx.view.controls.SimpleTextControl;
 import com.pos.app.model.*;
 
 import com.dlsc.formsfx.model.validators.IntegerRangeValidator;
@@ -13,10 +12,8 @@ import com.pos.app.store.ItemStore;
 import javafx.beans.property.*;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
-import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Dialog;
@@ -24,7 +21,6 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -74,9 +70,9 @@ public class ItemManager {
         TableColumn<Inventory, String> userCol = new TableColumn<>("User");
         userCol.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getUsername().getValue()));
         TableColumn<Inventory, String> changeCol = new TableColumn<>("In/Out");
-        changeCol.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getInventory().getValue() + ""));
+        changeCol.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getInventory().getValue().toString()));
         TableColumn<Inventory, String> quantityCol = new TableColumn<>("After quantity");
-        quantityCol.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getAfterInventory().getValue() + ""));
+        quantityCol.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getAfterInventory().getValue().toString()));
         TableColumn<Inventory, String> commentCol = new TableColumn<>("Comment");
         commentCol.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getComment().getValue()));
         stockHistoryTable.getColumns().addAll(dateCol, userCol, changeCol ,  quantityCol, commentCol);
@@ -97,10 +93,8 @@ public class ItemManager {
                 .editable(false);
 
         // Thay đổi điều kiện của trường nhập số lượng (thêm vào hoặc trừ ra khỏi số lượng item)  khi số lượng hiện tại thay đổi
-        currentQuantityField.valueProperty().addListener((observable, oldValue, newValue) -> {
-            inOutQuantityField.validate(IntegerRangeValidator.atLeast(-newValue.intValue()
-                    ,"Can't add value smaller than current inventory"));
-        });
+        currentQuantityField.valueProperty().addListener((observable, oldValue, newValue) ->
+            inOutQuantityField.validate(IntegerRangeValidator.atLeast(-newValue.intValue() ,"Can't add value smaller than current inventory")));
 
         // Tạo trường chọn vị trí để xem lịch sử, và hiển thị số lượng hiện tại của item tương ứng với vị trí
         int selectedLocationIndex = 0;
@@ -356,12 +350,8 @@ public class ItemManager {
         Button cancelButton = (Button) dialog.getDialogPane().lookupButton(cancelButtonType);
 
         // Thêm sự kiện nút bấm
-        okButton.addEventFilter(ActionEvent.ACTION, (event) -> {
-            saveNewItem(event, form, model, true);
-        });
-        newButton.addEventFilter(ActionEvent.ACTION, (event) -> {
-            saveNewItem(event, form, model, false);
-        });
+        okButton.addEventFilter(ActionEvent.ACTION, (event) -> saveNewItem(event, form, model, true));
+        newButton.addEventFilter(ActionEvent.ACTION, (event) -> saveNewItem(event, form, model, false));
 
         // Tạo HBox chứa các nút
         HBox buttonBox = new HBox(10.0, okButton, newButton, cancelButton);

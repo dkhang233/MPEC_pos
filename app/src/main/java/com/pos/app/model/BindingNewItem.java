@@ -1,13 +1,10 @@
 package com.pos.app.model;
 
 import javafx.beans.property.*;
-import javafx.beans.value.ObservableIntegerValue;
 import javafx.collections.FXCollections;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
 
