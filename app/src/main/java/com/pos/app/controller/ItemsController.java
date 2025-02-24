@@ -52,12 +52,19 @@ public class ItemsController {
     @FXML
     private ChoiceBox<String> locationChoices;
 
+    @FXML
+    private ComboBox exportFileBtn;
+
+    // Khởi tạo ItemManager để xử lý các sự kiện liên quan đến item
+    private ItemManager itemManager = new ItemManager();
+
     // Hàm khởi tạo, chạy khi view được load
     @FXML
     public void initialize() {
         setupLocationChoices(); // Khởi tạo danh sách các cửa hàng
         setupItemsTable(); // Khởi tạo bảng items
         setupItemsPagination(); // Khởi tạo phân trang
+        itemManager.exportFileForm(exportFileBtn);
     }
 
 
@@ -65,8 +72,7 @@ public class ItemsController {
     
     // Khởi tạo bảng items
     private void setupItemsTable(){
-        // Khởi tạo ItemManager để xử lý các sự kiện liên quan đến item
-        ItemManager itemManager = new ItemManager();
+
 
         // Xử lý sự kiện khi người dùng ấn nút "New Item"
         newItem.setOnAction(event -> itemManager.createItem());
@@ -288,5 +294,15 @@ public class ItemsController {
         });
         
     }
+
+
+
+    // Xử lý khi người dùng chọn import item
+    @FXML
+    private void importCSVFile() {
+        itemManager.openImportForm(importItemBtn);
+    }
+
+
 }
  

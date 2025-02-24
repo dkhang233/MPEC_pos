@@ -5,8 +5,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import lombok.Data;
 
-import java.util.stream.Collectors;
-
 @Data
 public class BindingUpdateInventory {
     private final StringProperty barcode = new SimpleStringProperty();

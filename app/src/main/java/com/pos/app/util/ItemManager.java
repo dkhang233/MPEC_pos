@@ -20,12 +20,19 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+import static com.pos.app.util.ImportExportFile.handleJsonOption;
+
 public class ItemManager {
+    final List<Item> items = ImportExportFile.getItems();
+
     // Xử lý khi người dùng chọn tạo item mới
     @FXML
     public void createItem() {
@@ -475,5 +482,104 @@ public class ItemManager {
         alert.setHeaderText(header);
         alert.setContentText(content);
         alert.showAndWait();
+    }
+
+
+    @FXML
+    public void openImportForm(Button importItemBtn) {
+        // Tạo Dialog cho form import file
+        Dialog<Void> importDialog = new Dialog<>();
+        importDialog.setTitle("Import File Form");
+
+        // Lấy cửa sổ chủ từ nút openFormButton
+        Stage owner = (Stage) importItemBtn.getScene().getWindow();
+        importDialog.initOwner(owner);
+
+        // Tạo nút import file trong form
+        Button importFileBtn = new Button("Import File");
+        importFileBtn.addEventFilter(ActionEvent.ACTION, event -> ImportExportFile.handleImportFile(importDialog));
+
+        // Sắp xếp các thành phần trong form
+        VBox layout = new VBox(10, importFileBtn);
+        layout.setAlignment(Pos.CENTER);
+        importDialog.getDialogPane().setContent(layout);
+
+        // Thêm nút Close để người dùng thoát Dialog
+        importDialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+        importDialog.showAndWait();
+    }
+
+    @FXML
+    public void exportFileForm(ComboBox<String> exportFileBtn) {
+        // Thêm các lựa chọn nếu chưa có
+        if (exportFileBtn.getItems().isEmpty()) {
+            exportFileBtn.getItems().addAll("JSON", "Excel", "CSV");
+        }
+
+        // Sự kiện khi chọn
+        exportFileBtn.setOnAction(event -> {
+            String selectedOption = exportFileBtn.getValue();
+            if (selectedOption != null) {
+                switch (selectedOption) {
+                    case "JSON":
+                        try {
+                            File fileJSON = fileFormat("item.json");
+                            ImportExportFile.handleJsonOption(items, fileJSON.getAbsolutePath());
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        break;
+                    case "Excel":
+                        try {
+                            File fileExcel = fileFormat("item.xlsx");
+                            ImportExportFile.handleExcelOption(items, fileExcel.getAbsolutePath());
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        break;
+                    case "CSV":
+                        try {
+                            File fileCsv = fileFormat("item.csv");
+                            ImportExportFile.handleCsvOption(items, fileCsv.getAbsolutePath());
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        break;
+                    default:
+                        System.out.println("Không có lựa chọn này");
+                }
+            }
+        });
+    }
+
+
+    private File fileFormat(String format) {
+        // Lấy thư mục download của người dùng
+        String downloadsPath = DownloadsFolderUtil.getDownloadsFolder();
+
+        // Tạo đối tượng File cho thư mục Downloads
+        File downloadsFolder = new File(downloadsPath);
+
+        // Kiểm tra và tạo thư mục nếu chưa tồn tại
+        if (!downloadsFolder.exists()) {
+            downloadsFolder.mkdirs();
+        }
+
+        // Tạo file items.xlsx trong thư mục Downloads
+        File file = new File(downloadsFolder, format);
+        if (file.exists()) {
+            // Sử dụng "\\." để escape dấu chấm trong regex
+            String[] parts = format.split("\\.");
+
+            String baseName = parts[0];
+            String extension = parts[1];
+            int i = 1;
+            while(file.exists()){
+                // Ghép lại tên file với số thứ tự và dấu chấm giữa tên và phần mở rộng
+                file = new File(downloadsFolder, baseName + "(" + i + ")." + extension);
+                i++;
+            }
+        }
+        return file;
     }
 }
