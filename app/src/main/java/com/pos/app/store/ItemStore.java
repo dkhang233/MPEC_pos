@@ -95,7 +95,7 @@ public class ItemStore {
         });
 
         // Chọn vị trí hiện tại là vị trí đầu tiên
-        currentLocation.getName().set(locations.get(0).getName().get());
+        currentLocation.getName().set(locations.getFirst().getName().get());
 
         // Thêm dữ liệu vào bảng inventory
         inventories.put(1,new ArrayList<>());
@@ -108,7 +108,7 @@ public class ItemStore {
             inventory.getUsername().set(faker.name().firstName());
             inventory.getTimestamp().set(LocalDateTime.now());
             inventory.getComment().set(faker.lorem().sentence());
-            inventory.getLocation().set(locations.get(0).getName().get());
+            inventory.getLocation().set(locations.getFirst().getName().get());
             inventory.getInventory().set(faker.number().numberBetween(-100,100));
             inventory.getAfterInventory().set(faker.number().numberBetween(100,500));
             ItemStore.inventories.get(1).add(inventory);

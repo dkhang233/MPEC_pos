@@ -53,10 +53,10 @@ public class ItemsController {
     private ChoiceBox<String> locationChoices;
 
     @FXML
-    private ComboBox exportFileBtn;
+    private ComboBox<String> exportFileBtn;
 
     // Khởi tạo ItemManager để xử lý các sự kiện liên quan đến item
-    private ItemManager itemManager = new ItemManager();
+    private final ItemManager itemManager = new ItemManager();
 
     // Hàm khởi tạo, chạy khi view được load
     @FXML
@@ -221,9 +221,12 @@ public class ItemsController {
     // Xử lý khi người dùng chọn xóa item
     @FXML
     private void deleteItem() {
-        ObservableList<Item> selectedItem = tableView.getSelectionModel().getSelectedItems(); // Bỏ chọn các dòng
-        if (selectedItem != null) {
-//            selectedItem.remove();
+        ObservableList<Item> selectedItem = tableView.getSelectionModel().getSelectedItems();
+        if (!selectedItem.isEmpty()) {
+            // Tạo bản sao của danh sách để tránh thay đổi đồng thời
+            List<Item> itemsToRemove = new ArrayList<>(selectedItem);
+            // Xóa các mục đã chọn khỏi danh sách dữ liệu gốc
+            tableView.getItems().removeAll(itemsToRemove);
         }
     }
 
@@ -273,11 +276,7 @@ public class ItemsController {
     private void showColVisible(){
         columnsVisibleContainer.setVisible(!columnsVisibleContainer.isVisible());
     }
-    
 
-
-
-    
     //--------------------------------Phần liên quan đến phân trang--------------------------------//
     // Khởi tạo phân trang
     private void setupItemsPagination(){
@@ -294,8 +293,6 @@ public class ItemsController {
         });
         
     }
-
-
 
     // Xử lý khi người dùng chọn import item
     @FXML

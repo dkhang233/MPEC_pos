@@ -19,7 +19,7 @@ public class Item {
     private StringProperty itemName = new SimpleStringProperty("");
     private StringProperty barcode = new SimpleStringProperty("");
     private StringProperty category = new SimpleStringProperty("");
-    private ObjectProperty<HashMap<String, ?>> attributes = new SimpleObjectProperty<>();
+//    private ObjectProperty<HashMap<String, ?>> attributes = new SimpleObjectProperty<>();
     private StringProperty stockType = new SimpleStringProperty("Stock");
     private StringProperty itemType = new SimpleStringProperty("Standard");
     private StringProperty supplier = new SimpleStringProperty("");
@@ -52,7 +52,7 @@ public class Item {
         bindingNewItem.getItemName().set(itemName.get());
         bindingNewItem.getBarcode().set(barcode.get());
         bindingNewItem.getCategory().set(category.get());
-        bindingNewItem.getAttributes().set(attributes.get());
+//        bindingNewItem.getAttributes().set(attributes.get());
         bindingNewItem.getSelectedStockType().set(stockType.get());
         bindingNewItem.getSelectedItemType().set(itemType.get());
         bindingNewItem.getSupplier().set(supplier.get());
@@ -80,7 +80,7 @@ public class Item {
         itemName.set(item.getItemName().get());
         barcode.set(item.getBarcode().get());
         category.set(item.getCategory().get());
-        attributes.set(item.getAttributes().get());
+//        attributes.set(item.getAttributes().get());
         stockType.set(item.getStockType().get());
         itemType.set(item.getItemType().get());
         supplier.set(item.getSupplier().get());

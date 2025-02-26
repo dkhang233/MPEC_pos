@@ -22,13 +22,13 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.PropertyException;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-
-import static com.pos.app.util.ImportExportFile.handleJsonOption;
 
 public class ItemManager {
     final List<Item> items = ImportExportFile.getItems();
@@ -485,7 +485,6 @@ public class ItemManager {
     }
 
 
-    @FXML
     public void openImportForm(Button importItemBtn) {
         // Tạo Dialog cho form import file
         Dialog<Void> importDialog = new Dialog<>();
@@ -509,11 +508,10 @@ public class ItemManager {
         importDialog.showAndWait();
     }
 
-    @FXML
     public void exportFileForm(ComboBox<String> exportFileBtn) {
         // Thêm các lựa chọn nếu chưa có
         if (exportFileBtn.getItems().isEmpty()) {
-            exportFileBtn.getItems().addAll("JSON", "Excel", "CSV");
+            exportFileBtn.getItems().addAll("JSON", "MS-Excel", "CSV", "PDF", "XML", "TXT", "SQL");
         }
 
         // Sự kiện khi chọn
@@ -523,24 +521,66 @@ public class ItemManager {
                 switch (selectedOption) {
                     case "JSON":
                         try {
-                            File fileJSON = fileFormat("item.json");
-                            ImportExportFile.handleJsonOption(items, fileJSON.getAbsolutePath());
+                            File fileJSON = fileFormat("items.json");
+                            ImportExportFile.exportJSON(items, fileJSON.getAbsolutePath());
+                            System.out.println("da chon json");
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
                         break;
-                    case "Excel":
+
+                    case "MS-Excel":
                         try {
-                            File fileExcel = fileFormat("item.xlsx");
-                            ImportExportFile.handleExcelOption(items, fileExcel.getAbsolutePath());
+                            File fileExcel = fileFormat("items_" + ".xlsx");
+                            ImportExportFile.exportExcel(items, fileExcel.getAbsolutePath());
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
                         break;
+
                     case "CSV":
                         try {
-                            File fileCsv = fileFormat("item.csv");
-                            ImportExportFile.handleCsvOption(items, fileCsv.getAbsolutePath());
+                            File fileCsv = fileFormat("items.csv");
+                            ImportExportFile.exportCSV(items, fileCsv.getAbsolutePath());
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        break;
+
+                    case "PDF":
+                        try {
+                            File filePDF = fileFormat("items.pdf");
+                            ImportExportFile.exportPDF(items, filePDF.getAbsolutePath());
+                            System.out.println("Da chon pdf");
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        break;
+
+                    case "XML":
+                        try {
+                            File fileXML = fileFormat("items.xml");
+                            ImportExportFile.exportXML(items, fileXML.getAbsolutePath());
+                        } catch (IOException | PropertyException e) {
+                            throw new RuntimeException(e);
+                        } catch (JAXBException e) {
+                            throw new RuntimeException(e);
+                        }
+                        break;
+
+                    case "TXT":
+                        try {
+                            File fileTXT = fileFormat("items.txt");
+                            ImportExportFile.exportTxt(items, fileTXT.getAbsolutePath());
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        break;
+
+                    case "SQL":
+                        try {
+                            File fileSQL = fileFormat("items.sql");
+                            ImportExportFile.exportSQL(items, fileSQL.getAbsolutePath());
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
