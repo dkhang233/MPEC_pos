@@ -16,7 +16,7 @@ public class BindingNewItem {
     private final StringProperty itemName = new SimpleStringProperty("");
     private final StringProperty barcode = new SimpleStringProperty("");
     private final StringProperty category = new SimpleStringProperty("");
-    private ObjectProperty<HashMap<String, ?>> attributes = new SimpleObjectProperty<>();
+//    private ObjectProperty<HashMap<String, ?>> attributes = new SimpleObjectProperty<>();
     private final ListProperty<String> stockTypes = new SimpleListProperty<>(FXCollections.observableArrayList("Stock", "Non-stock"));
     private final ObjectProperty<String> selectedStockType = new SimpleObjectProperty<>();
     private final ListProperty<String> itemTypes = new SimpleListProperty<>(FXCollections.observableArrayList("Standard", "Kit"));
@@ -46,7 +46,7 @@ public class BindingNewItem {
         item.getItemName().set(itemName.getValue());
         item.getBarcode().set(barcode.getValue());
         item.getCategory().set(category.getValue());
-        item.getAttributes().set(attributes.getValue());
+//        item.getAttributes().set(attributes.getValue());
         item.getStockType().set(selectedStockType.getValue());
         item.getItemType().set(selectedItemType.getValue());
         item.getSupplier().set(supplier.getValue());

@@ -5,21 +5,38 @@ import com.pos.app.store.ItemStore;
 import javafx.scene.control.Dialog;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
+import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ImportExportFile {
     public static final int COLUMN_INDEX_ID = 0;
-    public static final int COLUMN_INDEX_TITLE = 1;
-    public static final int COLUMN_INDEX_PRICE = 2;
-    public static final int COLUMN_INDEX_QUANTITY = 3;
-    public static final int COLUMN_INDEX_TOTAL = 4;
+    public static final int COLUMN_INDEX_BARCODE = 1;
+    public static final int COLUMN_INDEX_ITEM_NAME = 2;
+    public static final int COLUMN_INDEX_CATEGORY = 3;
+    public static final int COLUMN_INDEX_SUPPLIER_ID = 4;
+    public static final int COLUMN_INDEX_STOCK_TYPE = 5;
+    public static final int COLUMN_INDEX_ITEM_TYPE = 6;
+    public static final int COLUMN_INDEX_TAX1_NAME = 7;
+    public static final int COLUMN_INDEX_TAX1_VALUE = 8;
+    public static final int COLUMN_INDEX_TAX2_NAME = 9;
+    public static final int COLUMN_INDEX_TAX2_VALUE = 10;
+    public static final int COLUMN_INDEX_DESCRIPTION = 11;
+
     private static CellStyle cellStyleFormatNumber = null;
     // Xử lý sự kiện khi nhấn nút import file trong Dialog.
     public static void handleImportFile(Dialog<Void> dialog) {
@@ -81,7 +98,7 @@ public class ImportExportFile {
                     isFirstRow = false;
                     continue;
                 }
-                // Lấy dữ liệu từ các cột (giả sử cột 0: name, cột 1: value)
+                // Lấy dữ liệu từ các cột
                 Cell cell0 = (Cell) row.getCell(0, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
                 Cell cell1 = (Cell) row.getCell(1, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
 
@@ -96,15 +113,18 @@ public class ImportExportFile {
         }
     }
 
-    static void handleJsonOption(List<Item> items, String jsonFilePath) throws IOException {
+    static void exportJSON(List<Item> items, String jsonFilePath) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        // Ghi dữ liệu dưới dạng JSON với định dạng đẹp (pretty print)
+        objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File(jsonFilePath), items);
     }
 
-    static void handleExcelOption(List<Item> items, String excelFilePath) throws IOException {
+    static void exportExcel(List<Item> items, String excelFilePath) throws IOException {
         // Tạo Workbook
         Workbook workbook = getWorkbook(excelFilePath);
 
         // Tạo sheet
-        Sheet sheet = workbook.createSheet("Items"); // Create sheet with sheet name
+        Sheet sheet = workbook.createSheet("Items"); // Tạo sheet với tên sheet
 
         int rowIndex = 0;
 
@@ -124,7 +144,7 @@ public class ImportExportFile {
         // Tạo footer
         writeFooter(sheet, rowIndex);
 
-        // Auto resize column witdth
+        // Tự động thay đổi kích thước cột
         int numberOfColumn = sheet.getRow(0).getPhysicalNumberOfCells();
         autosizeColumn(sheet, numberOfColumn);
 
@@ -132,13 +152,117 @@ public class ImportExportFile {
         createOutputFile(workbook, excelFilePath);
     }
 
+    static void exportCSV(List<Item> items, String csvFilePath) throws IOException {
+        FileWriter writer = new FileWriter(csvFilePath);
+            // Ghi header
+            writer.append("Id,Barcode,Item Name,Stock Type,Item Type,Category,Supplier ID,Tax 1:,%,Tax 2:,%\n");
+
+            // Ghi dữ liệu
+            for (Item item : items) {
+                writer.append(String.valueOf(item.getId())).append(",");
+                writer.append(String.valueOf(item.getBarcode())).append(",");
+                writer.append(String.valueOf(item.getItemName())).append(",");
+                writer.append(String.valueOf(item.getStockType())).append(",");
+                writer.append(String.valueOf(item.getItemType())).append(",");
+                writer.append(String.valueOf(item.getCategory())).append(",");
+                writer.append(String.valueOf(item.getSupplier())).append(",");
+                writer.append(String.valueOf(item.getTax1Name())).append(",");
+                writer.append(String.valueOf(item.getTax1())).append(",");
+                writer.append(String.valueOf(item.getTax2Name())).append(",");
+                writer.append(String.valueOf(item.getTax2())).append("\n");
+            }
+        }
+
+    static void exportTxt(List<Item> items, String txtFilePath) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(txtFilePath))) {
+            for (Item item : items) {
+                writer.write(item.toString());
+                writer.newLine();
+            }
+        }
+    }
+
+    static void exportXML(List<Item> items, String xmlFilePath) throws IOException, JAXBException {
+        ItemsWrapper wrapper = new ItemsWrapper();
+        wrapper.setItems(items);
+        JAXBContext context = JAXBContext.newInstance(ItemsWrapper.class);
+        Marshaller marshaller = context.createMarshaller();
+        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        marshaller.marshal(wrapper, new File(xmlFilePath));
+    }
+
+    static void exportPDF(List<Item> items, String pdfFilePath) throws IOException {
+        // Tạo tài liệu PDF
+        PDDocument document = new PDDocument();
+        PDPage page = new PDPage();
+        document.addPage(page);
+
+        // Khởi tạo PDPageContentStream để ghi nội dung
+        PDPageContentStream contentStream = new PDPageContentStream(document, page);
+
+        // Cài đặt margin và các thông số cho bảng
+        float margin = 50;
+        float yStart = page.getMediaBox().getHeight() - margin; // điểm bắt đầu từ phía trên trang
+        float rowHeight = 100; // chiều cao mỗi hàng
+        float cellMargin = 5;
+        float imageWidth = 80;  // kích thước hiển thị của hình ảnh
+        float imageHeight = 80;
+        float textStartX = margin + imageWidth + cellMargin * 2; // vị trí bắt đầu của văn bản, bên phải hình ảnh
+
+        // Lặp qua danh sách Item để vẽ từng hàng
+        for (int i = 0; i < items.size(); i++) {
+            float currentY = yStart - (i * rowHeight);
+            Item item = items.get(i);
+
+            // Nếu item có hình ảnh (imagePath khác null hoặc rỗng)
+            if (item.getAvatar() != null && !item.getAvatar().getValue().isEmpty()) {
+                try {
+                    PDImageXObject pdImage = PDImageXObject.createFromFile(item.getAvatar().getValue(), document);
+                    // Vẽ hình ảnh tại vị trí (margin + cellMargin, currentY - imageHeight)
+                    contentStream.drawImage(pdImage, margin + cellMargin, currentY - imageHeight, imageWidth, imageHeight);
+                } catch (IOException e) {
+                    // Nếu không tải được hình ảnh, bạn có thể ghi log hoặc bỏ qua
+                    System.err.println("Không thể tải hình ảnh cho item " + item.getId() + ": " + e.getMessage());
+                }
+            }
+
+            // Vẽ văn bản liên quan (ví dụ: id và tên) bên cạnh hình ảnh
+            contentStream.beginText();
+            contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
+            // Vị trí văn bản: bắt đầu ở textStartX, tính từ currentY - 15 (để căn chỉnh theo hàng)
+            contentStream.newLineAtOffset(textStartX, currentY - 15);
+            String text = "ID: " + item.getId().getValue() + " - Name: " + item.getItemName().getValue();
+            contentStream.showText(text);
+            contentStream.endText();
+        }
+
+        // Đóng luồng nội dung và lưu tài liệu PDF
+        contentStream.close();
+        document.save(pdfFilePath);
+        document.close();
+    }
+
+    static void exportSQL(List<Item> items, String sqlFilePath) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(sqlFilePath))) {
+            writer.write("-- SQL Insert statements generated by exporter");
+            writer.newLine();
+            for (Item item : items) {
+                // Lưu ý: Chỉ dùng cho mục đích demo. Hãy xử lý escape ký tự nếu cần.
+                String sql = String.format("INSERT INTO items (id, name) VALUES (%d, '%s');",
+                        item.getId().getValue(), item.getItemName().getValue());
+                writer.write(sql);
+                writer.newLine();
+            }
+        }
+    }
+
     // Lấy dữ liệu hiện có trong bảng
     static List<Item> getItems() {
         ItemStore.itemsPerLocation.computeIfAbsent(ItemStore.currentLocation.getName().getValue(), k -> new ArrayList<>());
-        return ItemStore.itemsPerLocation.get(ItemStore.currentLocation.getName().getValue());
+        return ItemStore.visibleItems.get().stream().toList();
     }
 
-    // Create workbook
+    // Tạo workbook
     private static Workbook getWorkbook(String excelFilePath) throws IOException {
         Workbook workbook = null;
 
@@ -166,21 +290,51 @@ public class ImportExportFile {
         cell.setCellStyle(cellStyle);
         cell.setCellValue("Id");
 
-        cell = row.createCell(COLUMN_INDEX_TITLE);
+        cell = row.createCell(COLUMN_INDEX_BARCODE);
         cell.setCellStyle(cellStyle);
         cell.setCellValue("Barcode");
 
-        cell = row.createCell(COLUMN_INDEX_PRICE);
+        cell = row.createCell(COLUMN_INDEX_ITEM_NAME);
         cell.setCellStyle(cellStyle);
         cell.setCellValue("Item Name");
 
-        cell = row.createCell(COLUMN_INDEX_QUANTITY);
+        cell = row.createCell(COLUMN_INDEX_CATEGORY);
         cell.setCellStyle(cellStyle);
         cell.setCellValue("Category");
 
-        cell = row.createCell(COLUMN_INDEX_TOTAL);
+        cell = row.createCell(COLUMN_INDEX_SUPPLIER_ID);
         cell.setCellStyle(cellStyle);
         cell.setCellValue("Supplier ID");
+
+        cell = row.createCell(COLUMN_INDEX_STOCK_TYPE);
+        cell.setCellStyle(cellStyle);
+        cell.setCellValue("Stock Type");
+
+        cell = row.createCell(COLUMN_INDEX_ITEM_TYPE);
+        cell.setCellStyle(cellStyle);
+        cell.setCellValue("Item Type");
+
+        cell = row.createCell(COLUMN_INDEX_TAX1_NAME);
+        cell.setCellStyle(cellStyle);
+        cell.setCellValue("Tax 1");
+
+        cell = row.createCell(COLUMN_INDEX_TAX1_VALUE);
+        cell.setCellStyle(cellStyle);
+        cell.setCellValue("Value(%)");
+
+        cell = row.createCell(COLUMN_INDEX_TAX2_NAME);
+        cell.setCellStyle(cellStyle);
+        cell.setCellValue("Tax 2");
+
+        cell = row.createCell(COLUMN_INDEX_TAX2_VALUE);
+        cell.setCellStyle(cellStyle);
+        cell.setCellValue("Value(%)");
+
+        cell = row.createCell(COLUMN_INDEX_DESCRIPTION);
+        cell.setCellStyle(cellStyle);
+        cell.setCellValue("Description");
+
+
     }
 
     // Write data
@@ -200,23 +354,39 @@ public class ImportExportFile {
         Cell cell = row.createCell(COLUMN_INDEX_ID);
         cell.setCellValue(item.getId().getValue());
 
-        cell = row.createCell(COLUMN_INDEX_TITLE);
+        cell = row.createCell(COLUMN_INDEX_BARCODE);
         cell.setCellValue(item.getBarcode().getValue());
 
-        cell = row.createCell(COLUMN_INDEX_PRICE);
+        cell = row.createCell(COLUMN_INDEX_ITEM_NAME);
         cell.setCellValue(item.getItemName().getValue());
         cell.setCellStyle(cellStyleFormatNumber);
 
-        cell = row.createCell(COLUMN_INDEX_QUANTITY);
+        cell = row.createCell(COLUMN_INDEX_CATEGORY);
         cell.setCellValue(item.getCategory().getValue());
 
-        cell = row.createCell(COLUMN_INDEX_TOTAL);
+        cell = row.createCell(COLUMN_INDEX_SUPPLIER_ID);
         cell.setCellValue(item.getSupplier().getValue());
 
-        int currentRow = row.getRowNum() + 1;
-        String columnPrice = CellReference.convertNumToColString(COLUMN_INDEX_PRICE);
-        String columnQuantity = CellReference.convertNumToColString(COLUMN_INDEX_QUANTITY);
-        cell.setCellFormula(columnPrice + currentRow + "*" + columnQuantity + currentRow);
+        cell = row.createCell(COLUMN_INDEX_STOCK_TYPE);
+        cell.setCellValue(item.getStockType().getValue());
+
+        cell = row.createCell(COLUMN_INDEX_ITEM_TYPE);
+        cell.setCellValue(item.getItemType().getValue());
+
+        cell = row.createCell(COLUMN_INDEX_TAX1_NAME);
+        cell.setCellValue(item.getTax1Name().getValue());
+
+        cell = row.createCell(COLUMN_INDEX_TAX1_VALUE);
+        cell.setCellValue(item.getTax1().getValue());
+
+        cell = row.createCell(COLUMN_INDEX_TAX2_NAME);
+        cell.setCellValue(item.getTax2Name().getValue());
+
+        cell = row.createCell(COLUMN_INDEX_TAX2_VALUE);
+        cell.setCellValue(item.getTax2().getValue());
+
+        cell = row.createCell(COLUMN_INDEX_DESCRIPTION);
+        cell.setCellValue(item.getDescription().getValue());
     }
 
     // Create CellStyle for header
@@ -241,11 +411,11 @@ public class ImportExportFile {
     private static void writeFooter(Sheet sheet, int rowIndex) {
         // Create row
         Row row = sheet.createRow(rowIndex);
-        Cell cell = row.createCell(COLUMN_INDEX_TOTAL, CellType.FORMULA);
-        cell.setCellFormula("SUM(E2:E6)");
+        Cell cell = row.createCell(COLUMN_INDEX_SUPPLIER_ID, CellType.FORMULA);
+//        cell.setCellFormula("SUM(E2:E6)");
     }
 
-    // Auto resize column width
+    // Tự động điều chỉnh kích thước cột
     private static void autosizeColumn(Sheet sheet, int lastColumn) {
         for (int columnIndex = 0; columnIndex < lastColumn; columnIndex++) {
             sheet.autoSizeColumn(columnIndex);
@@ -259,7 +429,4 @@ public class ImportExportFile {
         }
     }
 
-
-    static void handleCsvOption(List<Item> items, String csvFilePath) throws IOException {
-    }
 }
