@@ -16,7 +16,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.control.Button;
-import javafx.scene.control.Dialog;
 import javafx.scene.control.ScrollPane;
 
 import java.util.*;
@@ -72,8 +71,6 @@ public class ItemsController {
     
     // Khởi tạo bảng items
     private void setupItemsTable(){
-
-
         // Xử lý sự kiện khi người dùng ấn nút "New Item"
         newItem.setOnAction(event -> itemManager.createItem());
 
@@ -113,7 +110,7 @@ public class ItemsController {
                 }
             }
         });
-        
+
         // Tùy chỉnh cột avatar để hiển thị hỉnh ảnh thay vì text
         avatarCol.setCellFactory(col -> new TableCell<>() {
             private final ImageView imageView = new ImageView();
@@ -157,30 +154,7 @@ public class ItemsController {
                     setGraphic(updateInventoryColBtn);
             }
         });
-
-        // Tùy chỉnh cột stock history để hiển thị button thay vì text
-//        stockHistoryCol.setCellFactory(col -> new TableCell<>() {
-//            final Button stockHistoryBtn = new Button("Stock history");
-//
-//            {
-//                stockHistoryBtn.getStyleClass().addAll("btn-custom");
-//                stockHistoryBtn.setOnAction(event -> {
-//                    Item item = getTableView().getItems().get(getIndex());
-//                    System.out.println("Display stock history for id: " + item.getId());
-//                    itemManager.stockHistory(item);
-//                });
-//            }
-//
-//            @Override
-//            protected void updateItem(String cell, boolean empty) {
-//                super.updateItem(cell, empty);
-//                if(super.isEmpty())
-//                    setGraphic(null);
-//                else
-//                    setGraphic(stockHistoryBtn);
-//            }
-//        });
-
+        
         // Tùy chỉnh cột update item để hiển thị button thay vì text
         updateItemCol.setCellFactory(col -> new TableCell<>() {
             final Button updateItemBtn = new Button("Update item ");
@@ -215,7 +189,7 @@ public class ItemsController {
             col.getStyleClass().add("col");
         });
         tableView.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY); // Không cho phép thay đổi kích thước cột
-        tableView.setItems(ItemStore.visibleItems);  // Thêm dữ liệu vào bảng
+        tableView.setItems(ItemStore.visibleItems); // Gán dữ liệu vào bảng
     }
 
     // Xử lý khi người dùng chọn xóa item
@@ -241,7 +215,6 @@ public class ItemsController {
         });
         // Khởi tạo
         locationChoices.getSelectionModel().selectFirst();
-        
     }
 
 
@@ -281,17 +254,7 @@ public class ItemsController {
     // Khởi tạo phân trang
     private void setupItemsPagination(){
         itemsPagination.pageCountProperty().bind(ItemStore.pageCount);     // Khi pageCount thay đồi thì pageCount của pagination cũng thay đổi
-        // Khi người dùng chuyển trang thì cập nhật dữ liệu hiển thị trên bảng
-        itemsPagination.setPageFactory(pageIndex -> {
-            int fromIndex = Math.min(pageIndex * ItemStore.pageSize.getValue(), ItemStore.visibleItems.size());
-            int toIndex = Math.min(fromIndex + ItemStore.pageSize.getValue(), ItemStore.visibleItems.size());
-            if ((fromIndex + toIndex) != 0)
-                tableView.setItems(FXCollections.observableList(ItemStore.visibleItems.subList(fromIndex, toIndex)));
-            else
-                tableView.setItems(FXCollections.observableList(new ArrayList<>()));
-            return new VBox();
-        });
-        
+        itemsPagination.currentPageIndexProperty().bindBidirectional(ItemStore.currentPage); // Khi currentPage thay đổi thì currentPage của pagination cũng thay đổi
     }
 
     // Xử lý khi người dùng chọn import item

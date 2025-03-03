@@ -26,6 +26,26 @@ USE `mpec_pos`;
 --
 
 
+--
+-- Table structure for table `roles`
+--
+DROP TABLE IF EXISTS `roles`;
+CREATE TABLE `roles` (
+  `role_id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) NOT NULL,
+  PRIMARY KEY (`role_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb3;
+--
+-- Dumping data for table `people`
+--
+
+LOCK TABLES `roles` WRITE;
+/*!40000 ALTER TABLE `roles` DISABLE KEYS */;
+INSERT INTO `roles` VALUES (1,'admin'),
+(2,'boss user'),
+(3,'user');
+/*!40000 ALTER TABLE `roles` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `people`
@@ -75,6 +95,7 @@ CREATE TABLE `users` (
   `username` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
   `person_id` int NOT NULL,
+  `role` int NOT NULL,
   `managed_by`varchar(255) NOT NULL DEFAULT '', 
   `deleted` tinyint(1) NOT NULL DEFAULT '0',
   `hash_version` tinyint(1) NOT NULL DEFAULT '2',
@@ -82,7 +103,8 @@ CREATE TABLE `users` (
   `language_code` varchar(8) DEFAULT NULL,
   PRIMARY KEY (`username`),
   CONSTRAINT `users_ibfk_1` FOREIGN KEY (`person_id`) REFERENCES `people` (`person_id`),
-  CONSTRAINT `users_ibfk_2` FOREIGN KEY (`managed_by`) REFERENCES `users` (`username`)
+  CONSTRAINT `users_ibfk_2` FOREIGN KEY (`role`) REFERENCES `roles` (`role_id`),
+  CONSTRAINT `users_ibfk_3` FOREIGN KEY (`managed_by`) REFERENCES `users` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -747,177 +769,9 @@ UNLOCK TABLES;
 
 
 
-
---
--- Table structure for table `item_kits`
---
-
-DROP TABLE IF EXISTS `item_kits`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `item_kits` (
-  `item_kit_id` int NOT NULL AUTO_INCREMENT,
-  `item_kit_number` varchar(255) DEFAULT NULL,
-  `name` varchar(255) NOT NULL,
-  `item_id` int NOT NULL DEFAULT '0',
-  `kit_discount` decimal(15,2) NOT NULL DEFAULT '0.00',
-  `kit_discount_type` tinyint(1) NOT NULL DEFAULT '0',
-  `price_option` tinyint(1) NOT NULL DEFAULT '0',
-  `print_option` tinyint(1) NOT NULL DEFAULT '0',
-  `description` varchar(255) NOT NULL,
-  PRIMARY KEY (`item_kit_id`),
-  KEY `item_kit_number` (`item_kit_number`),
-  KEY `name` (`name`,`description`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `item_kits`
---
-
-LOCK TABLES `item_kits` WRITE;
-/*!40000 ALTER TABLE `item_kits` DISABLE KEYS */;
-/*!40000 ALTER TABLE `item_kits` ENABLE KEYS */;
-UNLOCK TABLES;
-
-
---
--- Table structure for table `item_kit_items`
---
-
-DROP TABLE IF EXISTS `item_kit_items`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `item_kit_items` (
-  `item_kit_id` int NOT NULL,
-  `item_id` int NOT NULL,
-  `quantity` decimal(15,3) NOT NULL,
-  `kit_sequence` int NOT NULL DEFAULT '0',
-  PRIMARY KEY (`item_kit_id`,`item_id`,`quantity`),
-  KEY `item_kit_items_ibfk_2` (`item_id`),
-  CONSTRAINT `item_kit_items_ibfk_1` FOREIGN KEY (`item_kit_id`) REFERENCES `item_kits` (`item_kit_id`) ON DELETE CASCADE,
-  CONSTRAINT `item_kit_items_ibfk_2` FOREIGN KEY (`item_id`) REFERENCES `items` (`item_id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `item_kit_items`
---
-
-LOCK TABLES `item_kit_items` WRITE;
-/*!40000 ALTER TABLE `item_kit_items` DISABLE KEYS */;
-/*!40000 ALTER TABLE `item_kit_items` ENABLE KEYS */;
-UNLOCK TABLES;
-
-
-
---
--- Table structure for table `attribute_definitions`
---
-
---
--- Bảng này để lưu các thuộc tính của sản phẩm (ví dụ: màu sắc, kích thước, dung tích...)
---
-
-DROP TABLE IF EXISTS `attribute_definitions`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `attribute_definitions` (
-  `definition_id` int NOT NULL AUTO_INCREMENT,
-  `definition_name` varchar(255) NOT NULL, -- Tên thuộc tính
-  `definition_type` varchar(45) NOT NULL, -- Loại thuộc tính: GROUP -> nhóm thuộc tính, DECIMAL -> số thập phân, DATE -> ngày tháng, TEXT -> văn bản, DROPDOWN -> danh sách giá trị, CHECKBOX -> ô chọn. Ví dụ: GROUP: đồ uống; DROPDOWN: coca, pepsi, sprite; DECIMAL: 1.5, 2.5, 3.5;...
-  `definition_unit` varchar(16) DEFAULT NULL, -- Đơn vị của thuộc tính(nếu có, ví dụ: cm, inch, L ...)
-  `definition_flags` tinyint(1) NOT NULL, -- Cờ đánh dấu
-  `definition_fk` int DEFAULT NULL, -- Khóa ngoại tham chiếu đến definition_id(nếu có, ví dụ: một DECIMAL attribute: Dung tích có thể thuộc về một GROUP attribute: Đồ uống)
-  `deleted` tinyint(1) NOT NULL DEFAULT '0', -- Cờ đánh dấu xóa
-  PRIMARY KEY (`definition_id`),
-  KEY `definition_fk` (`definition_fk`),
-  KEY `definition_name` (`definition_name`),
-  KEY `definition_type` (`definition_type`),
-  CONSTRAINT `fk_attribute_definitions_ibfk_1` FOREIGN KEY (`definition_fk`) REFERENCES `attribute_definitions` (`definition_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `attribute_definitions`
---
-
-LOCK TABLES `attribute_definitions` WRITE;
-/*!40000 ALTER TABLE `attribute_definitions` DISABLE KEYS */;
-INSERT INTO `attribute_definitions` VALUES (1,'low sell','GROUP',NULL,7,NULL,0);
-/*!40000 ALTER TABLE `attribute_definitions` ENABLE KEYS */;
-UNLOCK TABLES;
-
-
---
--- Table structure for table `attribute_values`
---
-
---
--- Bảng này để lưu các giá trị của thuộc tính
---
-
-DROP TABLE IF EXISTS `attribute_values`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `attribute_values` (
-  `attribute_id` int NOT NULL AUTO_INCREMENT, 
-  `attribute_value` varchar(255) DEFAULT NULL, -- Giá trị thuộc tính dành cho các loại thuộc tính như DROPDOWN, TEXT, CHECKBOX
-  `attribute_date` date DEFAULT NULL, -- Giá trị thuộc tính dành cho loại thuộc tính như DATE(ví dụ: 2025-02-02)
-  `attribute_decimal` decimal(7,3) DEFAULT NULL, -- Giá trị thuộc tính dành cho loại thuộc tính như DECIMAL(ví dụ: 1,2,3,...)
-  PRIMARY KEY (`attribute_id`),
-  UNIQUE KEY `attribute_value` (`attribute_value`),
-  UNIQUE KEY `attribute_date` (`attribute_date`),
-  UNIQUE KEY `attribute_decimal` (`attribute_decimal`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `attribute_values`
---
-
-LOCK TABLES `attribute_values` WRITE;
-/*!40000 ALTER TABLE `attribute_values` DISABLE KEYS */;
-/*!40000 ALTER TABLE `attribute_values` ENABLE KEYS */;
-UNLOCK TABLES;
-
-
-
-
-
-
-
 --
 -- Sale management tables--------------------------------------------------------------
 --
-
-
---
--- Table structure for table `customers_packages`
---
-
-DROP TABLE IF EXISTS `customers_packages`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `customers_packages` (
-  `package_id` int NOT NULL AUTO_INCREMENT,
-  `package_name` varchar(255) DEFAULT NULL,
-  `points_percent` float NOT NULL DEFAULT '0',
-  `deleted` tinyint(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`package_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `customers_packages`
---
-
-LOCK TABLES `customers_packages` WRITE;
-/*!40000 ALTER TABLE `customers_packages` DISABLE KEYS */;
-INSERT INTO `customers_packages` VALUES (1,'Default',0,0),(2,'Bronze',10,0),(3,'Silver',20,0),(4,'Gold',30,0),(5,'Premium',50,0);
-/*!40000 ALTER TABLE `customers_packages` ENABLE KEYS */;
-UNLOCK TABLES;
-
 
 
 --
@@ -932,8 +786,6 @@ CREATE TABLE `customers` (
   `account_number` varchar(255) NOT NULL DEFAULT '',
   `discount` decimal(15,2) NOT NULL DEFAULT '0.00',
   `discount_type` tinyint(1) NOT NULL DEFAULT '0',
-  `package_id` int DEFAULT NULL,
-  `points` int DEFAULT NULL,
   `deleted` tinyint(1) NOT NULL DEFAULT '0',
   `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `created_by` varchar(255) NOT NULL,
@@ -941,10 +793,8 @@ CREATE TABLE `customers` (
   PRIMARY KEY (`person_id`),
   UNIQUE KEY `account_number` (`account_number`),
   KEY `person_id` (`person_id`),
-  KEY `package_id` (`package_id`),
   CONSTRAINT `customers_ibfk_1` FOREIGN KEY (`person_id`) REFERENCES `people` (`person_id`),
-  CONSTRAINT `customers_ibfk_2` FOREIGN KEY (`package_id`) REFERENCES `customers_packages` (`package_id`),
-  CONSTRAINT `customers_ibfk_3` FOREIGN KEY (`created_by`) REFERENCES `users` (`username`)
+  CONSTRAINT `customers_ibfk_2` FOREIGN KEY (`created_by`) REFERENCES `users` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -997,78 +847,5 @@ LOCK TABLES `sales` WRITE;
 /*!40000 ALTER TABLE `sales` DISABLE KEYS */;
 INSERT INTO `sales` VALUES ('2025-01-26 04:00:49',NULL,1,'',NULL,NULL,1,0,NULL,NULL,0),('2025-01-31 21:32:04',NULL,1,'',NULL,NULL,2,0,NULL,NULL,0),('2025-01-31 21:33:25',NULL,1,'',NULL,NULL,3,0,NULL,NULL,0),('2025-02-02 17:40:16',2,1,'',NULL,NULL,4,0,NULL,NULL,0),('2025-02-02 17:48:29',2,1,'',NULL,NULL,5,0,NULL,NULL,0),('2025-02-02 17:50:12',2,1,'',NULL,NULL,6,0,NULL,NULL,0),('2025-02-02 19:46:48',NULL,1,'',NULL,NULL,7,0,NULL,NULL,0),('2025-02-08 14:02:14',NULL,1,'',NULL,NULL,8,0,1,NULL,0),('2025-02-08 14:32:07',NULL,1,'',NULL,NULL,9,1,1,NULL,4),('2025-02-08 14:48:56',2,1,'',NULL,NULL,10,0,1,NULL,0),('2025-02-08 14:51:55',2,1,'',NULL,NULL,11,0,1,NULL,0),('2025-02-08 14:55:06',2,1,'',NULL,NULL,12,0,1,NULL,0);
 /*!40000 ALTER TABLE `sales` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `customers_points`
---
-
-DROP TABLE IF EXISTS `customers_points`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `customers_points` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `person_id` int NOT NULL,
-  `package_id` int NOT NULL,
-  `sale_id` int NOT NULL,
-  `points_earned` int NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `person_id` (`person_id`),
-  KEY `package_id` (`package_id`),
-  KEY `sale_id` (`sale_id`),
-  CONSTRAINT `customers_points_ibfk_1` FOREIGN KEY (`person_id`) REFERENCES `customers` (`person_id`),
-  CONSTRAINT `customers_points_ibfk_2` FOREIGN KEY (`package_id`) REFERENCES `customers_packages` (`package_id`),
-  CONSTRAINT `customers_points_ibfk_3` FOREIGN KEY (`sale_id`) REFERENCES `sales` (`sale_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `customers_points`
---
-
-LOCK TABLES `customers_points` WRITE;
-/*!40000 ALTER TABLE `customers_points` DISABLE KEYS */;
-/*!40000 ALTER TABLE `customers_points` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `attribute_links`
---
-
---
--- Bảng này để lưu các liên kết giữa các thuộc tính, giá trị thuộc tính và sản phẩm
---
-
-DROP TABLE IF EXISTS `attribute_links`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `attribute_links` (
-  `attribute_id` int DEFAULT NULL, -- Khóa ngoại tham chiếu đến giá trị thuộc tính trong bảng attribute_values
-  `definition_id` int NOT NULL, -- Khóa ngoại tham chiếu đến thuộc tính trong bảng attribute_definitions
-  `item_id` int DEFAULT NULL, -- Khóa ngoại tham chiếu đến sản phẩm trong bảng items
-  `sale_id` int DEFAULT NULL, -- Khóa ngoại tham chiếu đến hóa đơn bán hàng trong bảng sales
-  `receiving_id` int DEFAULT NULL, -- Khóa ngoại tham chiếu đến hóa đơn nhập hàng trong bảng receivings
-  UNIQUE KEY `attribute_links_uq1` (`attribute_id`,`definition_id`,`item_id`,`sale_id`,`receiving_id`),
-  UNIQUE KEY `attribute_links_uq2` (`item_id`,`sale_id`,`receiving_id`,`definition_id`,`attribute_id`),
-  KEY `attribute_id` (`attribute_id`),
-  KEY `definition_id` (`definition_id`),
-  KEY `item_id` (`item_id`),
-  KEY `sale_id` (`sale_id`),
-  KEY `receiving_id` (`receiving_id`),
-  CONSTRAINT `attribute_links_ibfk_1` FOREIGN KEY (`definition_id`) REFERENCES `attribute_definitions` (`definition_id`) ON DELETE CASCADE,
-  CONSTRAINT `attribute_links_ibfk_2` FOREIGN KEY (`attribute_id`) REFERENCES `attribute_values` (`attribute_id`) ON DELETE CASCADE,
-  CONSTRAINT `attribute_links_ibfk_3` FOREIGN KEY (`item_id`) REFERENCES `items` (`item_id`),
-  CONSTRAINT `attribute_links_ibfk_4` FOREIGN KEY (`receiving_id`) REFERENCES `receivings` (`receiving_id`) ON DELETE CASCADE ON UPDATE RESTRICT,
-  CONSTRAINT `attribute_links_ibfk_5` FOREIGN KEY (`sale_id`) REFERENCES `sales` (`sale_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `attribute_links`
---
-
-LOCK TABLES `attribute_links` WRITE;
-/*!40000 ALTER TABLE `attribute_links` DISABLE KEYS */;
-/*!40000 ALTER TABLE `attribute_links` ENABLE KEYS */;
 UNLOCK TABLES;
 

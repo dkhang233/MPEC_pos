@@ -4,18 +4,15 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ChoiceBox?>
-<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Pagination?>
 <?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.cell.PropertyValueFactory?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 
-<?import javafx.scene.control.ComboBox?>
 <AnchorPane prefHeight="649.0" prefWidth="1657.0" style="-fx-background-color: #f8c471;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.pos.app.controller.ItemsController">
    <children>
       <TableView fx:id="tableView" layoutX="110.4" layoutY="121.0" prefHeight="461.0" prefWidth="1455.0" AnchorPane.leftAnchor="110.0" AnchorPane.rightAnchor="92.0">
@@ -28,24 +25,23 @@
       </Pane>
       <Pane layoutX="1317.0" layoutY="32.0" prefWidth="247.0" AnchorPane.rightAnchor="92.79999999999995">
          <children>
-            <Button fx:id="deleteItemBtn" layoutX="186.0" layoutY="43.0" mnemonicParsing="false" onAction="#deleteItem" prefHeight="26.0" prefWidth="60.0" text="Delete">
+            <Button fx:id="deleteItemBtn" layoutX="202.0" layoutY="43.0" mnemonicParsing="false" onAction="#deleteItem" prefHeight="26.0" prefWidth="60.0" text="Delete">
                <styleClass>
                   <String fx:value="btn-danger" />
                   <String fx:value="btn" />
                </styleClass></Button>
-            <Button layoutX="98.0" layoutY="43.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="67.0" styleClass="btn" text="Bulk edit" />
-            <Button fx:id="newItem" layoutY="45.0" mnemonicParsing="false" text="New item">
+            <Button fx:id="newItem" layoutX="94.0" layoutY="46.0" mnemonicParsing="false" text="New item">
                <styleClass>
                   <String fx:value="btn" />
                   <String fx:value="btn-primary" />
                </styleClass></Button>
-            <Button fx:id="importItemBtn" layoutX="94.0" layoutY="-2.0"  mnemonicParsing="false" prefHeight="27.0" prefWidth="67.0" styleClass="btn" text="Import" onAction="#importCSVFile" />
+            <Button fx:id="importItemBtn" layoutX="94.0" layoutY="-2.0" mnemonicParsing="false" onAction="#importCSVFile" prefHeight="27.0" prefWidth="67.0" styleClass="btn" text="Import" />
 
-            <ComboBox fx:id="exportFileBtn" layoutX="200.0" layoutY="-2.0" prefHeight="30.0" prefWidth="80.0" promptText="Export"  />
+            <ComboBox fx:id="exportFileBtn" layoutX="200.0" layoutY="-2.0" prefHeight="30.0" prefWidth="80.0" promptText="Export" />
 
          </children>
       </Pane>
-      <Pagination fx:id="itemsPagination" layoutX="714.0" layoutY="583.0" prefHeight="51.0" prefWidth="247.0" styleClass="pagination" AnchorPane.bottomAnchor="12.0" AnchorPane.leftAnchor="714.0" AnchorPane.rightAnchor="695.5999999999999" />
+      <Pagination fx:id="itemsPagination" layoutX="607.2" layoutY="583.0" prefHeight="51.0" prefWidth="443.0" styleClass="pagination" AnchorPane.bottomAnchor="12.0" AnchorPane.leftAnchor="607.0" AnchorPane.rightAnchor="607.0" />
       <Button layoutX="523.0" layoutY="69.0" mnemonicParsing="false" onAction="#showColVisible" text="Show / Hide " />
       <ScrollPane fx:id="columnsVisibleContainer" layoutX="555.0" layoutY="96.0" prefHeight="191.0" prefWidth="158.0">
          <content>

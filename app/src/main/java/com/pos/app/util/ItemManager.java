@@ -378,9 +378,11 @@ public class ItemManager {
                 ItemStore.itemsPerLocation.computeIfAbsent(location, k -> new ArrayList<>());  // Nếu chưa có danh sách item tại vị trí này thì tạo mới
                 Item newItem = model.mapToItem();  // Chuyển từ BindingNewItem sang Item
                 newItem.setQuantityAtCurrentLocation(quantity.getValue()); // Set quantity cho item
+                ItemStore.itemsPerLocation.computeIfAbsent(location, k -> new ArrayList<>());
                 ItemStore.itemsPerLocation.get(location).add(newItem); // Thêm item mới vào danh sách item tại vị trí này
                 if (ItemStore.currentLocation.getName().getValue().equals(location)) {
-                    ItemStore.visibleItems.add(newItem); // Nếu vị trí này đang được hiển thị trên bảng thì cần thêm vào visibleItems để item mới được hiển thị
+                    ItemStore.pageCount.set((int) Math.ceil((double) ItemStore.itemsPerLocation.get(location).size() / ItemStore.pageSize.getValue()));
+                    ItemStore.currentPage.set(ItemStore.pageCount.getValue() - 1);
                 }
             });
         }
