@@ -18,7 +18,7 @@ public class ItemStore {
 
     
     // Danh sách các item hiển thị trên bảng
-    public static final ListProperty<Item> visibleItems = new SimpleListProperty<>(FXCollections.observableList(new ArrayList<>()));
+    public static final ListProperty<Item> visibleItems = new SimpleListProperty<>(FXCollections.synchronizedObservableList(FXCollections.observableList(new ArrayList<>())));
 
     // Danh sách các vị trí
     public static final ListProperty<Location> locations = new SimpleListProperty<>(FXCollections.observableList(new ArrayList<>()));
@@ -35,6 +35,7 @@ public class ItemStore {
     // Số lượng trang
     public static final IntegerProperty pageCount = new SimpleIntegerProperty(0);
 
+    public static final IntegerProperty currentPage = new SimpleIntegerProperty();
 
 
 
@@ -52,7 +53,7 @@ public class ItemStore {
         // Thêm dữ liệu vào danh sách item
         for (Location location : locations){
             List<Item> items = new ArrayList<>();
-            for (int i = 0; i < 100; i++) {
+            for (int i = 0; i < 1000; i++) {
                 Item item = new Item();
                 item.getId().set(i + 1);
                 item.getItemName().set(faker.commerce().productName());
@@ -90,8 +91,28 @@ public class ItemStore {
         // Nếu giá trị của vị trí hiện tại thay đổi thì cập nhật danh sách item tương ứng để hiển thị trên bảng
         currentLocation.getName().addListener((observable, oldValue, newValue) -> {
             visibleItems.clear();
-            if(itemsPerLocation.containsKey(newValue))
-                visibleItems.addAll(itemsPerLocation.get(newValue));
+            itemsPerLocation.computeIfPresent(newValue, (key, value) -> {
+                pageCount.set((int) Math.ceil((double) value.size() / ItemStore.pageSize.getValue()));
+                int fromIndex = currentPage.get() * ItemStore.pageSize.getValue();
+                System.out.println("Current page: " + currentPage.get());
+                int toIndex = Math.min(fromIndex + ItemStore.pageSize.getValue(), value.size());
+                visibleItems.addAll(itemsPerLocation.get(newValue).subList(fromIndex, toIndex));
+                System.out.println("fromIndex: " + fromIndex + " toIndex: " + toIndex);
+                return value;
+            });
+        });
+
+        // Khi chuyển trang thì cập nhật lại danh sách item hiển thị
+        currentPage.addListener((observable, oldValue, newValue) -> {
+            visibleItems.clear();
+            itemsPerLocation.computeIfPresent(currentLocation.getName().getValue(), (key, value) -> {
+                int fromIndex = currentPage.get() * ItemStore.pageSize.getValue();
+                System.out.println("Current page: " + currentPage.get());
+                int toIndex = Math.min(fromIndex + ItemStore.pageSize.getValue(), value.size());
+                System.out.println("fromIndex: " + fromIndex + " toIndex: " + toIndex);
+                visibleItems.addAll(value.subList(fromIndex, toIndex));
+                return value;
+            });
         });
 
         // Chọn vị trí hiện tại là vị trí đầu tiên
@@ -129,14 +150,6 @@ public class ItemStore {
             ItemStore.inventories.get(2).add(inventory);
             ItemStore.inventories.get(3).add(inventory);
         }
-
-        pageCount.set((int)Math.ceil(visibleItems.sizeProperty().doubleValue() / pageSize.getValue()));   // Khởi tao số lượng trang
-        // Nếu số lượng item hiển thị thay đổi thì cập nhật lại số lượng trang
-        visibleItems.sizeProperty().addListener((observable, oldValue, newValue) -> {
-            int count = Math.max(1,(int)Math.ceil(visibleItems.sizeProperty().doubleValue() / pageSize.getValue()));
-            pageCount.set(count);
-        });
-
     }
     
 }

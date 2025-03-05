@@ -999,17 +999,17 @@ DROP TABLE IF EXISTS `receivings`;
 CREATE TABLE `receivings` (
   `receiving_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `supplier_id` int DEFAULT NULL,
-  `user_id` int NOT NULL DEFAULT '0',
+  `user` VARCHAR(255) NOT NULL DEFAULT '',
   `comment` text,
   `receiving_id` int NOT NULL AUTO_INCREMENT,
   `payment_type` varchar(20) DEFAULT NULL,
   `reference` varchar(32) DEFAULT NULL,
   PRIMARY KEY (`receiving_id`),
   KEY `supplier_id` (`supplier_id`),
-  KEY `user_id` (`user_id`),
+  KEY `user` (`user`),
   KEY `reference` (`reference`),
   KEY `receiving_time` (`receiving_time`),
-  CONSTRAINT `receivings_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`person_id`),
+  CONSTRAINT `receivings_ibfk_1` FOREIGN KEY (`user`) REFERENCES `users` (`username`),
   CONSTRAINT `receivings_ibfk_2` FOREIGN KEY (`supplier_id`) REFERENCES `suppliers` (`person_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
