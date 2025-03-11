@@ -39,6 +39,10 @@ public class Item {
     private BooleanProperty hasSerialNumber = new SimpleBooleanProperty(false);
     private BooleanProperty deleted = new SimpleBooleanProperty(false);
 
+    public Item(String barcode, String itemName) {
+        this.barcode = new SimpleStringProperty(barcode);
+        this.itemName = new SimpleStringProperty(itemName);
+    }
 
 
     public void setQuantityAtCurrentLocation(int quantityAtCurrentLocation) {

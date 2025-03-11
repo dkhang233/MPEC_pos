@@ -4,6 +4,7 @@ package com.pos.app.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pos.app.util.ConfigLoader;
 import okhttp3.*;
+import retrofit2.http.Query;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -48,6 +49,7 @@ public class BaseApi {
         // Nếu response thành công
         return response.body() != null ? response.body().string() : "";
     }
+
 
     // Gửi request 
     public static <T> String request(String endpoint, String method, T data) throws IOException {

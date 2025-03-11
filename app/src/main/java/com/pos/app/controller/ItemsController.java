@@ -1,8 +1,10 @@
 package com.pos.app.controller;
 
+import com.pos.app.api.ItemsApi;
 import com.pos.app.model.*;
 import com.pos.app.store.ItemStore;
 import com.pos.app.util.FormatHelper;
+import com.pos.app.util.ImportExportFile;
 import com.pos.app.util.ItemManager;
 
 
@@ -16,14 +18,17 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.control.Button;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.ScrollPane;
 
 import java.util.*;
 
+import static org.apache.commons.lang3.ClassUtils.getClass;
+
 
 // Controller dung cho items view
 public class ItemsController {
-    // Đường dẫn mặc định của avatar
+     //Đường dẫn mặc định của avatar
     private final String defaultAvatar = Objects
             .requireNonNull(getClass().getClassLoader().getResource("static/default-item.png")).toExternalForm();
 
@@ -57,13 +62,15 @@ public class ItemsController {
     // Khởi tạo ItemManager để xử lý các sự kiện liên quan đến item
     private final ItemManager itemManager = new ItemManager();
 
+    private final ImportExportFile importExportFile = new ImportExportFile();
+
     // Hàm khởi tạo, chạy khi view được load
     @FXML
     public void initialize() {
         setupLocationChoices(); // Khởi tạo danh sách các cửa hàng
         setupItemsTable(); // Khởi tạo bảng items
         setupItemsPagination(); // Khởi tạo phân trang
-        itemManager.exportFileForm(exportFileBtn);
+        importExportFile.exportFileForm(exportFileBtn);
     }
 
 
@@ -71,6 +78,8 @@ public class ItemsController {
     
     // Khởi tạo bảng items
     private void setupItemsTable(){
+
+
         // Xử lý sự kiện khi người dùng ấn nút "New Item"
         newItem.setOnAction(event -> itemManager.createItem());
 
@@ -110,7 +119,7 @@ public class ItemsController {
                 }
             }
         });
-
+        
         // Tùy chỉnh cột avatar để hiển thị hỉnh ảnh thay vì text
         avatarCol.setCellFactory(col -> new TableCell<>() {
             private final ImageView imageView = new ImageView();
@@ -154,7 +163,30 @@ public class ItemsController {
                     setGraphic(updateInventoryColBtn);
             }
         });
-        
+
+        // Tùy chỉnh cột stock history để hiển thị button thay vì text
+//        stockHistoryCol.setCellFactory(col -> new TableCell<>() {
+//            final Button stockHistoryBtn = new Button("Stock history");
+//
+//            {
+//                stockHistoryBtn.getStyleClass().addAll("btn-custom");
+//                stockHistoryBtn.setOnAction(event -> {
+//                    Item item = getTableView().getItems().get(getIndex());
+//                    System.out.println("Display stock history for id: " + item.getId());
+//                    itemManager.stockHistory(item);
+//                });
+//            }
+//
+//            @Override
+//            protected void updateItem(String cell, boolean empty) {
+//                super.updateItem(cell, empty);
+//                if(super.isEmpty())
+//                    setGraphic(null);
+//                else
+//                    setGraphic(stockHistoryBtn);
+//            }
+//        });
+
         // Tùy chỉnh cột update item để hiển thị button thay vì text
         updateItemCol.setCellFactory(col -> new TableCell<>() {
             final Button updateItemBtn = new Button("Update item ");
@@ -189,7 +221,7 @@ public class ItemsController {
             col.getStyleClass().add("col");
         });
         tableView.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY); // Không cho phép thay đổi kích thước cột
-        tableView.setItems(ItemStore.visibleItems); // Gán dữ liệu vào bảng
+        tableView.setItems(ItemStore.visibleItems);  // Thêm dữ liệu vào bảng
     }
 
     // Xử lý khi người dùng chọn xóa item
@@ -202,6 +234,7 @@ public class ItemsController {
             // Xóa các mục đã chọn khỏi danh sách dữ liệu gốc
             tableView.getItems().removeAll(itemsToRemove);
         }
+        ItemsApi.deleteItem(selectedItem.get(0).getId().get());
     }
 
     
@@ -215,6 +248,7 @@ public class ItemsController {
         });
         // Khởi tạo
         locationChoices.getSelectionModel().selectFirst();
+        
     }
 
 
@@ -254,15 +288,29 @@ public class ItemsController {
     // Khởi tạo phân trang
     private void setupItemsPagination(){
         itemsPagination.pageCountProperty().bind(ItemStore.pageCount);     // Khi pageCount thay đồi thì pageCount của pagination cũng thay đổi
-        itemsPagination.currentPageIndexProperty().bindBidirectional(ItemStore.currentPage); // Khi currentPage thay đổi thì currentPage của pagination cũng thay đổi
+        // Khi người dùng chuyển trang thì cập nhật dữ liệu hiển thị trên bảng
+        itemsPagination.setPageFactory(pageIndex -> {
+            int fromIndex = Math.min(pageIndex * ItemStore.pageSize.getValue(), ItemStore.visibleItems.size());
+            int toIndex = Math.min(fromIndex + ItemStore.pageSize.getValue(), ItemStore.visibleItems.size());
+            if ((fromIndex + toIndex) != 0)
+                tableView.setItems(FXCollections.observableList(ItemStore.visibleItems.subList(fromIndex, toIndex)));
+            else
+                tableView.setItems(FXCollections.observableList(new ArrayList<>()));
+            return new VBox();
+        });
+        
     }
 
     // Xử lý khi người dùng chọn import item
     @FXML
-    private void importCSVFile() {
-        itemManager.openImportForm(importItemBtn);
+    private void importFile() {
+        importExportFile.openImportForm(importItemBtn);
     }
 
-
+    // Xử lý khi người dùng chọn export item
+//    @FXML
+//    private void exportFile() {
+//        importExportFile.exportFileForm(exportFileBtn);
+//    }
 }
  

@@ -1,8 +1,18 @@
 package com.pos.app.util;
 
+import com.pos.app.model.BindingNewItem;
 import com.pos.app.model.Item;
 import com.pos.app.store.ItemStore;
+import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.geometry.Pos;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Dialog;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -19,8 +29,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.PropertyException;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class ImportExportFile {
@@ -38,6 +50,8 @@ public class ImportExportFile {
     public static final int COLUMN_INDEX_DESCRIPTION = 11;
 
     private static CellStyle cellStyleFormatNumber = null;
+    final List<Item> items = ImportExportFile.getItems();
+
     // Xử lý sự kiện khi nhấn nút import file trong Dialog.
     public static void handleImportFile(Dialog<Void> dialog) {
         // Lấy cửa sổ chủ từ Dialog hiện tại
@@ -73,7 +87,7 @@ public class ImportExportFile {
                     String barcode = tokens[1].trim();
                     String name = tokens[2].trim();
 
-//                    ItemStore.visibleItems.add(new Item(barcode, name));
+                    ItemStore.visibleItems.add(new Item(barcode, name));
                 }
             }
             br.close();
@@ -89,37 +103,146 @@ public class ImportExportFile {
             Workbook workbook = WorkbookFactory.create(fis);
             // Lấy sheet đầu tiên (có thể thay đổi nếu cần)
             Sheet sheet = workbook.getSheetAt(0);
-            DataFormatter dataFormatter = new DataFormatter();
 
-            boolean isFirstRow = true;
-            for (Row row : sheet) {
-                // Nếu file Excel có header, bỏ qua dòng đầu tiên
-                if (isFirstRow) {
-                    isFirstRow = false;
-                    continue;
+            Iterator<Row> iterator = sheet.iterator();
+            DataFormatter formatter = new DataFormatter();
+
+            if (iterator.hasNext()) iterator.next(); // Bỏ qua dòng tiêu đề
+
+            while (iterator.hasNext()) {
+                Row row = iterator.next();
+                Cell cell0 = row.getCell(0, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+                Cell cell1 = row.getCell(1, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+                Cell cell2 = row.getCell(2, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+
+                String id = formatter.formatCellValue(cell0);
+                String name = formatter.formatCellValue(cell1);
+                String email = formatter.formatCellValue(cell2);
+
+
                 }
-                // Lấy dữ liệu từ các cột
-                Cell cell0 = (Cell) row.getCell(0, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
-                Cell cell1 = (Cell) row.getCell(1, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
-
-                String name = dataFormatter.formatCellValue((Cell) cell0);
-                String value = dataFormatter.formatCellValue((Cell) cell1);
-
-//                ItemStore.visibleItems.add(new Item(name, value));
-            }
             workbook.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    static void exportJSON(List<Item> items, String jsonFilePath) throws IOException {
+    public void openImportForm(Button importItemBtn) {
+        // Tạo Dialog cho form import file
+        Dialog<Void> importDialog = new Dialog<>();
+        importDialog.setTitle("Import File Form");
+
+        // Lấy cửa sổ chủ từ nút openFormButton
+        Stage owner = (Stage) importItemBtn.getScene().getWindow();
+        importDialog.initOwner(owner);
+
+        // Tạo nút import file trong form
+        Button importFileBtn = new Button("Import File");
+        importFileBtn.addEventFilter(ActionEvent.ACTION, event -> ImportExportFile.handleImportFile(importDialog));
+
+        // Sắp xếp các thành phần trong form
+        VBox layout = new VBox(10, importFileBtn);
+        layout.setAlignment(Pos.CENTER);
+        importDialog.getDialogPane().setContent(layout);
+
+        // Thêm nút Close để người dùng thoát Dialog
+        importDialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+        importDialog.showAndWait();
+    }
+
+
+    public void exportFileForm(ComboBox<String> exportFileBtn) {
+        ImportExportFile exportFile = new ImportExportFile();
+        // Thêm các lựa chọn nếu chưa có
+        if (exportFileBtn.getItems().isEmpty()) {
+            exportFileBtn.getItems().addAll("JSON", "MS-Excel", "CSV", "PDF", "XML", "TXT", "SQL");
+        }
+
+        // Sự kiện khi chọn
+        exportFileBtn.setOnAction(event -> {
+            String selectedOption = exportFileBtn.getValue();
+            if (selectedOption != null) {
+                switch (selectedOption) {
+                    case "JSON":
+                        try {
+                            File fileJSON = fileFormat("items.json");
+                            exportFile.exportJSON(items, fileJSON.getAbsolutePath());
+                            System.out.println("da chon json");
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        break;
+
+                    case "MS-Excel":
+                        try {
+                            File fileExcel = fileFormat("items_" + ".xlsx");
+                            exportFile.exportExcel(items, fileExcel.getAbsolutePath());
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        break;
+
+                    case "CSV":
+                        try {
+                            File fileCsv = fileFormat("items.csv");
+                            exportFile.exportCSV(items, fileCsv.getAbsolutePath());
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        break;
+
+                    case "PDF":
+                        try {
+                            File filePDF = fileFormat("items.pdf");
+                            exportFile.exportPDF(items, filePDF.getAbsolutePath());
+                            System.out.println("Da chon pdf");
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        break;
+
+                    case "XML":
+                        try {
+                            File fileXML = fileFormat("items.xml");
+                            exportFile.exportXML(items, fileXML.getAbsolutePath());
+                        } catch (IOException | PropertyException e) {
+                            throw new RuntimeException(e);
+                        } catch (JAXBException e) {
+                            throw new RuntimeException(e);
+                        }
+                        break;
+
+                    case "TXT":
+                        try {
+                            File fileTXT = fileFormat("items.txt");
+                            exportFile.exportTxt(items, fileTXT.getAbsolutePath());
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        break;
+
+                    case "SQL":
+                        try {
+                            File fileSQL = fileFormat("items.sql");
+                            exportFile.exportSQL(items, fileSQL.getAbsolutePath());
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        break;
+                    default:
+                        System.out.println("Không có lựa chọn này");
+                }
+            }
+        });
+    }
+
+    private void exportJSON(List<Item> items, String jsonFilePath) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         // Ghi dữ liệu dưới dạng JSON với định dạng đẹp (pretty print)
         objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File(jsonFilePath), items);
     }
 
-    static void exportExcel(List<Item> items, String excelFilePath) throws IOException {
+    private void exportExcel(List<Item> items, String excelFilePath) throws IOException {
         // Tạo Workbook
         Workbook workbook = getWorkbook(excelFilePath);
 
@@ -152,7 +275,7 @@ public class ImportExportFile {
         createOutputFile(workbook, excelFilePath);
     }
 
-    static void exportCSV(List<Item> items, String csvFilePath) throws IOException {
+    private void exportCSV(List<Item> items, String csvFilePath) throws IOException {
         FileWriter writer = new FileWriter(csvFilePath);
             // Ghi header
             writer.append("Id,Barcode,Item Name,Stock Type,Item Type,Category,Supplier ID,Tax 1:,%,Tax 2:,%\n");
@@ -173,16 +296,19 @@ public class ImportExportFile {
             }
         }
 
-    static void exportTxt(List<Item> items, String txtFilePath) throws IOException {
+    private void exportTxt(List<Item> items, String txtFilePath) throws IOException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(txtFilePath))) {
             for (Item item : items) {
                 writer.write(item.toString());
                 writer.newLine();
             }
+            writer.close();
+        } catch (IOException e) {
+            System.out.println("Error: " + e.getMessage());
         }
     }
 
-    static void exportXML(List<Item> items, String xmlFilePath) throws IOException, JAXBException {
+    private void exportXML(List<Item> items, String xmlFilePath) throws IOException, JAXBException {
         ItemsWrapper wrapper = new ItemsWrapper();
         wrapper.setItems(items);
         JAXBContext context = JAXBContext.newInstance(ItemsWrapper.class);
@@ -191,7 +317,7 @@ public class ImportExportFile {
         marshaller.marshal(wrapper, new File(xmlFilePath));
     }
 
-    static void exportPDF(List<Item> items, String pdfFilePath) throws IOException {
+    private void exportPDF(List<Item> items, String pdfFilePath) throws IOException {
         // Tạo tài liệu PDF
         PDDocument document = new PDDocument();
         PDPage page = new PDPage();
@@ -242,7 +368,7 @@ public class ImportExportFile {
         document.close();
     }
 
-    static void exportSQL(List<Item> items, String sqlFilePath) throws IOException {
+    private void exportSQL(List<Item> items, String sqlFilePath) throws IOException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(sqlFilePath))) {
             writer.write("-- SQL Insert statements generated by exporter");
             writer.newLine();
@@ -257,7 +383,7 @@ public class ImportExportFile {
     }
 
     // Lấy dữ liệu hiện có trong bảng
-    static List<Item> getItems() {
+    private static List<Item> getItems() {
         ItemStore.itemsPerLocation.computeIfAbsent(ItemStore.currentLocation.getName().getValue(), k -> new ArrayList<>());
         return ItemStore.visibleItems.get().stream().toList();
     }
@@ -427,6 +553,33 @@ public class ImportExportFile {
         try (OutputStream os = new FileOutputStream(excelFilePath)) {
             workbook.write(os);
         }
-    }
+    } private File fileFormat(String format) {
+        // Lấy thư mục download của người dùng
+        String downloadsPath = DownloadsFolderUtil.getDownloadsFolder();
 
+        // Tạo đối tượng File cho thư mục Downloads
+        File downloadsFolder = new File(downloadsPath);
+
+        // Kiểm tra và tạo thư mục nếu chưa tồn tại
+        if (!downloadsFolder.exists()) {
+            downloadsFolder.mkdirs();
+        }
+
+        // Tạo file items.xlsx trong thư mục Downloads
+        File file = new File(downloadsFolder, format);
+        if (file.exists()) {
+            // Sử dụng "\\." để escape dấu chấm trong regex
+            String[] parts = format.split("\\.");
+
+            String baseName = parts[0];
+            String extension = parts[1];
+            int i = 1;
+            while(file.exists()){
+                // Ghép lại tên file với số thứ tự và dấu chấm giữa tên và phần mở rộng
+                file = new File(downloadsFolder, baseName + "(" + i + ")." + extension);
+                i++;
+            }
+        }
+        return file;
+    }
 }

@@ -13,11 +13,13 @@ import javafx.beans.property.*;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -31,7 +33,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class ItemManager {
-    final List<Item> items = ImportExportFile.getItems();
 
     // Xử lý khi người dùng chọn tạo item mới
     @FXML
@@ -178,7 +179,7 @@ public class ItemManager {
         FormRenderer formRenderer = new FormRenderer(stockHistoryForm);
         formRenderer.setPrefSize(500, 280);
         try {
-            formRenderer.getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("css/styles.css")).toExternalForm());
+            formRenderer.getStylesheets().add(Objects.requireNonNull( getClass().getClassLoader().getResource("css/styles.css")).toExternalForm());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -270,6 +271,11 @@ public class ItemManager {
                     .label(location);
             quantityFields.add(quantityField);
         });
+        FlowPane flowPane = new FlowPane();
+        flowPane.setPadding(new Insets(11, 12, 12,13));
+        flowPane.setHgap(5);
+        flowPane.setVgap(5);
+
         return Form.of(
                 Group.of(
                         Field.ofStringType(newItemModel.getBarcode())
@@ -318,8 +324,9 @@ public class ItemManager {
                         Field.ofDoubleType(newItemModel.getTax2())
                                 .label("")
                                 .render(new CurrencyInput(2, "%"))
-                ),
 
+
+                ),
                 Group.of(quantityFields.toArray(new IntegerField[0])),
 
                 Group.of(Field.ofIntegerType(newItemModel.getReceivingQuantity())
@@ -434,7 +441,6 @@ public class ItemManager {
         stockDialog.getDialogPane().getButtonTypes().addAll(applyButtonType, ButtonType.CLOSE);
         Button applyButton = (Button) stockDialog.getDialogPane().lookupButton(applyButtonType);
 
-
         // Xử lý khi người dùng bấm nút Apply
         applyButton.addEventFilter(ActionEvent.ACTION, event -> {
             // Kiểm tra dữ liệu nhập vào có hợp lệ không, nếu không hiển thị thông báo lỗi
@@ -486,142 +492,4 @@ public class ItemManager {
         alert.showAndWait();
     }
 
-
-    public void openImportForm(Button importItemBtn) {
-        // Tạo Dialog cho form import file
-        Dialog<Void> importDialog = new Dialog<>();
-        importDialog.setTitle("Import File Form");
-
-        // Lấy cửa sổ chủ từ nút openFormButton
-        Stage owner = (Stage) importItemBtn.getScene().getWindow();
-        importDialog.initOwner(owner);
-
-        // Tạo nút import file trong form
-        Button importFileBtn = new Button("Import File");
-        importFileBtn.addEventFilter(ActionEvent.ACTION, event -> ImportExportFile.handleImportFile(importDialog));
-
-        // Sắp xếp các thành phần trong form
-        VBox layout = new VBox(10, importFileBtn);
-        layout.setAlignment(Pos.CENTER);
-        importDialog.getDialogPane().setContent(layout);
-
-        // Thêm nút Close để người dùng thoát Dialog
-        importDialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
-        importDialog.showAndWait();
-    }
-
-    public void exportFileForm(ComboBox<String> exportFileBtn) {
-        // Thêm các lựa chọn nếu chưa có
-        if (exportFileBtn.getItems().isEmpty()) {
-            exportFileBtn.getItems().addAll("JSON", "MS-Excel", "CSV", "PDF", "XML", "TXT", "SQL");
-        }
-
-        // Sự kiện khi chọn
-        exportFileBtn.setOnAction(event -> {
-            String selectedOption = exportFileBtn.getValue();
-            if (selectedOption != null) {
-                switch (selectedOption) {
-                    case "JSON":
-                        try {
-                            File fileJSON = fileFormat("items.json");
-                            ImportExportFile.exportJSON(items, fileJSON.getAbsolutePath());
-                            System.out.println("da chon json");
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                        break;
-
-                    case "MS-Excel":
-                        try {
-                            File fileExcel = fileFormat("items_" + ".xlsx");
-                            ImportExportFile.exportExcel(items, fileExcel.getAbsolutePath());
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                        break;
-
-                    case "CSV":
-                        try {
-                            File fileCsv = fileFormat("items.csv");
-                            ImportExportFile.exportCSV(items, fileCsv.getAbsolutePath());
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                        break;
-
-                    case "PDF":
-                        try {
-                            File filePDF = fileFormat("items.pdf");
-                            ImportExportFile.exportPDF(items, filePDF.getAbsolutePath());
-                            System.out.println("Da chon pdf");
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                        break;
-
-                    case "XML":
-                        try {
-                            File fileXML = fileFormat("items.xml");
-                            ImportExportFile.exportXML(items, fileXML.getAbsolutePath());
-                        } catch (IOException | PropertyException e) {
-                            throw new RuntimeException(e);
-                        } catch (JAXBException e) {
-                            throw new RuntimeException(e);
-                        }
-                        break;
-
-                    case "TXT":
-                        try {
-                            File fileTXT = fileFormat("items.txt");
-                            ImportExportFile.exportTxt(items, fileTXT.getAbsolutePath());
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                        break;
-
-                    case "SQL":
-                        try {
-                            File fileSQL = fileFormat("items.sql");
-                            ImportExportFile.exportSQL(items, fileSQL.getAbsolutePath());
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                        break;
-                    default:
-                        System.out.println("Không có lựa chọn này");
-                }
-            }
-        });
-    }
-
-
-    private File fileFormat(String format) {
-        // Lấy thư mục download của người dùng
-        String downloadsPath = DownloadsFolderUtil.getDownloadsFolder();
-
-        // Tạo đối tượng File cho thư mục Downloads
-        File downloadsFolder = new File(downloadsPath);
-
-        // Kiểm tra và tạo thư mục nếu chưa tồn tại
-        if (!downloadsFolder.exists()) {
-            downloadsFolder.mkdirs();
-        }
-
-        // Tạo file items.xlsx trong thư mục Downloads
-        File file = new File(downloadsFolder, format);
-        if (file.exists()) {
-            // Sử dụng "\\." để escape dấu chấm trong regex
-            String[] parts = format.split("\\.");
-
-            String baseName = parts[0];
-            String extension = parts[1];
-            int i = 1;
-            while(file.exists()){
-                // Ghép lại tên file với số thứ tự và dấu chấm giữa tên và phần mở rộng
-                file = new File(downloadsFolder, baseName + "(" + i + ")." + extension);
-                i++;
-            }
-        }
-        return file;
-    }
 }

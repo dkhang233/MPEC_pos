@@ -35,7 +35,7 @@
                   <String fx:value="btn" />
                   <String fx:value="btn-primary" />
                </styleClass></Button>
-            <Button fx:id="importItemBtn" layoutX="94.0" layoutY="-2.0" mnemonicParsing="false" onAction="#importCSVFile" prefHeight="27.0" prefWidth="67.0" styleClass="btn" text="Import" />
+            <Button fx:id="importItemBtn" layoutX="94.0" layoutY="-2.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="67.0" styleClass="btn" text="Import" onAction="#importFile" />
 
             <ComboBox fx:id="exportFileBtn" layoutX="200.0" layoutY="-2.0" prefHeight="30.0" prefWidth="80.0" promptText="Export" />
 
