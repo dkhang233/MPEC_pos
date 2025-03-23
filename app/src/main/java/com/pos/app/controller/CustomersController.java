@@ -1,15 +1,13 @@
 package com.pos.app.controller;
 
 import com.pos.app.model.Customer;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-
-import java.util.List;
+import javafx.scene.layout.GridPane;
+import javafx.util.Pair;
 
 public class CustomersController {
 
@@ -22,13 +20,9 @@ public class CustomersController {
     private TableColumn<Customer, String> firstNameCol, lastNameCol, emailCol, phoneCol, updateCol;
 
     @FXML
-    private TextField firstNameField, lastNameField, emailField, phoneField;
-
-    @FXML
     private Button addCustomerBtn, deleteCustomerBtn, updateCustomerBtn;
 
     private final ObservableList<Customer> customersList = FXCollections.observableArrayList();
-
     private int nextId = 3; // ID tự tăng
 
     @FXML
@@ -39,40 +33,36 @@ public class CustomersController {
     }
 
     private void setupCustomersTable() {
-        idCol.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getId()));
-        firstNameCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getFirstName()));
-        lastNameCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getLastName()));
-        emailCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getEmail()));
-        phoneCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getPhoneNumber()));
+        // Sử dụng PropertyValueFactory cho các cột
+        idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
+        firstNameCol.setCellValueFactory(new PropertyValueFactory<>("firstName"));
+        lastNameCol.setCellValueFactory(new PropertyValueFactory<>("lastName"));
+        emailCol.setCellValueFactory(new PropertyValueFactory<>("email"));
+        phoneCol.setCellValueFactory(new PropertyValueFactory<>("phoneNumber"));
 
-        // Thêm nút "Update" vào từng hàng
-        updateCol.setCellFactory(col -> new TableCell<>() {
-            final Button updateButton = new Button("Edit");
-
-            {
-                updateButton.setOnAction(event -> {
-                    Customer customer = getTableView().getItems().get(getIndex());
-                    firstNameField.setText(customer.getFirstName());
-                    lastNameField.setText(customer.getLastName());
-                    emailField.setText(customer.getEmail());
-                    phoneField.setText(customer.getPhoneNumber());
-                    updateCustomerBtn.setUserData(customer); // Lưu khách hàng cần cập nhật
-                });
-            }
-
-            @Override
-            protected void updateItem(String cell, boolean empty) {
-                super.updateItem(cell, empty);
-                if (empty) {
-                    setGraphic(null);
-                } else {
-                    setGraphic(updateButton);
+        // Thêm cột update với nút edit
+        updateCol.setCellFactory(col -> {
+            final Button editButton = new Button("Edit");
+            TableCell<Customer, String> cell = new TableCell<>() {
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty) {
+                        setGraphic(null);
+                    } else {
+                        setGraphic(editButton);
+                        editButton.setOnAction(event -> {
+                            Customer customer = getTableView().getItems().get(getIndex());
+                            showEditDialog(customer);
+                        });
+                    }
                 }
-            }
+            };
+            return cell;
         });
 
         customersTable.setItems(customersList);
-        customersTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        customersTable.getSelectionModel().setSelectionMode(SelectionMode.SINGLE); // Chỉ cho phép chọn 1 hàng
     }
 
     private void loadCustomers() {
@@ -84,48 +74,130 @@ public class CustomersController {
 
     @FXML
     private void addCustomer() {
-        if (validateInput()) {
-            Customer newCustomer = new Customer(
-                    nextId++,
-                    firstNameField.getText(),
-                    lastNameField.getText(),
-                    emailField.getText(),
-                    phoneField.getText()
-            );
-            customersList.add(newCustomer);
-            clearFields();
-        }
+        showAddDialog();
     }
 
     @FXML
     private void deleteCustomer() {
-        List<Customer> selectedCustomers = List.copyOf(customersTable.getSelectionModel().getSelectedItems());
-        customersList.removeAll(selectedCustomers);
+        Customer selected = customersTable.getSelectionModel().getSelectedItem();
+        if (selected != null) {
+            customersList.remove(selected);
+            customersTable.getSelectionModel().clearSelection(); // Xóa lựa chọn sau khi xóa
+        } else {
+            showAlert("No Selection", "Please select a customer to delete.");
+        }
     }
 
     @FXML
     private void updateCustomer() {
-        Customer customer = (Customer) updateCustomerBtn.getUserData();
-        if (customer != null && validateInput()) {
-            customer.setFirstName(firstNameField.getText());
-            customer.setLastName(lastNameField.getText());
-            customer.setEmail(emailField.getText());
-            customer.setPhoneNumber(phoneField.getText());
-            customersTable.refresh();
-            clearFields();
+        // Xử lý trong showEditDialog
+    }
+
+    // Hiển thị dialog để thêm khách hàng
+    private void showAddDialog() {
+        Dialog<Pair<String, String>> dialog = new Dialog<>();
+        dialog.setTitle("Add New Customer");
+        dialog.setHeaderText("Enter customer details");
+
+        ButtonType okButton = new ButtonType("Submit", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(okButton, ButtonType.CANCEL);
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+
+        TextField firstName = new TextField();
+        TextField lastName = new TextField();
+        TextField email = new TextField();
+        TextField phone = new TextField();
+
+        grid.add(new Label("First Name:"), 0, 0);
+        grid.add(firstName, 1, 0);
+        grid.add(new Label("Last Name:"), 0, 1);
+        grid.add(lastName, 1, 1);
+        grid.add(new Label("Email:"), 0, 2);
+        grid.add(email, 1, 2);
+        grid.add(new Label("Phone Number:"), 0, 3);
+        grid.add(phone, 1, 3);
+
+        dialog.getDialogPane().setContent(grid);
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == okButton && validateInput(firstName.getText(), lastName.getText(), email.getText(), phone.getText())) {
+                Customer newCustomer = new Customer(
+                        nextId++,
+                        firstName.getText(),
+                        lastName.getText(),
+                        email.getText(),
+                        phone.getText()
+                );
+                customersList.add(newCustomer);
+                return new Pair<>(firstName.getText(), lastName.getText());
+            }
+            return null;
+        });
+
+        dialog.showAndWait();
+    }
+
+    // Hiển thị dialog để chỉnh khách hàng
+    private void showEditDialog(Customer customer) {
+        if (customer == null) {
+            showAlert("No Selection", "Please select a customer to edit.");
+            return;
         }
+
+        Dialog<Pair<String, String>> dialog = new Dialog<>();
+        dialog.setTitle("Update Customer");
+        dialog.setHeaderText("Edit customer details");
+
+        ButtonType okButton = new ButtonType("Submit", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(okButton, ButtonType.CANCEL);
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+
+        TextField firstName = new TextField(customer.getFirstName());
+        TextField lastName = new TextField(customer.getLastName());
+        TextField email = new TextField(customer.getEmail());
+        TextField phone = new TextField(customer.getPhoneNumber());
+
+        grid.add(new Label("First Name:"), 0, 0);
+        grid.add(firstName, 1, 0);
+        grid.add(new Label("Last Name:"), 0, 1);
+        grid.add(lastName, 1, 1);
+        grid.add(new Label("Email:"), 0, 2);
+        grid.add(email, 1, 2);
+        grid.add(new Label("Phone Number:"), 0, 3);
+        grid.add(phone, 1, 3);
+
+        dialog.getDialogPane().setContent(grid);
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == okButton && validateInput(firstName.getText(), lastName.getText(), email.getText(), phone.getText())) {
+                customer.setFirstName(firstName.getText());
+                customer.setLastName(lastName.getText());
+                customer.setEmail(email.getText());
+                customer.setPhoneNumber(phone.getText());
+                customersTable.refresh();
+                return new Pair<>(firstName.getText(), lastName.getText());
+            }
+            return null;
+        });
+
+        dialog.showAndWait();
     }
 
-    private boolean validateInput() {
-        return !firstNameField.getText().isEmpty() && !lastNameField.getText().isEmpty()
-                && !emailField.getText().isEmpty() && !phoneField.getText().isEmpty();
+    private boolean validateInput(String firstName, String lastName, String email, String phone) {
+        return !firstName.isEmpty() && !lastName.isEmpty() && !email.isEmpty() && !phone.isEmpty();
     }
 
-    private void clearFields() {
-        firstNameField.clear();
-        lastNameField.clear();
-        emailField.clear();
-        phoneField.clear();
-        updateCustomerBtn.setUserData(null);
+    private void showAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }

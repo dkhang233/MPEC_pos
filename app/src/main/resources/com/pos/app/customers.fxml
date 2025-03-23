@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
+<?import java.lang.String?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane prefHeight="450.0" prefWidth="650.0"
+<AnchorPane prefHeight="450.0" prefWidth="850.0"
+            style="-fx-background-color: #f8c471;"
             xmlns="http://javafx.com/javafx/23.0.1"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.pos.app.controller.CustomersController">
 
     <children>
-        <TableView fx:id="customersTable" layoutX="20.0" layoutY="60.0" prefHeight="400.0" prefWidth="850.0">
+        <TableView fx:id="customersTable" layoutX="20.0" layoutY="60.0" prefHeight="461.0" prefWidth="1455.0">
             <columns>
                 <TableColumn fx:id="idCol" text="ID" prefWidth="50.0"/>
                 <TableColumn fx:id="firstNameCol" text="First Name" prefWidth="100.0"/>
@@ -20,15 +21,15 @@
             </columns>
         </TableView>
 
-        <!-- Các trường nhập thông tin khách hàng -->
-        <TextField fx:id="firstNameField" layoutX="900.0" layoutY="350.0" promptText="First Name"/>
-        <TextField fx:id="lastNameField" layoutX="1020.0" layoutY="350.0" promptText="Last Name"/>
-        <TextField fx:id="emailField" layoutX="1160.0" layoutY="350.0" promptText="Email"/>
-        <TextField fx:id="phoneField" layoutX="1280.0" layoutY="350.0" promptText="Phone Number"/>
-
-        <!-- Nút chức năng -->
-        <Button fx:id="addCustomerBtn" layoutX="900.0" layoutY="400.0" text="Add Customer" onAction="#addCustomer"/>
-        <Button fx:id="deleteCustomerBtn" layoutX="1000.0" layoutY="400.0" text="Delete Customer" onAction="#deleteCustomer"/>
-        <Button fx:id="updateCustomerBtn" layoutX="1115.0" layoutY="400.0" text="Update Customer" onAction="#updateCustomer"/>
+        <Button fx:id="addCustomerBtn" layoutX="20.0" layoutY="20.0" text="Add Customer" onAction="#addCustomer" >
+            <styleClass>
+                <String fx:value="btn" />
+                <String fx:value="btn-primary" />
+            </styleClass></Button>
+        <Button fx:id="deleteCustomerBtn" layoutX="160.0" layoutY="20.0" text="Delete Customer" onAction="#deleteCustomer">
+        <styleClass>
+            <String fx:value="btn-danger" />
+            <String fx:value="btn" />
+        </styleClass></Button>
     </children>
 </AnchorPane>
