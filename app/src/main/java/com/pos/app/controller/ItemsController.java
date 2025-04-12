@@ -1,5 +1,6 @@
 package com.pos.app.controller;
 
+import com.pos.app.api.ItemsApi;
 import com.pos.app.model.*;
 import com.pos.app.store.ItemStore;
 import com.pos.app.util.FormatHelper;
@@ -57,13 +58,17 @@ public class ItemsController {
     // Khởi tạo ItemManager để xử lý các sự kiện liên quan đến item
     private final ItemManager itemManager = new ItemManager();
 
+    private final ItemsApi itemsApi = new ItemsApi();
+
     // Hàm khởi tạo, chạy khi view được load
     @FXML
     public void initialize() {
+        itemManager.getItemsData(); // Khởi tạo dữ liệu mẫu
         setupLocationChoices(); // Khởi tạo danh sách các cửa hàng
         setupItemsTable(); // Khởi tạo bảng items
         setupItemsPagination(); // Khởi tạo phân trang
         itemManager.exportFileForm(exportFileBtn);
+
     }
 
 

@@ -60,6 +60,7 @@ public class MainController {
     //Xu li khi nguoi dung chon Customer
     @FXML
     public void onCustomerClicked(){
+        System.out.println("Customer clicked");
         hideAllView();
         customersView.setVisible(true);
     }

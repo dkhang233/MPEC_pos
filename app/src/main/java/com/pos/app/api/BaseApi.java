@@ -1,6 +1,7 @@
 package com.pos.app.api;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pos.app.util.ConfigLoader;
 import okhttp3.*;
@@ -10,8 +11,8 @@ import java.util.concurrent.TimeUnit;
 
 // Lớp cơ sở cho các API
 public class BaseApi {
-    public static final String apiUrl = ConfigLoader.getApiUrl();
-    private static final OkHttpClient client = new OkHttpClient.Builder()
+    private final String apiUrl = ConfigLoader.getApiUrl();
+    private final OkHttpClient client = new OkHttpClient.Builder()
             .connectTimeout(10, TimeUnit.SECONDS)
             .readTimeout(15, TimeUnit.SECONDS)
             .writeTimeout(15, TimeUnit.SECONDS)
@@ -27,12 +28,12 @@ public class BaseApi {
             .build();
 
     // Lấy token
-    private static String getToken() {
+    private String getToken() {
         return "your-access-token";
     }
 
     // Xử lý response chung
-    private static String handleResponse(Response response) throws IOException {
+    private String handleResponse(Response response) throws IOException {
         // Nếu response không thành công
         if (!response.isSuccessful()) {
             int statusCode = response.code();
@@ -50,9 +51,15 @@ public class BaseApi {
     }
 
     // Gửi request 
-    public static <T> String request(String endpoint, String method, T data) throws IOException {
+    public <T> String request(String endpoint, String method, T data) {
         ObjectMapper objectMapper = new ObjectMapper();
-        RequestBody requestBody = RequestBody.create(objectMapper.writeValueAsString(data), MediaType.get("application/json; charset=utf-8"));
+        RequestBody requestBody = null;
+        try {
+            if (data != null)
+                requestBody = RequestBody.create(objectMapper.writeValueAsString(data), MediaType.get("application/json; charset=utf-8"));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
         Request.Builder builder = new Request.Builder().url(apiUrl + endpoint);
 
         switch (method.toUpperCase()) {
@@ -65,6 +72,9 @@ public class BaseApi {
 
         try (Response response = client.newCall(builder.build()).execute()) {
             return handleResponse(response);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "";
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.pos.app.util;
 
 import com.dlsc.formsfx.model.structure.*;
+import com.pos.app.api.ItemsApi;
 import com.pos.app.model.*;
 
 import com.dlsc.formsfx.model.validators.IntegerRangeValidator;
@@ -32,6 +33,15 @@ import java.util.*;
 
 public class ItemManager {
     final List<Item> items = ImportExportFile.getItems();
+    final ItemsApi itemsApi = new ItemsApi();
+
+    public void getItemsData(){
+        // Lấy dữ liệu từ API
+        List<Item> items = itemsApi.getItems();
+        ItemStore.itemsPerLocation.get(ItemStore.currentLocation.getName().getValue()).addAll(items);
+        ItemStore.visibleItems.addAll(items);
+    }
+
 
     // Xử lý khi người dùng chọn tạo item mới
     @FXML
@@ -366,6 +376,8 @@ public class ItemManager {
         return buttonBox;
     }
 
+
+    // Lưu item mới vào danh sách item
     private void saveNewItem(Event event, Form form, BindingNewItem model, Boolean closeForm) {
         if (!form.isValid()) {
             showAlert("Error", "Invalid Data", "Please check your input data.");

@@ -87,9 +87,9 @@
                                     <Label alignment="CENTER" contentDisplay="CENTER" layoutX="1.0" layoutY="57.0" prefHeight="27.0" prefWidth="88.0" text="Items Kits" textAlignment="CENTER" textFill="#fbfcfc" />
                                  </children>
                               </Pane>
-                              <Pane layoutX="189.0" layoutY="10.0" prefHeight="100.0" prefWidth="89.0" styleClass="item-wrapper">
+                              <Pane layoutX="189.0" layoutY="10.0" onMouseClicked="#onCustomerClicked" prefHeight="100.0" prefWidth="89.0" styleClass="item-wrapper">
                                  <children>
-                                    <Pane layoutX="25.0" layoutY="14.0" onMouseClicked="#onCustomerClicked" prefHeight="40.0" prefWidth="40.0">
+                                    <Pane layoutX="25.0" layoutY="14.0"  prefHeight="40.0" prefWidth="40.0">
                                        <styleClass>
                                           <String fx:value="item" />
                                           <String fx:value="circular-pane" />
