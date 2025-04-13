@@ -30,7 +30,7 @@ public class Item {
     private StringProperty tax2Name = new SimpleStringProperty("");
     private DoubleProperty tax2 = new SimpleDoubleProperty(0);
     private StringProperty hsnCode = new SimpleStringProperty("");
-    private IntegerProperty quantityAtCurrentLocation = new SimpleIntegerProperty(0);
+    private IntegerProperty quantity = new SimpleIntegerProperty(0);
     private IntegerProperty receivingQuantity = new SimpleIntegerProperty(0);
     private IntegerProperty reorderLevel = new SimpleIntegerProperty(0);
     private StringProperty description = new SimpleStringProperty("");
@@ -40,10 +40,6 @@ public class Item {
     private BooleanProperty deleted = new SimpleBooleanProperty(false);
 
 
-
-    public void setQuantityAtCurrentLocation(int quantityAtCurrentLocation) {
-        this.quantityAtCurrentLocation.set(quantityAtCurrentLocation);
-    }
 
     // Chuyển từ Item sang BindingNewItem
     public BindingNewItem mapToBindingNewItem() {
@@ -91,7 +87,7 @@ public class Item {
         tax2Name.set(item.getTax2Name().get());
         tax2.set(item.getTax2().get());
         hsnCode.set(item.getHsnCode().get());
-        quantityAtCurrentLocation.set(item.getQuantityAtCurrentLocation().get());
+        quantity.set(item.getQuantity().get());
         receivingQuantity.set(item.getReceivingQuantity().get());
         reorderLevel.set(item.getReorderLevel().get());
         description.set(item.getDescription().get());

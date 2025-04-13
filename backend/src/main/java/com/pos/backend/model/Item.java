@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
-
 @Entity
 @Table(name = "items")
 @Data
@@ -23,7 +21,6 @@ public class Item {
     @Column(name = "category")
     private String category;
 
-
     @Column(name = "supplier_id")
     private int supplier;
 
@@ -34,13 +31,13 @@ public class Item {
     private String description;
 
     @Column(name = "cost_price")
-    private BigDecimal costPrice;
+    private Double costPrice;
 
     @Column(name = "selling_price")
-    private BigDecimal sellingPrice;
+    private Double sellingPrice;
 
     @Column(name = "reorder_level")
-    private BigDecimal reorderLevel = BigDecimal.ZERO;
+    private Integer reorderLevel;
 
     @Column(name = "pic_filename")
     private String picFilename;

@@ -71,5 +71,58 @@
     -fx-border-radius: 0px 5px;
 }
 
+/* Kiểu cho bảng không viền */
+.no-border-table {
+    -fx-border-color: transparent; /* Ẩn đường viền ngoài */
+    -fx-background-insets: 0; /* Loại bỏ khoảng cách viền */
+    -fx-background-color: #ffffff; /* Màu nền trắng giống hóa đơn */
+    -fx-font-family: "Arial"; /* Font chữ giống hóa đơn */
+    -fx-font-size: 14px; /* Kích thước chữ */
+}
 
+.no-border-table .column-header-background {
+    -fx-border-color: transparent; /* Ẩn viền header */
+    -fx-background-color: #f0f0f0; /* Màu nền header nhẹ */
+    -fx-font-weight: bold; /* Chữ in đậm cho header */
+}
 
+.no-border-table .table-cell {
+    -fx-border-color: transparent; /* Ẩn viền các ô */
+    -fx-alignment: CENTER; /* Căn giữa nội dung */
+}
+
+/* Tùy chỉnh nhãn Total Price */
+#totalPriceLabel {
+    -fx-font-family: "Arial";
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333333; /* Màu chữ đậm */
+}
+
+/* Tùy chỉnh nút Confirm và Cancel */
+#confirmBtnTable2, #cancelBtn {
+    -fx-background-color: #4CAF50; /* Màu xanh cho Confirm */
+    -fx-text-fill: white;
+    -fx-font-family: "Arial";
+    -fx-font-size: 14px;
+}
+
+#cancelBtn {
+    -fx-background-color: #f44336; /* Màu đỏ cho Cancel */
+}
+
+/* Tùy chỉnh ListView gợi ý */
+#suggestionsList {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #cccccc;
+    -fx-font-family: "Arial";
+    -fx-font-size: 14px;
+}
+
+#suggestionsList .list-cell {
+    -fx-padding: 5px;
+}
+
+#suggestionsList .list-cell:hover {
+    -fx-background-color: #e0e0e0;
+}

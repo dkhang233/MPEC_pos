@@ -258,8 +258,7 @@ public class ImportExportFile {
 
     // Lấy dữ liệu hiện có trong bảng
     static List<Item> getItems() {
-        ItemStore.itemsPerLocation.computeIfAbsent(ItemStore.currentLocation.getName().getValue(), k -> new ArrayList<>());
-        return ItemStore.visibleItems.get().stream().toList();
+        return ItemStore.items.get().stream().toList();
     }
 
     // Tạo workbook

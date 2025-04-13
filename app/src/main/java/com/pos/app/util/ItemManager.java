@@ -38,7 +38,7 @@ public class ItemManager {
     public void getItemsData(){
         // Lấy dữ liệu từ API
         List<Item> items = itemsApi.getItems();
-        ItemStore.itemsPerLocation.get(ItemStore.currentLocation.getName().getValue()).addAll(items);
+        ItemStore.items.addAll(items);
         ItemStore.visibleItems.addAll(items);
     }
 
@@ -59,24 +59,16 @@ public class ItemManager {
     // Xử lý khi người dùng muốn cập nhật số lượng item
     @FXML
     public void updateInventory(Item item) {
-        IntegerProperty currentQuantity = new SimpleIntegerProperty(item.getQuantityAtCurrentLocation().getValue());
+        IntegerProperty currentQuantity = new SimpleIntegerProperty(item.getQuantity().getValue());
         IntegerProperty inOutQuantity = new SimpleIntegerProperty(0);
         StringProperty comment = new SimpleStringProperty("");
 
         // Tạo danh sách lịch sử thay đổi số lượng item theo từng vị trí
-        Map<String, List<Inventory>> inventoriesForThisItem = new HashMap<>();
+        List<Inventory> inventoriesForThisItem = new ArrayList<>();
         if (!ItemStore.inventories.containsKey(item.getId().getValue())) {
             ItemStore.inventories.put(item.getId().getValue(), new ArrayList<>());
         }
-        ItemStore.inventories.get(item.getId().getValue()).forEach( inventory -> {
-            if(inventoriesForThisItem.containsKey(inventory.getLocation().getValue())){
-                inventoriesForThisItem.get(inventory.getLocation().getValue()).add(inventory);
-            }else{
-                List<Inventory> list = new ArrayList<>();
-                list.add(inventory);
-                inventoriesForThisItem.put(inventory.getLocation().getValue(), list);
-            }
-        });
+        inventoriesForThisItem.addAll(ItemStore.inventories.get(item.getId().getValue()));
 
 
         // Tạo TableView để hiển thị lịch sử số lượng item
@@ -113,46 +105,10 @@ public class ItemManager {
         currentQuantityField.valueProperty().addListener((observable, oldValue, newValue) ->
             inOutQuantityField.validate(IntegerRangeValidator.atLeast(-newValue.intValue() ,"Can't add value smaller than current inventory")));
 
-        // Tạo trường chọn vị trí để xem lịch sử, và hiển thị số lượng hiện tại của item tương ứng với vị trí
-        int selectedLocationIndex = 0;
-        for (int i = 0; i < ItemStore.locations.size(); i++) {
-            if(ItemStore.locations.get(i).getName().getValue().equals(
-                    ItemStore.currentLocation.getName().toString()
-            )){
-                selectedLocationIndex = i;
-                break;
-            }
-        }
-
-        // Tạo trường chọn vị trí
-        SingleSelectionField<String> stockLocationField =  Field.ofSingleSelectionType(ItemStore.locations.stream().map(location -> location.getName().getValue()).toList(),selectedLocationIndex)
-        .label("Location: ");
-
-        // Khi người dùng chọn vị trí khác thì cập nhật lại số lượng hiện tại và lịch sử thay đổi số lượng item
-        stockLocationField.selectionProperty().addListener((observable, oldValue, newValue) -> {
-            stockHistoryTable.getItems().clear();  // Xoá dữ liệu cũ
-            if (!inventoriesForThisItem.containsKey(newValue)) { // Nếu không có lịch sử -> tạo mới
-                inventoriesForThisItem.put(newValue, new ArrayList<>());
-            }
-            stockHistoryTable.getItems().addAll(inventoriesForThisItem.get(newValue));
-
-            // Nếu có item tại vị trí này -> hiển thị số lượng hiện tại, nếu không thì hiển thị 0
-            if (ItemStore.itemsPerLocation.containsKey(newValue)) { // Để cho chăc chắn, kiểm tra xem đã khởi tạo danh sách item tại vị trí này chưa, nếu rồi thì thao tác tiếp
-                Optional<Item> quantity = ItemStore.itemsPerLocation.get(newValue).stream().filter(i -> i.getId().getValue().equals(item.getId().getValue())).findFirst();
-                if (quantity.isPresent()) {
-                    currentQuantity.set(quantity.get().getQuantityAtCurrentLocation().getValue());
-                    return;
-                }
-            }
-            currentQuantity.set(0);
-        });
-
 
          // Thêm dữ liệu vào TableView
-        if(inventoriesForThisItem.containsKey(stockLocationField.getSelection())){
-            stockHistoryTable.getItems().addAll(inventoriesForThisItem.get(stockLocationField.getSelection()));
-        }
-         
+        stockHistoryTable.getItems().addAll(inventoriesForThisItem);
+
         // Tạo form để hiển thị chi tiết số lượng item
         Form stockHistoryForm = Form.of(
                 Group.of(
@@ -167,7 +123,6 @@ public class ItemManager {
                         Field.ofStringType(item.getCategory())
                                 .label("Category: ")
                                 .editable(false),
-                        stockLocationField,  // thêm trường tạo ở trên vào form
                         currentQuantityField,
                         inOutQuantityField,
 
@@ -193,7 +148,7 @@ public class ItemManager {
             e.printStackTrace();
         }
 
-        configDialogButtonUpdateInventory(stockDialog, stockHistoryForm ,item, currentQuantity ,stockLocationField, inOutQuantity, comment, inventoriesForThisItem, stockHistoryTable);
+        configDialogButtonUpdateInventory(stockDialog, stockHistoryForm ,item, currentQuantity , inOutQuantity, comment, inventoriesForThisItem, stockHistoryTable);
 
         body.getChildren().add(formRenderer);
         body.getChildren().add(stockHistoryTable);
@@ -218,18 +173,11 @@ public class ItemManager {
         // Kiểm tra item là mới hay đã có dựa trên tên item
         if (item.getItemName().getValue().isBlank()){
             // Nếu item mới thì số lượng tại mỗi vị trí sẽ là 0
-            ItemStore.locations.forEach(location -> newItemModel.getQuantityPerLocation().put(location.getName().getValue(), new SimpleIntegerProperty(0)));
+           newItemModel.getQuantity().set(0);
         } else {
-            // Nếu item đã có thì lấy số lượng tại mỗi vị trí từ danh sách item tại vị trí đó
-            ItemStore.locations.forEach(location ->{
-                if (!ItemStore.itemsPerLocation.containsKey(location.getName().getValue())) {
-                    ItemStore.itemsPerLocation.put(location.getName().getValue(), new ArrayList<>());
-                }
-                Optional<Item> quantity = ItemStore.itemsPerLocation.get(location.getName().getValue()).stream().filter(i -> i.getId().getValue().equals(item.getId().getValue())).findFirst();
-                if (quantity.isPresent()) {
-                    newItemModel.getQuantityPerLocation().put(location.getName().getValue(), new SimpleIntegerProperty(quantity.get().getQuantityAtCurrentLocation().getValue()));
-                } else {
-                    newItemModel.getQuantityPerLocation().put(location.getName().getValue(), new SimpleIntegerProperty(0));
+            ItemStore.items.forEach((one) -> {
+                if (one.getItemName().getValue().equals(newItemModel.getItemName().getValue())) {
+                    newItemModel.getQuantity().set(one.getQuantity().getValue());
                 }
             });
         }
@@ -274,12 +222,6 @@ public class ItemManager {
 
     // Tạo form để thêm mới và cập nhật item
     private Form createItemForm(BindingNewItem newItemModel) {
-        final List<IntegerField> quantityFields = new ArrayList<>();
-        newItemModel.getQuantityPerLocation().forEach((location, quantity) -> {
-            IntegerField quantityField = Field.ofIntegerType(quantity)
-                    .label(location);
-            quantityFields.add(quantityField);
-        });
         return Form.of(
                 Group.of(
                         Field.ofStringType(newItemModel.getBarcode())
@@ -316,23 +258,17 @@ public class ItemManager {
                                 .render(new CurrencyInput(1, "$")),
 
                         Field.ofStringType(newItemModel.getTax1Name())
-                                .label("Tax1")
-                                .placeholder("Name of Tax 1:"),
-                        Field.ofStringType(newItemModel.getTax2Name())
-                                .label("Tax2")
-                                .placeholder("Name of Tax 2:"),
+                                .label("Tax")
+                                .placeholder("Name of Tax:"),
 
                         Field.ofDoubleType(newItemModel.getTax1())
                                 .label("")
                                 .render(new CurrencyInput(2, "%")),
-                        Field.ofDoubleType(newItemModel.getTax2())
-                                .label("")
-                                .render(new CurrencyInput(2, "%"))
-                ),
 
-                Group.of(quantityFields.toArray(new IntegerField[0])),
-
-                Group.of(Field.ofIntegerType(newItemModel.getReceivingQuantity())
+                        Field.ofIntegerType(newItemModel.getReceivingQuantity())
+                                .label("Quantity"),
+                        
+                        Field.ofIntegerType(newItemModel.getReceivingQuantity())
                                 .label("Receiving Quantity")
                                 .required("Receiving Quantity is required"),
 
@@ -351,7 +287,6 @@ public class ItemManager {
                         Field.ofBooleanType(newItemModel.getDeleted())
                                 .label("Deleted")
                 )
-
         );
     }
     
@@ -384,19 +319,18 @@ public class ItemManager {
             event.consume();
         }else {
             form.persist();
-
-            // Trong BindingNewItem, số lượng item tại mỗi vị trí được lưu trong một map, nên cần duyệt qua từng cặp key-value để lưu item tại mỗi vị trí
-            model.getQuantityPerLocation().forEach((location, quantity) -> {
-                ItemStore.itemsPerLocation.computeIfAbsent(location, k -> new ArrayList<>());  // Nếu chưa có danh sách item tại vị trí này thì tạo mới
-                Item newItem = model.mapToItem();  // Chuyển từ BindingNewItem sang Item
-                newItem.setQuantityAtCurrentLocation(quantity.getValue()); // Set quantity cho item
-                ItemStore.itemsPerLocation.computeIfAbsent(location, k -> new ArrayList<>());
-                ItemStore.itemsPerLocation.get(location).add(newItem); // Thêm item mới vào danh sách item tại vị trí này
-                if (ItemStore.currentLocation.getName().getValue().equals(location)) {
-                    ItemStore.pageCount.set((int) Math.ceil((double) ItemStore.itemsPerLocation.get(location).size() / ItemStore.pageSize.getValue()));
-                    ItemStore.currentPage.set(ItemStore.pageCount.getValue() - 1);
+            Item newItem = model.mapToItem();
+            // Nếu item đã tồn tại thì không cho phép tạo mới
+            ItemStore.items.forEach((one) -> {
+                if (one.getItemName().getValue().equals(newItem.getItemName().getValue())) {
+                    showAlert("Error", "Item already exists", "Please check your input data.");
+                    event.consume();
                 }
             });
+
+            // Nếu item chưa tồn tại thì thêm mới
+            ItemStore.items.add(newItem); // Thêm item mới vào danh sách item
+            ItemStore.visibleItems.add(newItem); // Thêm item mới vào danh sách item hiển thị trên bảng
         }
         // Nếu closeForm = true thì đóng form, ngược lại thì không đóng
         if (!closeForm) {
@@ -421,15 +355,9 @@ public class ItemManager {
             } else {
                 form.persist();
                 Item item = model.mapToItem();   // Chuyển từ BindingNewItem sang Item
-                // Trong BindingNewItem, số lượng item tại mỗi vị trí được lưu trong một map, nên cần duyệt qua từng cặp key-value để lưu item tại mỗi vị trí
-                model.getQuantityPerLocation().forEach((location, quantity) -> {
-                    ItemStore.itemsPerLocation.computeIfAbsent(location, k -> new ArrayList<>());   // Nếu chưa có danh sách item tại vị trí này thì tạo mới
-                    Optional<Item> itemOptional = ItemStore.itemsPerLocation.get(location).stream().filter(i -> i.getId().getValue().equals(item.getId().getValue())).findFirst();  // Kiểm tra xem item đã tồn tại tại vị trí này chưa
-                    item.setQuantityAtCurrentLocation(quantity.getValue()); // Set quantity cho item
-                    if (itemOptional.isPresent()) {
-                        itemOptional.get().copyFromOtherItem(item); // Nếu đã tồn tại thì cập nhật thông tin
-                    }else {
-                        ItemStore.itemsPerLocation.get(location).add(item); // Nếu chưa tồn tại thì thêm mới
+                ItemStore.items.forEach(one -> {
+                    if (one.getId().getValue().equals(item.getId().getValue())) {
+                        one.copyFromOtherItem(item); // Nếu đã tồn tại thì cập nhật thông tin
                     }
                 });
             }
@@ -441,7 +369,7 @@ public class ItemManager {
     }
 
 
-    private void configDialogButtonUpdateInventory(Dialog<?> stockDialog, Form form ,Item item, IntegerProperty currentQuantity, SingleSelectionField<String> stockLocationField, IntegerProperty inOutQuantity, StringProperty comment, Map<String, List<Inventory>> inventoriesForThisItem, TableView<Inventory> stockHistoryTable) {
+    private void configDialogButtonUpdateInventory(Dialog<?> stockDialog, Form form ,Item item, IntegerProperty currentQuantity, IntegerProperty inOutQuantity, StringProperty comment, List<Inventory> inventoriesForThisItem, TableView<Inventory> stockHistoryTable) {
         ButtonType applyButtonType = new ButtonType("Apply", ButtonBar.ButtonData.APPLY);
         stockDialog.getDialogPane().getButtonTypes().addAll(applyButtonType, ButtonType.CLOSE);
         Button applyButton = (Button) stockDialog.getDialogPane().lookupButton(applyButtonType);
@@ -460,31 +388,16 @@ public class ItemManager {
             currentQuantity.set(currentQuantity.get() + inOutQuantity.get());
 
             // Tạo inventory mới ->  thêm vào danh sách inventory trong ItemStore và bảng lịch sử
-            Inventory inventory = new Inventory(1,item.getId().getValue(),"abc", LocalDateTime.now(), stockLocationField.getSelection(),inOutQuantity.get(), currentQuantity.get(),comment.get());
+            Inventory inventory = new Inventory(1,item.getId().getValue(),"abc", LocalDateTime.now(), "",inOutQuantity.get(), currentQuantity.get(),comment.get());
             ItemStore.inventories.get(item.getId().getValue()).add(inventory);
-            inventoriesForThisItem.computeIfAbsent(stockLocationField.getSelection(), k -> new ArrayList<>());
-            inventoriesForThisItem.get(stockLocationField.getSelection()).add(inventory);
+            inventoriesForThisItem.add(inventory);
             stockHistoryTable.getItems().add(inventory);
-
-            // Kiểm tra xem item đã tồn tại tại vị trí này chưa, nếu chưa thì thêm vào danh sách item tại vị trí này, nếu có rồi thì cập nhật số lượng
-            if(ItemStore.itemsPerLocation.containsKey(stockLocationField.getSelection())) { // Để cho chắc chắn, kiểm tra xem đã khởi tạo danh sách item tại vị trí này chưa, nếu rồi thì không cần thêm mới
-                Optional<Item> quantity = ItemStore.itemsPerLocation.get(stockLocationField.getSelection()).stream().filter(i -> i.getId().getValue().equals(item.getId().getValue())).findFirst();
-                if (quantity.isPresent()) {
-                    quantity.get().getQuantityAtCurrentLocation().set(currentQuantity.get());
-                } else {
-                    Item newItem = new Item();
-                    newItem.copyFromOtherItem(item);
-                    newItem.getQuantityAtCurrentLocation().set(currentQuantity.get());
-                    ItemStore.itemsPerLocation.get(stockLocationField.getSelection()).add(newItem);
+            // Cập nhật lại số lượng item trong danh sách items
+            ItemStore.items.forEach(one -> {
+                if (one.getId().getValue().equals(item.getId().getValue())) {
+                    one.getQuantity().set(currentQuantity.get());
                 }
-            }else { // Nếu chưa khởi tạo danh sách item tại vị trí này thì thêm mới
-                Item newItem = new Item();
-                newItem.copyFromOtherItem(item);
-                newItem.getQuantityAtCurrentLocation().set(currentQuantity.get());
-                List<Item> items = new ArrayList<>();
-                items.add(newItem);
-                ItemStore.itemsPerLocation.put(stockLocationField.getSelection(), items);
-            }
+            });
             event.consume();
         });
     }
