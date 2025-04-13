@@ -1,12 +1,14 @@
 package com.pos.backend.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "items")
 @Data
+@AllArgsConstructor
 @NoArgsConstructor
 public class Item {
 
@@ -36,6 +38,9 @@ public class Item {
     @Column(name = "selling_price")
     private Double sellingPrice;
 
+    @Column(name = "quantity")
+    private Integer quantity;
+
     @Column(name = "reorder_level")
     private Integer reorderLevel;
 
@@ -44,4 +49,7 @@ public class Item {
 
     @Column(name = "deleted")
     private Boolean deleted = false;
+
+    @Column(name = "owned_by")
+    private String ownedBy;
 }
