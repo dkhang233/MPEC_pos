@@ -1,7 +1,6 @@
 package com.pos.app.controller;
 
 import com.pos.app.model.Item;
-import com.pos.app.model.InventoryModel;
 import com.pos.app.store.ItemStore;
 import com.pos.app.util.FormatHelper;
 import com.pos.app.util.ItemManager;
@@ -42,7 +41,7 @@ public class ItemsController {
 
     @FXML
     private Button newItem;
-    
+
     @FXML
     private ComboBox<String> exportFileBtn;
 
@@ -65,8 +64,8 @@ public class ItemsController {
         TableColumn<Item, String> itemNameCol = new TableColumn<>("Item Name");
         TableColumn<Item, String> categoryCol = new TableColumn<>("Category");
         TableColumn<Item, String> supplierCol = new TableColumn<>("Supplier");
-        TableColumn<Item, Number> wholeSalePriceCol = new TableColumn<>("Wholesale Price");
-        TableColumn<Item, Number> retailPriceCol = new TableColumn<>("Retail Price");
+        TableColumn<Item, Number> costPriceCol = new TableColumn<>("Cost Price");
+        TableColumn<Item, Number> sellingPriceCol = new TableColumn<>("Selling Price");
         TableColumn<Item, Number> quantityAtCurrentLocationCol = new TableColumn<>("Quantity");
         TableColumn<Item, String> avatarCol = new TableColumn<>("Avatar");
         TableColumn<Item, String> updateInventoryCol = new TableColumn<>("");
@@ -77,29 +76,30 @@ public class ItemsController {
         itemNameCol.setCellValueFactory(cellData -> cellData.getValue().getItemName());
         categoryCol.setCellValueFactory(cellData -> cellData.getValue().getCategory());
         supplierCol.setCellValueFactory(cellData -> cellData.getValue().getSupplier());
-        wholeSalePriceCol.setCellValueFactory(cellData -> cellData.getValue().getWholesalePrice());
-        retailPriceCol.setCellValueFactory(cellData -> cellData.getValue().getRetailPrice());
+        costPriceCol.setCellValueFactory(cellData -> cellData.getValue().getCostPrice());
+        sellingPriceCol.setCellValueFactory(cellData -> cellData.getValue().getSellingPrice());
         quantityAtCurrentLocationCol.setCellValueFactory(cellData -> cellData.getValue().getQuantity());
         avatarCol.setCellValueFactory(cellData -> cellData.getValue().getAvatar());
 
-        wholeSalePriceCol.setCellFactory(col -> new TableCell<>() {
+        costPriceCol.setCellFactory(col -> new TableCell<>() {
             @Override
             protected void updateItem(Number price, boolean empty) {
                 super.updateItem(price, empty);
-                setText(empty || price == null ? null : FormatHelper.formatDecimalNumber(price.doubleValue()));
+                setText(empty || price == null ? null : FormatHelper.formatDecimalNumber(price.doubleValue()) + " đ");
             }
         });
 
-        retailPriceCol.setCellFactory(col -> new TableCell<>() {
+        sellingPriceCol.setCellFactory(col -> new TableCell<>() {
             @Override
             protected void updateItem(Number price, boolean empty) {
                 super.updateItem(price, empty);
-                setText(empty || price == null ? null : FormatHelper.formatDecimalNumber(price.doubleValue()));
+                setText(empty || price == null ? null : FormatHelper.formatDecimalNumber(price.doubleValue()) + " đ");
             }
         });
 
         avatarCol.setCellFactory(col -> new TableCell<>() {
             private final ImageView imageView = new ImageView();
+
             @Override
             protected void updateItem(String avatar, boolean empty) {
                 super.updateItem(avatar, empty);
@@ -128,6 +128,7 @@ public class ItemsController {
                     itemManager.updateInventory(item);
                 });
             }
+
             @Override
             protected void updateItem(String cell, boolean empty) {
                 super.updateItem(cell, empty);
@@ -145,6 +146,7 @@ public class ItemsController {
                     itemManager.updateItemInfo(item);
                 });
             }
+
             @Override
             protected void updateItem(String cell, boolean empty) {
                 super.updateItem(cell, empty);
@@ -153,7 +155,7 @@ public class ItemsController {
         });
 
         tableView.getColumns().addAll(idCol, barcodeCol, itemNameCol, categoryCol, supplierCol,
-                wholeSalePriceCol, retailPriceCol, quantityAtCurrentLocationCol, avatarCol,
+                costPriceCol, sellingPriceCol, quantityAtCurrentLocationCol, avatarCol,
                 updateInventoryCol, updateItemCol);
 
         deleteItemBtn.disableProperty().bind(tableView.getSelectionModel().selectedItemProperty().isNull());
@@ -165,7 +167,7 @@ public class ItemsController {
             col.getStyleClass().add("col");
         });
         tableView.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
-        tableView.setItems(ItemStore.visibleItems);
+        tableView.setItems(ItemStore.itemPage);
     }
 
     @FXML
@@ -173,13 +175,12 @@ public class ItemsController {
         ObservableList<Item> selectedItems = tableView.getSelectionModel().getSelectedItems();
         if (!selectedItems.isEmpty()) {
             List<Item> itemsToRemove = new ArrayList<>(selectedItems);
-            ItemStore.items.removeAll(itemsToRemove);
-            ItemStore.updateVisibleItems();
-            InventoryModel inventoryModel = InventoryModel.getInstance();
-            inventoryModel.getItems().removeAll(itemsToRemove);
+            for (Item item : itemsToRemove) {
+                itemManager.deleteItem(item);
+            }
         }
     }
-    
+
     private void setupColVisible() {
         columnsVisible.setSpacing(10);
         DropShadow dropShadow = new DropShadow();

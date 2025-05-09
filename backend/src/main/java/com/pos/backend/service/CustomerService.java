@@ -32,13 +32,14 @@ public class CustomerService {
     public Customer updateCustomer(int id, Customer customer) {
         Customer result = customerRepository.findById(id).orElse(null);
         if (result != null) {
-            result.setAccountNumber(customer.getAccountNumber());
+            result.setName(customer.getName());
+            // result.setAccountNumber(customer.getAccountNumber());
             result.setDiscount(customer.getDiscount());
             result.setDiscountType(customer.getDiscountType());
             result.setDeleted(customer.getDeleted());
             result.setDate(customer.getDate());
             result.setCreatedBy(customer.getCreatedBy());
-            result.setConsent(customer.getConsent());
+            // result.setConsent(customer.getCons/ent());
             result = customerRepository.save(result);
         }
         return result;

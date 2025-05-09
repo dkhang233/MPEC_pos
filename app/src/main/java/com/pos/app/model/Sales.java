@@ -4,7 +4,7 @@ import javafx.beans.property.*;
 import lombok.Data;
 
 @Data
-public class Receivings {
+public class Sales {
     private final IntegerProperty id;
     private final StringProperty barcode;
     private final StringProperty name;
@@ -16,7 +16,7 @@ public class Receivings {
     private final DoubleProperty total;
     private final StringProperty avatar;
 
-    public Receivings(int id, String barcode, String name, String category, String supplier,
+    public Sales(int id, String barcode, String name, String category, String supplier,
             double wholesalePrice, double retailPrice, int quantity, String avatar) {
         this.id = new SimpleIntegerProperty(id);
         this.barcode = new SimpleStringProperty(barcode);
@@ -27,11 +27,11 @@ public class Receivings {
         this.retailPrice = new SimpleDoubleProperty(retailPrice);
         this.quantity = new SimpleIntegerProperty(quantity);
         this.avatar = new SimpleStringProperty(avatar);
-        this.total = new SimpleDoubleProperty(quantity * wholesalePrice);
+        this.total = new SimpleDoubleProperty(quantity * retailPrice);
 
         // Update total
         this.quantity
-                .addListener((obs, oldVal, newVal) -> this.total.set(newVal.intValue() * this.wholesalePrice.get()));
+                .addListener((obs, oldVal, newVal) -> this.total.set(newVal.intValue() * this.retailPrice.get()));
         this.retailPrice
                 .addListener((obs, oldVal, newVal) -> this.total.set(this.quantity.get() * newVal.doubleValue()));
     }

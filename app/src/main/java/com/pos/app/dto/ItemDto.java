@@ -1,6 +1,8 @@
 package com.pos.app.dto;
 
 import com.pos.app.model.Item;
+import com.pos.app.store.ItemStore;
+import com.pos.app.store.UserStore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,8 +16,8 @@ public class ItemDto {
     private String name;
 
     private String category;
-    
-    private int supplier;
+
+    private int supplier = 0;
 
     private String barcode;
 
@@ -25,25 +27,54 @@ public class ItemDto {
 
     private Double sellingPrice;
 
+    private Integer quantity;
+
     private Integer reorderLevel;
 
     private String picFilename;
 
     private Boolean deleted = false;
 
+    private String ownedBy;
+
     public Item mapToItem() {
         Item item = new Item();
         item.getId().set(this.itemId);
         item.getItemName().set(this.name);
         item.getCategory().set(this.category);
-        item.getSupplier().set(String.valueOf(this.supplier));
+        ItemStore.suppliers.forEach(supplier -> {
+            if (supplier.getId() == this.supplier) {
+                item.getSupplier().set(supplier.getCompanyName());
+            }
+        });
         item.getBarcode().set(this.barcode);
         item.getDescription().set(this.description);
-        item.getWholesalePrice().set(this.costPrice);
-        item.getRetailPrice().set(this.sellingPrice);
+        item.getCostPrice().set(this.costPrice);
+        item.getSellingPrice().set(this.sellingPrice);
+        item.getQuantity().set(this.quantity);
         item.getReorderLevel().set(this.reorderLevel);
         item.getAvatar().set(this.picFilename);
         item.getDeleted().set(this.deleted);
         return item;
+    }
+
+    public ItemDto(Item item) {
+        this.itemId = item.getId().get();
+        this.name = item.getItemName().get();
+        this.category = item.getCategory().get();
+        ItemStore.suppliers.forEach(supplier -> {
+            if (supplier.getCompanyName() == item.getSupplier().get()) {
+                this.supplier = supplier.getId();
+            }
+        });
+        this.barcode = item.getBarcode().get();
+        this.description = item.getDescription().get();
+        this.costPrice = item.getCostPrice().get();
+        this.sellingPrice = item.getSellingPrice().get();
+        this.quantity = item.getQuantity().get();
+        this.reorderLevel = item.getReorderLevel().get();
+        this.picFilename = item.getAvatar().get();
+        this.deleted = item.getDeleted().get();
+        this.ownedBy = UserStore.username;
     }
 }

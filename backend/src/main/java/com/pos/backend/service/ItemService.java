@@ -82,7 +82,7 @@ public class ItemService {
             inventory.setItem(quantityDto.getItemId());
             inventory.setChangedQuantity(quantityDto.getChangedQuantity());
             inventory.setAfterQuantity(result.getQuantity());
-            inventory.setComment("Updated quantity for item ID: " + quantityDto.getItemId());
+            inventory.setComment(quantityDto.getComment());
             inventory.setTimestamp(LocalDateTime.now());
             return inventoryRepository.save(inventory);
         }
@@ -92,5 +92,12 @@ public class ItemService {
     public List<Inventory> getInventoryForItem(Integer itemId) {
         List<Inventory> result = inventoryRepository.findByItem(itemId);
         return result;
+    }
+
+    public void deleteItem(int id) {
+        Item result = itemRepository.findById(id).orElse(null);
+        if (result != null) {
+            itemRepository.delete(result);
+        }
     }
 }

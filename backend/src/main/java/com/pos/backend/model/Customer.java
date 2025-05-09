@@ -13,11 +13,8 @@ import java.time.LocalDateTime;
 public class Customer {
 
     @Id
-    @Column(name = "person_id")
-    private Integer personId;
-
-    @Column(name = "account_number")
-    private String accountNumber = "";
+    @Column(name = "name")
+    private String name;
 
     @Column(name = "discount")
     private Double discount;
@@ -34,6 +31,4 @@ public class Customer {
     @Column(name = "created_by")
     private String createdBy;
 
-    @Column(name = "consent")
-    private Integer consent = 0;
 }

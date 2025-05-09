@@ -16,14 +16,14 @@ public class MainController {
     @FXML
     public Pane supplierView;
 
-    @FXML
-    public Pane expenseView;
+    // @FXML
+    // public Pane expenseView;
 
     @FXML
     public Pane cashupView;
 
-    @FXML
-    public Pane officeView;
+    // @FXML
+    // public Pane officeView;
 
     @FXML
     public Pane receivingView;
@@ -31,35 +31,32 @@ public class MainController {
     @FXML
     private Pane itemsView;
 
-    @FXML
-    private Pane itemsKitsView;
+    // @FXML
+    // private Pane itemsKitsView;
 
     @FXML
     private Pane customersView;
 
+    @FXML
+    private Pane salesView;
+
     // Xu li khi nguoi dung chon sales
     @FXML
-    public void onSalesClicked(){
-        System.out.println("Sales clicked");
+    public void onSalesClicked() {
+        hideAllView();
+        salesView.setVisible(true);
     }
 
     // Xu li khi nguoi dung chon items
     @FXML
-    public void onItemsClicked(){
+    public void onItemsClicked() {
         hideAllView();
         itemsView.setVisible(true);
     }
 
-    // Xu li khi nguoi dung chon items kits
+    // Xu li khi nguoi dung chon Customer
     @FXML
-    public void onItemsKitsClicked(){
-        hideAllView();
-        itemsKitsView.setVisible(true);
-    }
-
-    //Xu li khi nguoi dung chon Customer
-    @FXML
-    public void onCustomerClicked(){
+    public void onCustomerClicked() {
         System.out.println("Customer clicked");
         hideAllView();
         customersView.setVisible(true);
@@ -72,21 +69,9 @@ public class MainController {
     }
 
     @FXML
-    public void onExpenseClicked() {
-        hideAllView();
-        expenseView.setVisible(true);
-    }
-
-    @FXML
     public void onCashupClicked() {
         hideAllView();
         cashupView.setVisible(true);
-    }
-
-    @FXML
-    public void onOfficeClicked() {
-        hideAllView();
-        officeView.setVisible(true);
     }
 
     @FXML
@@ -99,5 +84,11 @@ public class MainController {
         for (Node node : wrapView.getChildren()) {
             node.setVisible(false);
         }
+    }
+
+    @FXML
+    public void initialize() {
+        hideAllView();
+        itemsView.setVisible(true);
     }
 }

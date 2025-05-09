@@ -3,7 +3,7 @@ package com.pos.app.controller;
 import com.pos.app.api.ItemsApi;
 import com.pos.app.dto.ItemQuantityDto;
 import com.pos.app.model.Item;
-import com.pos.app.model.Receivings;
+import com.pos.app.model.Sales;
 import com.pos.app.store.ItemStore;
 import com.pos.app.util.ItemManager;
 import javafx.collections.FXCollections;
@@ -15,17 +15,18 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.util.converter.IntegerStringConverter;
 
 import java.text.DecimalFormat;
+import java.util.Optional;
 
-public class ReceivingsController {
+public class SalesController {
 
     @FXML
-    private TableView<Receivings> tableView;
+    private TableView<Sales> tableView;
     @FXML
-    private TableView<Receivings> tableView1;
+    private TableView<Sales> tableView1;
     @FXML
     private TextField searchField;
     @FXML
-    private ListView<Receivings> suggestionsList;
+    private ListView<Sales> suggestionsList;
     @FXML
     private Button newItem;
     @FXML
@@ -41,14 +42,13 @@ public class ReceivingsController {
     @FXML
     private Label totalPriceLabel;
 
-    private ObservableList<Receivings> leftTableItems = FXCollections.observableArrayList();
-    private ObservableList<Receivings> rightTableItems = FXCollections.observableArrayList();
-    private ObservableList<Receivings> availableItems = FXCollections.observableArrayList();
-    private ObservableList<Receivings> suggestions = FXCollections.observableArrayList();
+    private ObservableList<Sales> leftTableItems = FXCollections.observableArrayList();
+    private ObservableList<Sales> rightTableItems = FXCollections.observableArrayList();
+    private ObservableList<Sales> availableItems = FXCollections.observableArrayList();
+    private ObservableList<Sales> suggestions = FXCollections.observableArrayList();
     private boolean isTableHidden = false;
 
     private final ItemManager itemManager = new ItemManager();
-
     private final ItemsApi itemsApi = new ItemsApi();
 
     private static final DecimalFormat numberFormat = new DecimalFormat("#,###.###");
@@ -56,24 +56,24 @@ public class ReceivingsController {
     @FXML
     public void initialize() {
 
-        TableColumn<Receivings, Integer> idCol = new TableColumn<>("ID");
+        TableColumn<Sales, Integer> idCol = new TableColumn<>("ID");
         idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
 
-        TableColumn<Receivings, String> barcodeCol = new TableColumn<>("Barcode");
+        TableColumn<Sales, String> barcodeCol = new TableColumn<>("Barcode");
         barcodeCol.setCellValueFactory(new PropertyValueFactory<>("barcode"));
 
-        TableColumn<Receivings, String> nameCol = new TableColumn<>("Item Name");
+        TableColumn<Sales, String> nameCol = new TableColumn<>("Item Name");
         nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
 
-        TableColumn<Receivings, String> categoryCol = new TableColumn<>("Category");
+        TableColumn<Sales, String> categoryCol = new TableColumn<>("Category");
         categoryCol.setCellValueFactory(new PropertyValueFactory<>("category"));
 
-        TableColumn<Receivings, String> supplierCol = new TableColumn<>("Supplier");
+        TableColumn<Sales, String> supplierCol = new TableColumn<>("Supplier");
         supplierCol.setCellValueFactory(new PropertyValueFactory<>("supplier"));
 
-        TableColumn<Receivings, Double> wholesalePriceCol = new TableColumn<>("Cost Price");
+        TableColumn<Sales, Double> wholesalePriceCol = new TableColumn<>("Cost Price");
         wholesalePriceCol.setCellValueFactory(new PropertyValueFactory<>("wholesalePrice"));
-        wholesalePriceCol.setCellFactory(column -> new TableCell<Receivings, Double>() {
+        wholesalePriceCol.setCellFactory(column -> new TableCell<Sales, Double>() {
             @Override
             protected void updateItem(Double item, boolean empty) {
                 super.updateItem(item, empty);
@@ -81,9 +81,9 @@ public class ReceivingsController {
             }
         });
 
-        TableColumn<Receivings, Double> retailPriceCol = new TableColumn<>("Selling Price");
+        TableColumn<Sales, Double> retailPriceCol = new TableColumn<>("Selling Price");
         retailPriceCol.setCellValueFactory(new PropertyValueFactory<>("retailPrice"));
-        retailPriceCol.setCellFactory(column -> new TableCell<Receivings, Double>() {
+        retailPriceCol.setCellFactory(column -> new TableCell<Sales, Double>() {
             @Override
             protected void updateItem(Double item, boolean empty) {
                 super.updateItem(item, empty);
@@ -91,20 +91,20 @@ public class ReceivingsController {
             }
         });
 
-        TableColumn<Receivings, Integer> quantityCol = new TableColumn<>("Quantity");
+        TableColumn<Sales, Integer> quantityCol = new TableColumn<>("Quantity");
         quantityCol.setCellValueFactory(new PropertyValueFactory<>("quantity"));
         quantityCol.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
         quantityCol.setOnEditCommit(event -> {
-            Receivings receivings = event.getRowValue();
-            receivings.setQuantity(event.getNewValue());
+            Sales Sales = event.getRowValue();
+            Sales.setQuantity(event.getNewValue());
         });
 
-        TableColumn<Receivings, String> avatarCol = new TableColumn<>("Avatar");
+        TableColumn<Sales, String> avatarCol = new TableColumn<>("Avatar");
         avatarCol.setCellValueFactory(new PropertyValueFactory<>("avatar"));
 
-        TableColumn<Receivings, Double> totalCol = new TableColumn<>("Total");
+        TableColumn<Sales, Double> totalCol = new TableColumn<>("Total");
         totalCol.setCellValueFactory(new PropertyValueFactory<>("total"));
-        totalCol.setCellFactory(column -> new TableCell<Receivings, Double>() {
+        totalCol.setCellFactory(column -> new TableCell<Sales, Double>() {
             @Override
             protected void updateItem(Double item, boolean empty) {
                 super.updateItem(item, empty);
@@ -117,24 +117,24 @@ public class ReceivingsController {
         tableView.setItems(leftTableItems);
         tableView.setEditable(true);
 
-        TableColumn<Receivings, Integer> idColRight = new TableColumn<>("ID");
+        TableColumn<Sales, Integer> idColRight = new TableColumn<>("ID");
         idColRight.setCellValueFactory(new PropertyValueFactory<>("id"));
 
-        TableColumn<Receivings, String> barcodeColRight = new TableColumn<>("Barcode");
+        TableColumn<Sales, String> barcodeColRight = new TableColumn<>("Barcode");
         barcodeColRight.setCellValueFactory(new PropertyValueFactory<>("barcode"));
 
-        TableColumn<Receivings, String> nameColRight = new TableColumn<>("Item Name");
+        TableColumn<Sales, String> nameColRight = new TableColumn<>("Item Name");
         nameColRight.setCellValueFactory(new PropertyValueFactory<>("name"));
 
-        TableColumn<Receivings, String> categoryColRight = new TableColumn<>("Category");
+        TableColumn<Sales, String> categoryColRight = new TableColumn<>("Category");
         categoryColRight.setCellValueFactory(new PropertyValueFactory<>("category"));
 
-        TableColumn<Receivings, String> supplierColRight = new TableColumn<>("Supplier");
+        TableColumn<Sales, String> supplierColRight = new TableColumn<>("Supplier");
         supplierColRight.setCellValueFactory(new PropertyValueFactory<>("supplier"));
 
-        TableColumn<Receivings, Double> wholesalePriceColRight = new TableColumn<>("Wholesale Price");
+        TableColumn<Sales, Double> wholesalePriceColRight = new TableColumn<>("Wholesale Price");
         wholesalePriceColRight.setCellValueFactory(new PropertyValueFactory<>("wholesalePrice"));
-        wholesalePriceColRight.setCellFactory(column -> new TableCell<Receivings, Double>() {
+        wholesalePriceColRight.setCellFactory(column -> new TableCell<Sales, Double>() {
             @Override
             protected void updateItem(Double item, boolean empty) {
                 super.updateItem(item, empty);
@@ -142,9 +142,9 @@ public class ReceivingsController {
             }
         });
 
-        TableColumn<Receivings, Double> retailPriceColRight = new TableColumn<>("Retail Price");
+        TableColumn<Sales, Double> retailPriceColRight = new TableColumn<>("Retail Price");
         retailPriceColRight.setCellValueFactory(new PropertyValueFactory<>("retailPrice"));
-        retailPriceColRight.setCellFactory(column -> new TableCell<Receivings, Double>() {
+        retailPriceColRight.setCellFactory(column -> new TableCell<Sales, Double>() {
             @Override
             protected void updateItem(Double item, boolean empty) {
                 super.updateItem(item, empty);
@@ -152,15 +152,15 @@ public class ReceivingsController {
             }
         });
 
-        TableColumn<Receivings, Integer> quantityColRight = new TableColumn<>("Quantity");
+        TableColumn<Sales, Integer> quantityColRight = new TableColumn<>("Quantity");
         quantityColRight.setCellValueFactory(new PropertyValueFactory<>("quantity"));
 
-        TableColumn<Receivings, String> avatarColRight = new TableColumn<>("Avatar");
+        TableColumn<Sales, String> avatarColRight = new TableColumn<>("Avatar");
         avatarColRight.setCellValueFactory(new PropertyValueFactory<>("avatar"));
 
-        TableColumn<Receivings, Double> totalColRight = new TableColumn<>("Total");
+        TableColumn<Sales, Double> totalColRight = new TableColumn<>("Total");
         totalColRight.setCellValueFactory(new PropertyValueFactory<>("total"));
-        totalColRight.setCellFactory(column -> new TableCell<Receivings, Double>() {
+        totalColRight.setCellFactory(column -> new TableCell<Sales, Double>() {
             @Override
             protected void updateItem(Double item, boolean empty) {
                 super.updateItem(item, empty);
@@ -173,9 +173,9 @@ public class ReceivingsController {
         tableView1.setItems(rightTableItems);
         tableView1.getStyleClass().add("no-border-table");
 
-        suggestionsList.setCellFactory(lv -> new ListCell<Receivings>() {
+        suggestionsList.setCellFactory(lv -> new ListCell<Sales>() {
             @Override
-            protected void updateItem(Receivings item, boolean empty) {
+            protected void updateItem(Sales item, boolean empty) {
                 super.updateItem(item, empty);
                 setText(empty || item == null ? null : item.getName());
             }
@@ -187,8 +187,8 @@ public class ReceivingsController {
                 suggestions.clear();
             } else {
                 suggestions.clear();
-                for (Receivings item : ItemStore.items.stream().filter(i -> i.getDeleted().get() == false)
-                        .map(Item::mapToReceivings).toList()) {
+                for (Sales item : ItemStore.items.stream().filter(i -> i.getDeleted().get() == false)
+                        .map(Item::mapToSales).toList()) {
                     if (item.getName().toLowerCase().contains(newVal.toLowerCase())) {
                         suggestions.add(item);
                     }
@@ -199,9 +199,9 @@ public class ReceivingsController {
         });
 
         suggestionsList.setOnMouseClicked(event -> {
-            Receivings selectedItem = suggestionsList.getSelectionModel().getSelectedItem();
+            Sales selectedItem = suggestionsList.getSelectionModel().getSelectedItem();
             if (selectedItem != null) {
-                leftTableItems.add(new Receivings(
+                leftTableItems.add(new Sales(
                         selectedItem.getId(), selectedItem.getBarcode(), selectedItem.getName(),
                         selectedItem.getCategory(), selectedItem.getSupplier(), selectedItem.getWholesalePrice(),
                         selectedItem.getRetailPrice(), selectedItem.getQuantity(), selectedItem.getAvatar()));
@@ -223,7 +223,7 @@ public class ReceivingsController {
 
     @FXML
     public void deleteItem() {
-        Receivings selectedItem = tableView.getSelectionModel().getSelectedItem();
+        Sales selectedItem = tableView.getSelectionModel().getSelectedItem();
         if (selectedItem != null) {
             leftTableItems.remove(selectedItem);
         }
@@ -238,6 +238,43 @@ public class ReceivingsController {
     @FXML
     public void handleConfirmTable1() {
         if (!leftTableItems.isEmpty()) {
+            Boolean valid = true;
+            for (Sales item : leftTableItems) {
+                if (item.getQuantity() <= 0) {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Invalid Quantity");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Invalid quantity for item: " + item.getName());
+                    alert.showAndWait();
+                    valid = false;
+                    break;
+                }
+
+                Optional<Item> item2 = ItemStore.items.stream().filter(i -> i.getId().get() == item.getId())
+                        .findFirst();
+                if (item2.isEmpty()) {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Item Not Found");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Item not found: " + item.getName());
+                    alert.showAndWait();
+                    valid = false;
+                    break;
+                }
+
+                if (item2.get().getQuantity().get() < item.getQuantity()) {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Insufficient Quantity");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Not enough quantity for item: " + item.getName());
+                    alert.showAndWait();
+                    valid = false;
+                    break;
+                }
+            }
+            if (!valid) {
+                return;
+            }
             rightTableItems.addAll(leftTableItems);
             leftTableItems.clear();
             tableView1.setVisible(true);
@@ -256,12 +293,12 @@ public class ReceivingsController {
     @FXML
     public void handleConfirmTable2() {
         if (!rightTableItems.isEmpty()) {
-            for (Receivings item : rightTableItems) {
-                ItemQuantityDto itemQuantityDto = new ItemQuantityDto(item.getId(), item.getQuantity(),
-                        "Receiving item");
+            for (Sales item : rightTableItems) {
+                ItemQuantityDto itemQuantityDto = new ItemQuantityDto(item.getId(), -item.getQuantity(),
+                        "Selling item");
                 itemsApi.updateItemQuantity(itemQuantityDto);
                 ItemStore.items.stream().filter(i -> i.getId().get() == item.getId()).findFirst()
-                        .ifPresent(i -> i.getQuantity().set(i.getQuantity().get() + item.getQuantity()));
+                        .ifPresent(i -> i.getQuantity().set(i.getQuantity().get() - item.getQuantity()));
             }
         } else {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -271,11 +308,10 @@ public class ReceivingsController {
             alert.showAndWait();
         }
         double totalAmount = rightTableItems.stream()
-                .mapToDouble(Receivings::getTotal)
+                .mapToDouble(Sales::getTotal)
                 .sum();
         totalPriceLabel.setText("Total Price: $" + numberFormat.format(totalAmount));
         confirmBtnTable2.disableProperty().set(true);
-
     }
 
     @FXML
@@ -283,10 +319,9 @@ public class ReceivingsController {
         rightTableItems.clear();
         totalPriceLabel.setText("Total Price: $0.00");
         tableView1.setVisible(false);
+        confirmBtnTable2.disableProperty().set(false);
         confirmBtnTable2.setVisible(false);
         cancelBtn.setVisible(false);
         totalPriceLabel.setVisible(false);
-        confirmBtnTable2.disableProperty().set(false);
-
     }
 }

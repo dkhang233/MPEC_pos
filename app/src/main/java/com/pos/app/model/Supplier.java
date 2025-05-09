@@ -8,10 +8,7 @@ import lombok.Data;
 public class Supplier {
     private int id;
     private String companyName;
-    private String agencyName;
-    private String category;
-    private String firstName;
-    private String lastName;
-    private String Email;
     private String phoneNumber;
+    private String address;
+    private Boolean deleted = false;
 }

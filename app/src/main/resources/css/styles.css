@@ -1,128 +1,147 @@
 .col {
-    -fx-alignment: CENTER;
-    -fx-padding: 5px;
+  -fx-alignment: CENTER;
+  -fx-padding: 5px;
 }
 
 .circular-pane {
-    -fx-background-radius: 50%;
-    -fx-border-radius: 50%;
+  -fx-background-radius: 50%;
+  -fx-border-radius: 50%;
 }
 
-.avatar{
-    -fx-background-color: white;
-    -fx-background-image: url("../static/default-avatar.png");
+.avatar {
+  -fx-background-color: white;
+  -fx-background-image: url("../static/default-avatar.png");
 }
 
 .item {
-    -fx-background-color: #f5f5f5;
-    -fx-background-image: url("../static/default-item.png");
-    -fx-background-size: cover;
-    -fx-background-position: center center;
-    -fx-background-repeat: no-repeat;
+  -fx-background-color: #f5f5f5;
+  -fx-background-size: cover;
+  -fx-background-position: center center;
+  -fx-background-repeat: no-repeat;
 }
 
 .item-wrapper:hover {
-    -fx-background-color: #1abc9c;
-    -fx-cursor: hand;
+  -fx-background-color: #1abc9c;
+  -fx-cursor: hand;
+}
+
+.item-bg {
+  -fx-background-image: url("../static/itemsIcon.png");
+}
+
+.sales-bg {
+  -fx-background-image: url("../static/salesIcon.png");
+}
+
+.receivings-bg {
+  -fx-background-image: url("../static/receivingIcon.png");
+}
+
+.customer-bg {
+  -fx-background-image: url("../static/customerIcon.png");
+}
+
+.supplier-bg {
+  -fx-background-image: url("../static/supplierIcon.png");
 }
 
 .btn:hover {
-    -fx-cursor: hand;
+  -fx-cursor: hand;
 }
 
-
 .btn-custom {
-    -fx-background-color:  #1abc9c;
-    -fx-text-fill: white;
-    -fx-text-alignment: center;
-    -fx-font-size: 10px;
-    -fx-font-weight: bold;
-    -fx-padding: 10px;
-    -fx-wrap-text: true;
+  -fx-background-color: #1abc9c;
+  -fx-text-fill: white;
+  -fx-text-alignment: center;
+  -fx-font-size: 10px;
+  -fx-font-weight: bold;
+  -fx-padding: 10px;
+  -fx-wrap-text: true;
 }
 
 .btn-custom:hover {
-    -fx-background-color: #16a085;
-    -fx-cursor: hand;
+  -fx-background-color: #16a085;
+  -fx-cursor: hand;
 }
 
-.close{
-    -fx-background-image:url("../static/close.png");
+.close {
+  -fx-background-image: url("../static/close.png");
 }
 
-.upload-btn{
-    -fx-background-color: #16a085;
-    -fx-text-fill: white;
-    /*-fx-background-image: url("../static/add.png");*/
-    /*-fx-background-repeat: no-repeat;*/
+.upload-btn {
+  -fx-background-color: #16a085;
+  -fx-text-fill: white;
+  /*-fx-background-image: url("../static/add.png");*/
+  /*-fx-background-repeat: no-repeat;*/
 }
 
-.remove-btn{
-    -fx-background-color: #e74c3c;
-    -fx-text-fill: white;
+.remove-btn {
+  -fx-background-color: #e74c3c;
+  -fx-text-fill: white;
 }
 
 .currency-symbol {
-    -fx-font-size: 10px;
-    -fx-font-weight: bold;
-    -fx-text-fill: white;
-    -fx-background-color: #16a085;
-    -fx-padding: 5px 10px;
-    -fx-border-radius: 0px 5px;
+  -fx-font-size: 10px;
+  -fx-font-weight: bold;
+  -fx-text-fill: white;
+  -fx-background-color: #16a085;
+  -fx-padding: 5px 10px;
+  -fx-border-radius: 0px 5px;
 }
 
 /* Kiểu cho bảng không viền */
 .no-border-table {
-    -fx-border-color: transparent; /* Ẩn đường viền ngoài */
-    -fx-background-insets: 0; /* Loại bỏ khoảng cách viền */
-    -fx-background-color: #ffffff; /* Màu nền trắng giống hóa đơn */
-    -fx-font-family: "Arial"; /* Font chữ giống hóa đơn */
-    -fx-font-size: 14px; /* Kích thước chữ */
+  -fx-border-color: transparent; /* Ẩn đường viền ngoài */
+  -fx-background-insets: 0; /* Loại bỏ khoảng cách viền */
+  -fx-background-color: #ffffff; /* Màu nền trắng giống hóa đơn */
+  -fx-font-family: "Arial"; /* Font chữ giống hóa đơn */
+  -fx-font-size: 14px; /* Kích thước chữ */
 }
 
 .no-border-table .column-header-background {
-    -fx-border-color: transparent; /* Ẩn viền header */
-    -fx-background-color: #f0f0f0; /* Màu nền header nhẹ */
-    -fx-font-weight: bold; /* Chữ in đậm cho header */
+  -fx-border-color: transparent; /* Ẩn viền header */
+  -fx-background-color: #f0f0f0; /* Màu nền header nhẹ */
+  -fx-font-weight: bold; /* Chữ in đậm cho header */
 }
 
 .no-border-table .table-cell {
-    -fx-border-color: transparent; /* Ẩn viền các ô */
-    -fx-alignment: CENTER; /* Căn giữa nội dung */
+  -fx-border-color: transparent; /* Ẩn viền các ô */
+  -fx-alignment: CENTER; /* Căn giữa nội dung */
 }
 
 /* Tùy chỉnh nhãn Total Price */
 #totalPriceLabel {
-    -fx-font-family: "Arial";
-    -fx-font-size: 16px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #333333; /* Màu chữ đậm */
+  -fx-font-family: "Arial";
+  -fx-font-size: 16px;
+  -fx-font-weight: bold;
+  -fx-text-fill: #333333; /* Màu chữ đậm */
 }
 
 /* Tùy chỉnh nút Confirm và Cancel */
-#confirmBtnTable2, #cancelBtn {
-    -fx-background-color: #4CAF50; /* Màu xanh cho Confirm */
-    -fx-text-fill: white;
-    -fx-font-family: "Arial";
-    -fx-font-size: 14px;
+#confirmBtnTable2,
+#cancelBtn {
+  -fx-background-color: #4caf50; /* Màu xanh cho Confirm */
+  -fx-text-fill: white;
+  -fx-font-family: "Arial";
+  -fx-font-size: 14px;
 }
 
 #cancelBtn {
-    -fx-background-color: #f44336; /* Màu đỏ cho Cancel */
+  -fx-background-color: #f44336; /* Màu đỏ cho Cancel */
 }
 
 /* Tùy chỉnh ListView gợi ý */
 #suggestionsList {
-    -fx-background-color: #ffffff;
-    -fx-border-color: #cccccc;
-    -fx-font-family: "Arial";
-    -fx-font-size: 14px;
+  -fx-background-color: #ffffff;
+  -fx-border-color: #cccccc;
+  -fx-font-family: "Arial";
+  -fx-font-size: 14px;
 }
 
 #suggestionsList .list-cell {
-    -fx-padding: 5px;
+  -fx-padding: 5px;
 }
 
 #suggestionsList .list-cell:hover {
-    -fx-background-color: #e0e0e0;
+  -fx-background-color: #e0e0e0;
 }

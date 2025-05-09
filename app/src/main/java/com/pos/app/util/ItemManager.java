@@ -5,10 +5,10 @@ import com.pos.app.api.ItemsApi;
 import com.pos.app.model.*;
 
 import com.dlsc.formsfx.model.validators.IntegerRangeValidator;
-import com.dlsc.formsfx.view.controls.SimpleRadioButtonControl;
 import com.dlsc.formsfx.view.renderer.FormRenderer;
 import com.pos.app.component.CurrencyInput;
 import com.pos.app.component.ImageUpload;
+import com.pos.app.dto.ItemQuantityDto;
 import com.pos.app.store.ItemStore;
 import javafx.beans.property.*;
 import javafx.event.ActionEvent;
@@ -16,9 +16,6 @@ import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.control.Button;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -27,21 +24,20 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.PropertyException;
 import java.io.File;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.IntStream;
 
 public class ItemManager {
     final List<Item> items = ImportExportFile.getItems();
     final ItemsApi itemsApi = new ItemsApi();
 
-    public void getItemsData(){
+    public void getItemsData() {
         // Lấy dữ liệu từ API
         List<Item> items = itemsApi.getItems();
         ItemStore.items.addAll(items);
         ItemStore.visibleItems.addAll(items);
     }
-
 
     // Xử lý khi người dùng chọn tạo item mới
     @FXML
@@ -51,10 +47,9 @@ public class ItemManager {
 
     // Xử lý khi người dùng muốn cập nhật thông tin item
     @FXML
-    public void updateItemInfo(Item item){
-       initItemForm(2, item);
+    public void updateItemInfo(Item item) {
+        initItemForm(2, item);
     }
-
 
     // Xử lý khi người dùng muốn cập nhật số lượng item
     @FXML
@@ -64,49 +59,56 @@ public class ItemManager {
         StringProperty comment = new SimpleStringProperty("");
 
         // Tạo danh sách lịch sử thay đổi số lượng item theo từng vị trí
-        List<Inventory> inventoriesForThisItem = new ArrayList<>();
-        if (!ItemStore.inventories.containsKey(item.getId().getValue())) {
-            ItemStore.inventories.put(item.getId().getValue(), new ArrayList<>());
-        }
-        inventoriesForThisItem.addAll(ItemStore.inventories.get(item.getId().getValue()));
+        List<Inventory> inventoriesForThisItem = itemsApi.getItemQuantityHistory(item.getId().getValue());
 
+        int key = item.getId().getValue();
+        List<Inventory> list = ItemStore.inventories.get(key);
+        if (list == null) {
+            list = new ArrayList<>();
+            ItemStore.inventories.put(key, list);
+        }
+
+        list.addAll(inventoriesForThisItem);
 
         // Tạo TableView để hiển thị lịch sử số lượng item
         TableView<Inventory> stockHistoryTable = new TableView<>();
         stockHistoryTable.setPrefSize(650, 500);
         TableColumn<Inventory, String> dateCol = new TableColumn<>("Date");
-        dateCol.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getTimestamp().getValue().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))));
-        TableColumn<Inventory, String> userCol = new TableColumn<>("User");
-        userCol.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getUsername().getValue()));
+        dateCol.setCellValueFactory(param -> new SimpleObjectProperty<>(
+                param.getValue().getTimestamp().getValue().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))));
         TableColumn<Inventory, String> changeCol = new TableColumn<>("In/Out");
-        changeCol.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getInventory().getValue().toString()));
+        changeCol.setCellValueFactory(
+                param -> new SimpleStringProperty(param.getValue().getChangedQuantity().getValue().toString()));
         TableColumn<Inventory, String> quantityCol = new TableColumn<>("After quantity");
-        quantityCol.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getAfterInventory().getValue().toString()));
+        quantityCol.setCellValueFactory(
+                param -> new SimpleStringProperty(param.getValue().getAfterQuantity().getValue().toString()));
         TableColumn<Inventory, String> commentCol = new TableColumn<>("Comment");
         commentCol.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getComment().getValue()));
-        stockHistoryTable.getColumns().addAll(dateCol, userCol, changeCol ,  quantityCol, commentCol);
+        stockHistoryTable.getColumns().addAll(dateCol, changeCol, quantityCol, commentCol);
         int cols = stockHistoryTable.getColumns().size(); // Số cột của bảng
-        stockHistoryTable.getColumns().forEach(col -> col.prefWidthProperty().bind(stockHistoryTable.widthProperty().divide(cols).subtract(0.65))); // Tự động thay đổi kích thước cột khi thay đổi kích thước bảng
+        stockHistoryTable.getColumns().forEach(
+                col -> col.prefWidthProperty().bind(stockHistoryTable.widthProperty().divide(cols).subtract(0.65)));
 
         // Tạo trường nhập số lượng để thêm vào hoặc trừ ra khỏi số lượng item
         IntegerField inOutQuantityField = Field.ofIntegerType(inOutQuantity)
                 .label("In/Out")
                 .tooltip("Input positive value to add to inventory, negative value to subtract")
                 .required("Quantity is a required field")
-                .validate(IntegerRangeValidator.atLeast(-currentQuantity.get()
-                        ,"Can't add value smaller than current inventory"));
+                .validate(IntegerRangeValidator.atLeast(-currentQuantity.get(),
+                        "Can't add value smaller than current inventory"));
 
         // Tạo trường hiển thị số lượng hiện tại của item
         IntegerField currentQuantityField = Field.ofIntegerType(currentQuantity)
                 .label("Quantity")
                 .editable(false);
 
-        // Thay đổi điều kiện của trường nhập số lượng (thêm vào hoặc trừ ra khỏi số lượng item)  khi số lượng hiện tại thay đổi
-        currentQuantityField.valueProperty().addListener((observable, oldValue, newValue) ->
-            inOutQuantityField.validate(IntegerRangeValidator.atLeast(-newValue.intValue() ,"Can't add value smaller than current inventory")));
+        // Thay đổi điều kiện của trường nhập số lượng (thêm vào hoặc trừ ra khỏi số
+        // lượng item) khi số lượng hiện tại thay đổi
+        currentQuantityField.valueProperty()
+                .addListener((observable, oldValue, newValue) -> inOutQuantityField.validate(IntegerRangeValidator
+                        .atLeast(-newValue.intValue(), "Can't add value smaller than current inventory")));
 
-
-         // Thêm dữ liệu vào TableView
+        // Thêm dữ liệu vào TableView
         stockHistoryTable.getItems().addAll(inventoriesForThisItem);
 
         // Tạo form để hiển thị chi tiết số lượng item
@@ -128,11 +130,7 @@ public class ItemManager {
 
                         Field.ofStringType(comment)
                                 .label("Comment")
-                                .multiline(true)
-                )
-        );
-
-
+                                .multiline(true)));
 
         Dialog<Object> stockDialog = new Dialog<>();
         stockDialog.setTitle("Inventory Count Detail");
@@ -143,12 +141,14 @@ public class ItemManager {
         FormRenderer formRenderer = new FormRenderer(stockHistoryForm);
         formRenderer.setPrefSize(500, 280);
         try {
-            formRenderer.getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("css/styles.css")).toExternalForm());
+            formRenderer.getStylesheets().add(
+                    Objects.requireNonNull(getClass().getClassLoader().getResource("css/styles.css")).toExternalForm());
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        configDialogButtonUpdateInventory(stockDialog, stockHistoryForm ,item, currentQuantity , inOutQuantity, comment, inventoriesForThisItem, stockHistoryTable);
+        configDialogButtonUpdateInventory(stockDialog, stockHistoryForm, item, currentQuantity, inOutQuantity, comment,
+                inventoriesForThisItem, stockHistoryTable);
 
         body.getChildren().add(formRenderer);
         body.getChildren().add(stockHistoryTable);
@@ -157,23 +157,20 @@ public class ItemManager {
         stockDialog.showAndWait();
     }
 
-
-
-
     // Xử lý khi người dùng muốn xem lịch sử thay đổi số lượng item
-//    @FXML
-//    public void stockHistory(Item item){
-//
-//    }
+    // @FXML
+    // public void stockHistory(Item item){
+    //
+    // }
 
     // Khởi tạo các thành phần cần thiết để tạo mới hoặc cập nhật item
     private void initItemForm(int type, Item item) {
-        final BindingNewItem newItemModel =  item.mapToBindingNewItem();   // Khởi tạo model
+        final BindingNewItem newItemModel = item.mapToBindingNewItem(); // Khởi tạo model
 
         // Kiểm tra item là mới hay đã có dựa trên tên item
-        if (item.getItemName().getValue().isBlank()){
+        if (item.getItemName().getValue().isBlank()) {
             // Nếu item mới thì số lượng tại mỗi vị trí sẽ là 0
-           newItemModel.getQuantity().set(0);
+            newItemModel.getQuantity().set(0);
         } else {
             ItemStore.items.forEach((one) -> {
                 if (one.getItemName().getValue().equals(newItemModel.getItemName().getValue())) {
@@ -181,13 +178,14 @@ public class ItemManager {
                 }
             });
         }
-        Form newItemForm = createItemForm(newItemModel);      // Tạo form
+        Form newItemForm = createItemForm(newItemModel); // Tạo form
 
         // Tạo renderer cho form
         FormRenderer formRenderer = new FormRenderer(newItemForm);
         formRenderer.setPrefSize(600, 600);
         try {
-            formRenderer.getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("css/styles.css")).toExternalForm());
+            formRenderer.getStylesheets().add(
+                    Objects.requireNonNull(getClass().getClassLoader().getResource("css/styles.css")).toExternalForm());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -203,22 +201,21 @@ public class ItemManager {
 
         // Khởi tạo dialog
         Dialog<Item> itemDialog = new Dialog<>();
-        itemDialog.getDialogPane().setContent(scrollPane);     // Thêm form vào Dialog
+        itemDialog.getDialogPane().setContent(scrollPane); // Thêm form vào Dialog
         itemDialog.setWidth(650);
         itemDialog.setHeight(600);
         HBox buttonBox;
         if (type == 1) {
             itemDialog.setTitle("Create new item");
-            buttonBox = configDialogButtonNewItem(itemDialog,newItemForm, newItemModel);
+            buttonBox = configDialogButtonNewItem(itemDialog, newItemForm, newItemModel);
 
         } else {
             itemDialog.setTitle("Update Item");
-            buttonBox = configDialogButtonUpdateItemInfo(itemDialog,newItemForm, newItemModel);
+            buttonBox = configDialogButtonUpdateItemInfo(itemDialog, newItemForm, newItemModel);
         }
-        container.getChildren().add(buttonBox);    // Thêm nút tạo mới vào form
+        container.getChildren().add(buttonBox); // Thêm nút tạo mới vào form
         itemDialog.showAndWait();
     }
-
 
     // Tạo form để thêm mới và cập nhật item
     private Form createItemForm(BindingNewItem newItemModel) {
@@ -239,45 +236,26 @@ public class ItemManager {
                                 .label("Supplier")
                                 .tooltip("Supplier"),
 
-                        Field.ofSingleSelectionType(newItemModel.getStockTypes(), newItemModel.getSelectedStockType())
-                                .label("Stock Item")
-                                .render(new SimpleRadioButtonControl<>()),
+                        Field.ofDoubleType(newItemModel.getCostPrice())
+                                .label("Cost Price")
+                                .required("Cost Price is required")
+                                .render(new CurrencyInput(1, "đ")),
 
-                        Field.ofSingleSelectionType(newItemModel.getItemTypes(), newItemModel.getSelectedItemType())
-                                .label("Item type")
-                                .render(new SimpleRadioButtonControl<>()),
+                        Field.ofDoubleType(newItemModel.getSellingPrice())
+                                .label("Selling Price")
+                                .required("Selling Price is required")
+                                .render(new CurrencyInput(1, "đ")),
 
-                        Field.ofDoubleType(newItemModel.getWholesalePrice())
-                                .label("Wholesale Price")
-                                .required("Wholesale Price is required")
-                                .render(new CurrencyInput(1, "$")),
-
-                        Field.ofDoubleType(newItemModel.getRetailPrice())
-                                .label("Retail Price")
-                                .required("Retail Price is required")
-                                .render(new CurrencyInput(1, "$")),
-
-                        Field.ofStringType(newItemModel.getTax1Name())
-                                .label("Tax")
-                                .placeholder("Name of Tax:"),
-
-                        Field.ofDoubleType(newItemModel.getTax1())
-                                .label("")
-                                .render(new CurrencyInput(2, "%")),
-
-                        Field.ofIntegerType(newItemModel.getReceivingQuantity())
-                                .label("Quantity"),
-                        
-                        Field.ofIntegerType(newItemModel.getReceivingQuantity())
-                                .label("Receiving Quantity")
-                                .required("Receiving Quantity is required"),
+                        // Field.ofIntegerType(newItemModel.getQuantity())
+                        // .label("Quantity"),
 
                         Field.ofIntegerType(newItemModel.getReorderLevel())
                                 .label("Reorder Level")
                                 .required("Reorder Level is required"),
 
                         Field.ofStringType(newItemModel.getDescription())
-                                .label("Description"),
+                                .label("Description")
+                                .multiline(true),
 
                         // Trường avatar cần tùy chỉnh để cho phép chọn và hiển thị hình ảnh
                         Field.ofStringType(newItemModel.getAvatar())
@@ -285,12 +263,10 @@ public class ItemManager {
                                 .render(new ImageUpload()),
 
                         Field.ofBooleanType(newItemModel.getDeleted())
-                                .label("Deleted")
-                )
-        );
+                                .label("Deleted")));
     }
-    
-    private HBox configDialogButtonNewItem(Dialog<?> dialog,Form form, BindingNewItem model) {
+
+    private HBox configDialogButtonNewItem(Dialog<?> dialog, Form form, BindingNewItem model) {
         ButtonType okButtonType = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
         ButtonType newButtonType = new ButtonType("New", ButtonBar.ButtonData.FINISH);
         ButtonType cancelButtonType = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
@@ -311,36 +287,45 @@ public class ItemManager {
         return buttonBox;
     }
 
-
     // Lưu item mới vào danh sách item
     private void saveNewItem(Event event, Form form, BindingNewItem model, Boolean closeForm) {
         if (!form.isValid()) {
             showAlert("Error", "Invalid Data", "Please check your input data.");
             event.consume();
-        }else {
-            form.persist();
-            Item newItem = model.mapToItem();
-            // Nếu item đã tồn tại thì không cho phép tạo mới
-            ItemStore.items.forEach((one) -> {
-                if (one.getItemName().getValue().equals(newItem.getItemName().getValue())) {
-                    showAlert("Error", "Item already exists", "Please check your input data.");
-                    event.consume();
-                }
-            });
-
-            // Nếu item chưa tồn tại thì thêm mới
-            ItemStore.items.add(newItem); // Thêm item mới vào danh sách item
-            ItemStore.visibleItems.add(newItem); // Thêm item mới vào danh sách item hiển thị trên bảng
+            return;
         }
+
+        form.persist();
+        Item newItem = model.mapToItem();
+
+        // Nếu item đã tồn tại thì không cho phép tạo mới
+        Boolean itemExists = ItemStore.items.stream()
+                .anyMatch(item -> item.getItemName().getValue().equals(newItem.getItemName().getValue()));
+        if (itemExists) {
+            showAlert("Error", "Item already exists", "Please check your input data.");
+            event.consume();
+            return;
+        }
+
+        // Nếu item chưa tồn tại thì thêm mới
+        Optional<Item> res = itemsApi.createNewItem(newItem); // Gọi API để tạo mới item
+
+        if (res.isEmpty()) {
+            AlertBox.show("Error", "Failed to create new item");
+            event.consume();
+        }
+
+        ItemStore.items.add(res.get()); // Thêm item mới vào danh sách item
+        ItemStore.visibleItems.add(res.get()); // Thêm item mới vào danh sách item hiển thị trên bảng
+
         // Nếu closeForm = true thì đóng form, ngược lại thì không đóng
         if (!closeForm) {
             event.consume();
         }
     }
 
-
     // Cấu hình nút bấm cho việc cập nhật thông tin item
-    private HBox configDialogButtonUpdateItemInfo(Dialog<?> dialog,Form form, BindingNewItem model) {
+    private HBox configDialogButtonUpdateItemInfo(Dialog<?> dialog, Form form, BindingNewItem model) {
         ButtonType submitButtonType = new ButtonType("Submit", ButtonBar.ButtonData.APPLY);
         ButtonType cancelButtonType = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
         dialog.getDialogPane().getButtonTypes().addAll(submitButtonType, cancelButtonType);
@@ -354,12 +339,40 @@ public class ItemManager {
                 event.consume();
             } else {
                 form.persist();
-                Item item = model.mapToItem();   // Chuyển từ BindingNewItem sang Item
+                // Gọi API để cập nhật thông tin item
+                Optional<Item> res = itemsApi.updateItem(model.mapToItem());
+                if (res.isEmpty()) {
+                    showAlert("Error", "Failed to update item", "Please check your input data.");
+                    event.consume();
+                    return;
+                }
+
+                Item updatedItem = res.get();
+
+                // Cập nhật lại item trong danh sách items
                 ItemStore.items.forEach(one -> {
-                    if (one.getId().getValue().equals(item.getId().getValue())) {
-                        one.copyFromOtherItem(item); // Nếu đã tồn tại thì cập nhật thông tin
+                    if (one.getId().getValue().equals(updatedItem.getId().getValue())) {
+                        one.setItemName(updatedItem.getItemName());
+                        one.setCategory(updatedItem.getCategory());
+                        one.setSupplier(updatedItem.getSupplier());
+                        one.setCostPrice(updatedItem.getCostPrice());
+                        one.setSellingPrice(updatedItem.getSellingPrice());
+                        one.setReorderLevel(updatedItem.getReorderLevel());
+                        one.setDescription(updatedItem.getDescription());
+                        one.setAvatar(updatedItem.getAvatar());
                     }
                 });
+
+                // Cập nhật lại item trong danh sách items hiển thị trên bảng
+                int index = IntStream.range(0, ItemStore.visibleItems.size())
+                        .filter(i -> ItemStore.visibleItems.get(i).getId().get() == updatedItem.getId().get())
+                        .findFirst()
+                        .orElse(-1); // trả về -1 nếu không tìm thấy
+
+                if (index != -1) {
+                    ItemStore.visibleItems.set(index, updatedItem); // Cập nhật lại item trong danh sách items hiển thị
+                                                                    // trên bảng
+                }
             }
         });
 
@@ -368,36 +381,72 @@ public class ItemManager {
         return buttonBox;
     }
 
-
-    private void configDialogButtonUpdateInventory(Dialog<?> stockDialog, Form form ,Item item, IntegerProperty currentQuantity, IntegerProperty inOutQuantity, StringProperty comment, List<Inventory> inventoriesForThisItem, TableView<Inventory> stockHistoryTable) {
+    private void configDialogButtonUpdateInventory(Dialog<?> stockDialog, Form form, Item item,
+            IntegerProperty currentQuantity, IntegerProperty inOutQuantity, StringProperty comment,
+            List<Inventory> inventoriesForThisItem, TableView<Inventory> stockHistoryTable) {
         ButtonType applyButtonType = new ButtonType("Apply", ButtonBar.ButtonData.APPLY);
         stockDialog.getDialogPane().getButtonTypes().addAll(applyButtonType, ButtonType.CLOSE);
         Button applyButton = (Button) stockDialog.getDialogPane().lookupButton(applyButtonType);
 
-
         // Xử lý khi người dùng bấm nút Apply
         applyButton.addEventFilter(ActionEvent.ACTION, event -> {
             // Kiểm tra dữ liệu nhập vào có hợp lệ không, nếu không hiển thị thông báo lỗi
-            if(!form.isValid()){
+            if (!form.isValid()) {
                 showAlert("Error", "Invalid Data", "Please check your input data.");
                 event.consume();
                 return;
             }
             // Nếu dữ liệu hợp lệ
             form.persist();
+
+            String cmt = comment.get().isEmpty() ? "Update inventory" : comment.get(); // Nếu không có comment thì để là
+                                                                                       // No comment
+            ItemQuantityDto itemQuantityDto = new ItemQuantityDto(item.getId().getValue(),
+                    inOutQuantity.get(), cmt); // Chuyển đổi sang ItemQuantityDto để gửi lên API
+
+            Optional<Inventory> res = itemsApi.updateItemQuantity(itemQuantityDto); // Gọi API để cập nhật số lượng item
+
+            if (res.isEmpty()) {
+                showAlert("Error", "Failed to update item quantity", "Please check your input data.");
+                event.consume();
+                return;
+            }
+
             currentQuantity.set(currentQuantity.get() + inOutQuantity.get());
 
-            // Tạo inventory mới ->  thêm vào danh sách inventory trong ItemStore và bảng lịch sử
-            Inventory inventory = new Inventory(1,item.getId().getValue(),"abc", LocalDateTime.now(), "",inOutQuantity.get(), currentQuantity.get(),comment.get());
-            ItemStore.inventories.get(item.getId().getValue()).add(inventory);
-            inventoriesForThisItem.add(inventory);
-            stockHistoryTable.getItems().add(inventory);
+            int key = item.getId().getValue();
+            List<Inventory> list = ItemStore.inventories.get(key);
+            if (list == null) {
+                list = new ArrayList<>();
+                ItemStore.inventories.put(key, list);
+            }
+            list.add(res.get());
+
+            stockHistoryTable.getItems().add(res.get()); // Thêm vào bảng lịch sử
+
             // Cập nhật lại số lượng item trong danh sách items
             ItemStore.items.forEach(one -> {
                 if (one.getId().getValue().equals(item.getId().getValue())) {
                     one.getQuantity().set(currentQuantity.get());
                 }
             });
+
+            // Cập nhật lại item trong danh sách items hiển thị trên bảng
+            int index = IntStream.range(0, ItemStore.visibleItems.size())
+                    .filter(i -> ItemStore.visibleItems.get(i).getId().get() == key)
+                    .findFirst()
+                    .orElse(-1); // trả về -1 nếu không tìm thấy
+
+            Item updateItem = ItemStore.items.stream()
+                    .filter(i -> i.getId().getValue() == key)
+                    .findFirst()
+                    .orElse(null); // tìm item trong danh sách items
+
+            if (index != -1) {
+                ItemStore.visibleItems.set(index, updateItem); // Cập nhật lại item trong danh sách items hiển thị
+                                                               // trên bảng
+            }
+
             event.consume();
         });
     }
@@ -410,7 +459,6 @@ public class ItemManager {
         alert.setContentText(content);
         alert.showAndWait();
     }
-
 
     public void openImportForm(Button importItemBtn) {
         // Tạo Dialog cho form import file
@@ -519,7 +567,6 @@ public class ItemManager {
         });
     }
 
-
     private File fileFormat(String format) {
         // Lấy thư mục download của người dùng
         String downloadsPath = DownloadsFolderUtil.getDownloadsFolder();
@@ -541,12 +588,21 @@ public class ItemManager {
             String baseName = parts[0];
             String extension = parts[1];
             int i = 1;
-            while(file.exists()){
+            while (file.exists()) {
                 // Ghép lại tên file với số thứ tự và dấu chấm giữa tên và phần mở rộng
                 file = new File(downloadsFolder, baseName + "(" + i + ")." + extension);
                 i++;
             }
         }
         return file;
+    }
+
+    public void deleteItem(Item item) {
+        // Gọi API để xóa item
+        itemsApi.deleteItem(item.getId().getValue());
+
+        // Xóa item khỏi danh sách items
+        ItemStore.items.remove(item);
+        ItemStore.visibleItems.remove(item);
     }
 }

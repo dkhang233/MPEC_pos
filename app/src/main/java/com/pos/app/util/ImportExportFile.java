@@ -162,14 +162,8 @@ public class ImportExportFile {
                 writer.append(String.valueOf(item.getId())).append(",");
                 writer.append(String.valueOf(item.getBarcode())).append(",");
                 writer.append(String.valueOf(item.getItemName())).append(",");
-                writer.append(String.valueOf(item.getStockType())).append(",");
-                writer.append(String.valueOf(item.getItemType())).append(",");
                 writer.append(String.valueOf(item.getCategory())).append(",");
                 writer.append(String.valueOf(item.getSupplier())).append(",");
-                writer.append(String.valueOf(item.getTax1Name())).append(",");
-                writer.append(String.valueOf(item.getTax1())).append(",");
-                writer.append(String.valueOf(item.getTax2Name())).append(",");
-                writer.append(String.valueOf(item.getTax2())).append("\n");
             }
         }
 
@@ -365,25 +359,7 @@ public class ImportExportFile {
 
         cell = row.createCell(COLUMN_INDEX_SUPPLIER_ID);
         cell.setCellValue(item.getSupplier().getValue());
-
-        cell = row.createCell(COLUMN_INDEX_STOCK_TYPE);
-        cell.setCellValue(item.getStockType().getValue());
-
-        cell = row.createCell(COLUMN_INDEX_ITEM_TYPE);
-        cell.setCellValue(item.getItemType().getValue());
-
-        cell = row.createCell(COLUMN_INDEX_TAX1_NAME);
-        cell.setCellValue(item.getTax1Name().getValue());
-
-        cell = row.createCell(COLUMN_INDEX_TAX1_VALUE);
-        cell.setCellValue(item.getTax1().getValue());
-
-        cell = row.createCell(COLUMN_INDEX_TAX2_NAME);
-        cell.setCellValue(item.getTax2Name().getValue());
-
-        cell = row.createCell(COLUMN_INDEX_TAX2_VALUE);
-        cell.setCellValue(item.getTax2().getValue());
-
+        
         cell = row.createCell(COLUMN_INDEX_DESCRIPTION);
         cell.setCellValue(item.getDescription().getValue());
     }
