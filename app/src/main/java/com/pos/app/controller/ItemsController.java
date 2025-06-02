@@ -60,13 +60,13 @@ public class ItemsController {
         newItem.setOnAction(event -> itemManager.createItem());
 
         TableColumn<Item, Number> idCol = new TableColumn<>("ID");
-        TableColumn<Item, String> barcodeCol = new TableColumn<>("Barcode");
-        TableColumn<Item, String> itemNameCol = new TableColumn<>("Item Name");
-        TableColumn<Item, String> categoryCol = new TableColumn<>("Category");
-        TableColumn<Item, String> supplierCol = new TableColumn<>("Supplier");
-        TableColumn<Item, Number> costPriceCol = new TableColumn<>("Cost Price");
-        TableColumn<Item, Number> sellingPriceCol = new TableColumn<>("Selling Price");
-        TableColumn<Item, Number> quantityAtCurrentLocationCol = new TableColumn<>("Quantity");
+        TableColumn<Item, String> barcodeCol = new TableColumn<>("Mã vạch");
+        TableColumn<Item, String> itemNameCol = new TableColumn<>("Tên mặt hàng");
+        TableColumn<Item, String> categoryCol = new TableColumn<>("Loại hàng");
+        TableColumn<Item, String> supplierCol = new TableColumn<>("Nhà cung cấp");
+        TableColumn<Item, Number> costPriceCol = new TableColumn<>("Giá nhập");
+        TableColumn<Item, Number> sellingPriceCol = new TableColumn<>("Giá bán");
+        TableColumn<Item, Number> quantityAtCurrentLocationCol = new TableColumn<>("Số lượng");
         TableColumn<Item, String> avatarCol = new TableColumn<>("Avatar");
         TableColumn<Item, String> updateInventoryCol = new TableColumn<>("");
         TableColumn<Item, String> updateItemCol = new TableColumn<>("");
@@ -119,7 +119,7 @@ public class ItemsController {
         });
 
         updateInventoryCol.setCellFactory(col -> new TableCell<>() {
-            final Button updateInventoryColBtn = new Button("Update inventory");
+            final Button updateInventoryColBtn = new Button("Biến động");
             {
                 updateInventoryColBtn.getStyleClass().addAll("btn-custom");
                 updateInventoryColBtn.setOnAction(event -> {
@@ -137,7 +137,7 @@ public class ItemsController {
         });
 
         updateItemCol.setCellFactory(col -> new TableCell<>() {
-            final Button updateItemBtn = new Button("Update item");
+            final Button updateItemBtn = new Button("Cập nhật hàng");
             {
                 updateItemBtn.getStyleClass().addAll("btn-custom");
                 updateItemBtn.setOnAction(event -> {

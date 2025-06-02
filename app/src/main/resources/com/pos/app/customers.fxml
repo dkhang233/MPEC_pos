@@ -13,20 +13,20 @@
         <TableView fx:id="customersTable" layoutX="20.0" layoutY="60.0" prefHeight="461.0" prefWidth="1455.0">
             <columns>
                 <TableColumn fx:id="idCol" text="ID" prefWidth="50.0"/>
-                <TableColumn fx:id="firstNameCol" text="First Name" prefWidth="100.0"/>
-                <TableColumn fx:id="lastNameCol" text="Last Name" prefWidth="100.0"/>
+                <TableColumn fx:id="firstNameCol" text="Họ" prefWidth="100.0"/>
+                <TableColumn fx:id="lastNameCol" text="Tên" prefWidth="100.0"/>
                 <TableColumn fx:id="emailCol" text="Email" prefWidth="150.0"/>
-                <TableColumn fx:id="phoneCol" text="Phone Number" prefWidth="120.0"/>
-                <TableColumn fx:id="updateCol" text="Update" prefWidth="80.0"/>
+                <TableColumn fx:id="phoneCol" text="Số điện thoại" prefWidth="120.0"/>
+                <TableColumn fx:id="updateCol" text="Cập nhật" prefWidth="80.0"/>
             </columns>
         </TableView>
 
-        <Button fx:id="addCustomerBtn" layoutX="20.0" layoutY="20.0" text="Add Customer" onAction="#addCustomer" >
+        <Button fx:id="addCustomerBtn" layoutX="20.0" layoutY="20.0" text="Thêm khách hàng" onAction="#addCustomer" >
             <styleClass>
                 <String fx:value="btn" />
                 <String fx:value="btn-primary" />
             </styleClass></Button>
-        <Button fx:id="deleteCustomerBtn" layoutX="160.0" layoutY="20.0" text="Delete Customer" onAction="#deleteCustomer">
+        <Button fx:id="deleteCustomerBtn" layoutX="160.0" layoutY="20.0" text="Xóa khách hàng" onAction="#deleteCustomer">
         <styleClass>
             <String fx:value="btn-danger" />
             <String fx:value="btn" />

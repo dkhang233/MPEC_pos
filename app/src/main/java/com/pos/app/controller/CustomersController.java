@@ -84,7 +84,7 @@ public class CustomersController {
             customersList.remove(selected);
             customersTable.getSelectionModel().clearSelection(); // Xóa lựa chọn sau khi xóa
         } else {
-            showAlert("No Selection", "Please select a customer to delete.");
+            showAlert("Không có lựa chọn", "Hãy chọn một khách hàng để xóa");
         }
     }
 
@@ -96,8 +96,8 @@ public class CustomersController {
     // Hiển thị dialog để thêm khách hàng
     private void showAddDialog() {
         Dialog<Pair<String, String>> dialog = new Dialog<>();
-        dialog.setTitle("Add New Customer");
-        dialog.setHeaderText("Enter customer details");
+        dialog.setTitle("Thêm khách hàng mới");
+        dialog.setHeaderText("Nhập thông tin khách hàng");
 
         ButtonType okButton = new ButtonType("Submit", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(okButton, ButtonType.CANCEL);
@@ -111,13 +111,13 @@ public class CustomersController {
         TextField email = new TextField();
         TextField phone = new TextField();
 
-        grid.add(new Label("First Name:"), 0, 0);
+        grid.add(new Label("Họ:"), 0, 0);
         grid.add(firstName, 1, 0);
-        grid.add(new Label("Last Name:"), 0, 1);
+        grid.add(new Label("Tên:"), 0, 1);
         grid.add(lastName, 1, 1);
         grid.add(new Label("Email:"), 0, 2);
         grid.add(email, 1, 2);
-        grid.add(new Label("Phone Number:"), 0, 3);
+        grid.add(new Label("Số điện thoại:"), 0, 3);
         grid.add(phone, 1, 3);
 
         dialog.getDialogPane().setContent(grid);
@@ -143,13 +143,13 @@ public class CustomersController {
     // Hiển thị dialog để chỉnh khách hàng
     private void showEditDialog(Customer customer) {
         if (customer == null) {
-            showAlert("No Selection", "Please select a customer to edit.");
+            showAlert("Không có lựa chọn", "Hãy chọn một khách hàng để sửa !");
             return;
         }
 
         Dialog<Pair<String, String>> dialog = new Dialog<>();
-        dialog.setTitle("Update Customer");
-        dialog.setHeaderText("Edit customer details");
+        dialog.setTitle("Cập nhật thông tin khách hàng");
+        dialog.setHeaderText("Sửa thông tin khách hàng");
 
         ButtonType okButton = new ButtonType("Submit", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(okButton, ButtonType.CANCEL);
@@ -163,13 +163,13 @@ public class CustomersController {
         TextField email = new TextField(customer.getEmail());
         TextField phone = new TextField(customer.getPhoneNumber());
 
-        grid.add(new Label("First Name:"), 0, 0);
+        grid.add(new Label("Họ:"), 0, 0);
         grid.add(firstName, 1, 0);
-        grid.add(new Label("Last Name:"), 0, 1);
+        grid.add(new Label("Tên:"), 0, 1);
         grid.add(lastName, 1, 1);
         grid.add(new Label("Email:"), 0, 2);
         grid.add(email, 1, 2);
-        grid.add(new Label("Phone Number:"), 0, 3);
+        grid.add(new Label("Số điện thoại:"), 0, 3);
         grid.add(phone, 1, 3);
 
         dialog.getDialogPane().setContent(grid);
