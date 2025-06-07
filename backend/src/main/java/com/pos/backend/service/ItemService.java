@@ -3,13 +3,13 @@ package com.pos.backend.service;
 import com.pos.backend.dto.ItemQuantityDto;
 import com.pos.backend.model.Inventory;
 import com.pos.backend.model.Item;
+import com.pos.backend.model.Supplier;
 import com.pos.backend.repository.InventoryRepository;
 import com.pos.backend.repository.ItemRepository;
+import com.pos.backend.repository.SupplierRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.sql.Date;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -18,15 +18,14 @@ import java.util.List;
 public class ItemService {
     private final ItemRepository itemRepository;
     private final InventoryRepository inventoryRepository;
+    private final SupplierRepository supplierRepository;
 
     public List<Item> getItems() {
-        List<Item> result = itemRepository.findAll();
-        return result;
+        return itemRepository.findAll();
     }
 
     public List<Item> getItemsByUsername(String username) {
-        List<Item> result = itemRepository.findByOwnedBy(username);
-        return result;
+        return itemRepository.findByOwnedBy(username);
     }
 
     public Item getItemById(int id) {

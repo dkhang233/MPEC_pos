@@ -23,8 +23,8 @@ public class Item {
     @Column(name = "category")
     private String category;
 
-    @Column(name = "supplier_id")
-    private int supplier;
+    @Column(name = "supplier")
+    private String supplier;
 
     @Column(name = "barcode")
     private String barcode;

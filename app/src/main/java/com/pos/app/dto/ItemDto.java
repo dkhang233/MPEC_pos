@@ -1,6 +1,7 @@
 package com.pos.app.dto;
 
 import com.pos.app.model.Item;
+import com.pos.app.model.Supplier;
 import com.pos.app.store.ItemStore;
 import com.pos.app.store.UserStore;
 import lombok.AllArgsConstructor;
@@ -17,7 +18,7 @@ public class ItemDto {
 
     private String category;
 
-    private int supplier = 0;
+    private String supplier;
 
     private String barcode;
 
@@ -42,11 +43,7 @@ public class ItemDto {
         item.getId().set(this.itemId);
         item.getItemName().set(this.name);
         item.getCategory().set(this.category);
-        ItemStore.suppliers.forEach(supplier -> {
-            if (supplier.getId() == this.supplier) {
-                item.getSupplier().set(supplier.getCompanyName());
-            }
-        });
+        item.getSupplier().set(this.supplier);
         item.getBarcode().set(this.barcode);
         item.getDescription().set(this.description);
         item.getCostPrice().set(this.costPrice);
@@ -62,11 +59,7 @@ public class ItemDto {
         this.itemId = item.getId().get();
         this.name = item.getItemName().get();
         this.category = item.getCategory().get();
-        ItemStore.suppliers.forEach(supplier -> {
-            if (supplier.getCompanyName() == item.getSupplier().get()) {
-                this.supplier = supplier.getId();
-            }
-        });
+        this.supplier = item.getSupplier().get();
         this.barcode = item.getBarcode().get();
         this.description = item.getDescription().get();
         this.costPrice = item.getCostPrice().get();
@@ -77,4 +70,5 @@ public class ItemDto {
         this.deleted = item.getDeleted().get();
         this.ownedBy = UserStore.username;
     }
+
 }
