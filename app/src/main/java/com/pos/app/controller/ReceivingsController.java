@@ -59,19 +59,19 @@ public class ReceivingsController {
         TableColumn<Receivings, Integer> idCol = new TableColumn<>("ID");
         idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
 
-        TableColumn<Receivings, String> barcodeCol = new TableColumn<>("Barcode");
+        TableColumn<Receivings, String> barcodeCol = new TableColumn<>("Mã vạch");
         barcodeCol.setCellValueFactory(new PropertyValueFactory<>("barcode"));
 
-        TableColumn<Receivings, String> nameCol = new TableColumn<>("Item Name");
+        TableColumn<Receivings, String> nameCol = new TableColumn<>("Tên sản phẩm");
         nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
 
-        TableColumn<Receivings, String> categoryCol = new TableColumn<>("Category");
+        TableColumn<Receivings, String> categoryCol = new TableColumn<>("Phân loại");
         categoryCol.setCellValueFactory(new PropertyValueFactory<>("category"));
 
-        TableColumn<Receivings, String> supplierCol = new TableColumn<>("Supplier");
+        TableColumn<Receivings, String> supplierCol = new TableColumn<>("Nhà cung cấp");
         supplierCol.setCellValueFactory(new PropertyValueFactory<>("supplier"));
 
-        TableColumn<Receivings, Double> wholesalePriceCol = new TableColumn<>("Cost Price");
+        TableColumn<Receivings, Double> wholesalePriceCol = new TableColumn<>("Giá nhập");
         wholesalePriceCol.setCellValueFactory(new PropertyValueFactory<>("wholesalePrice"));
         wholesalePriceCol.setCellFactory(column -> new TableCell<Receivings, Double>() {
             @Override
@@ -81,7 +81,7 @@ public class ReceivingsController {
             }
         });
 
-        TableColumn<Receivings, Double> retailPriceCol = new TableColumn<>("Selling Price");
+        TableColumn<Receivings, Double> retailPriceCol = new TableColumn<>("Giá bán");
         retailPriceCol.setCellValueFactory(new PropertyValueFactory<>("retailPrice"));
         retailPriceCol.setCellFactory(column -> new TableCell<Receivings, Double>() {
             @Override
@@ -91,7 +91,7 @@ public class ReceivingsController {
             }
         });
 
-        TableColumn<Receivings, Integer> quantityCol = new TableColumn<>("Quantity");
+        TableColumn<Receivings, Integer> quantityCol = new TableColumn<>("Số lượng");
         quantityCol.setCellValueFactory(new PropertyValueFactory<>("quantity"));
         quantityCol.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
         quantityCol.setOnEditCommit(event -> {
@@ -102,7 +102,7 @@ public class ReceivingsController {
         TableColumn<Receivings, String> avatarCol = new TableColumn<>("Avatar");
         avatarCol.setCellValueFactory(new PropertyValueFactory<>("avatar"));
 
-        TableColumn<Receivings, Double> totalCol = new TableColumn<>("Total");
+        TableColumn<Receivings, Double> totalCol = new TableColumn<>("Tổng giá");
         totalCol.setCellValueFactory(new PropertyValueFactory<>("total"));
         totalCol.setCellFactory(column -> new TableCell<Receivings, Double>() {
             @Override
@@ -120,19 +120,19 @@ public class ReceivingsController {
         TableColumn<Receivings, Integer> idColRight = new TableColumn<>("ID");
         idColRight.setCellValueFactory(new PropertyValueFactory<>("id"));
 
-        TableColumn<Receivings, String> barcodeColRight = new TableColumn<>("Barcode");
+        TableColumn<Receivings, String> barcodeColRight = new TableColumn<>("Mã vạch");
         barcodeColRight.setCellValueFactory(new PropertyValueFactory<>("barcode"));
 
-        TableColumn<Receivings, String> nameColRight = new TableColumn<>("Item Name");
+        TableColumn<Receivings, String> nameColRight = new TableColumn<>("Tên sản phẩm");
         nameColRight.setCellValueFactory(new PropertyValueFactory<>("name"));
 
-        TableColumn<Receivings, String> categoryColRight = new TableColumn<>("Category");
+        TableColumn<Receivings, String> categoryColRight = new TableColumn<>("Phân loại");
         categoryColRight.setCellValueFactory(new PropertyValueFactory<>("category"));
 
-        TableColumn<Receivings, String> supplierColRight = new TableColumn<>("Supplier");
+        TableColumn<Receivings, String> supplierColRight = new TableColumn<>("Nhà cung cấp");
         supplierColRight.setCellValueFactory(new PropertyValueFactory<>("supplier"));
 
-        TableColumn<Receivings, Double> wholesalePriceColRight = new TableColumn<>("Wholesale Price");
+        TableColumn<Receivings, Double> wholesalePriceColRight = new TableColumn<>("Giá nhập");
         wholesalePriceColRight.setCellValueFactory(new PropertyValueFactory<>("wholesalePrice"));
         wholesalePriceColRight.setCellFactory(column -> new TableCell<Receivings, Double>() {
             @Override
@@ -142,7 +142,7 @@ public class ReceivingsController {
             }
         });
 
-        TableColumn<Receivings, Double> retailPriceColRight = new TableColumn<>("Retail Price");
+        TableColumn<Receivings, Double> retailPriceColRight = new TableColumn<>("Giá bán");
         retailPriceColRight.setCellValueFactory(new PropertyValueFactory<>("retailPrice"));
         retailPriceColRight.setCellFactory(column -> new TableCell<Receivings, Double>() {
             @Override
@@ -152,13 +152,13 @@ public class ReceivingsController {
             }
         });
 
-        TableColumn<Receivings, Integer> quantityColRight = new TableColumn<>("Quantity");
+        TableColumn<Receivings, Integer> quantityColRight = new TableColumn<>("Số lượng");
         quantityColRight.setCellValueFactory(new PropertyValueFactory<>("quantity"));
 
         TableColumn<Receivings, String> avatarColRight = new TableColumn<>("Avatar");
         avatarColRight.setCellValueFactory(new PropertyValueFactory<>("avatar"));
 
-        TableColumn<Receivings, Double> totalColRight = new TableColumn<>("Total");
+        TableColumn<Receivings, Double> totalColRight = new TableColumn<>("Tổng");
         totalColRight.setCellValueFactory(new PropertyValueFactory<>("total"));
         totalColRight.setCellFactory(column -> new TableCell<Receivings, Double>() {
             @Override
@@ -244,6 +244,8 @@ public class ReceivingsController {
             confirmBtnTable2.setVisible(true);
             cancelBtn.setVisible(true);
             totalPriceLabel.setVisible(true);
+            isTableHidden = !isTableHidden;
+            tableView.setVisible(!isTableHidden);
         } else {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("No Items");
@@ -287,6 +289,7 @@ public class ReceivingsController {
         cancelBtn.setVisible(false);
         totalPriceLabel.setVisible(false);
         confirmBtnTable2.disableProperty().set(false);
+        tableView.setVisible(isTableHidden);
 
     }
 }

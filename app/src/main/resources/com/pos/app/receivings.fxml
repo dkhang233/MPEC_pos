@@ -12,8 +12,12 @@
 
 <AnchorPane prefHeight="649.0" prefWidth="1657.0" style="-fx-background-color: #f8c471;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.pos.app.controller.ReceivingsController">
     <children>
-        <TableView fx:id="tableView" layoutX="79.0" layoutY="117.0" prefHeight="418.0" prefWidth="915.0" AnchorPane.leftAnchor="79.0" AnchorPane.rightAnchor="663.0">
+        <TableView fx:id="tableView" layoutX="79.0" layoutY="117.0" prefHeight="418.0" prefWidth="1100.0" AnchorPane.leftAnchor="79.0" AnchorPane.rightAnchor="300.0">
+
         </TableView>
+
+
+
         <Pane layoutX="110.0" layoutY="68.0" AnchorPane.leftAnchor="110.0">
             <children>
                 <TextField fx:id="searchField" layoutY="1.0" prefHeight="27.0" prefWidth="234.0" promptText="Search" />
@@ -34,11 +38,11 @@
                 <String fx:value="btn" />
             </styleClass>
         </Button>
-        <TableView fx:id="tableView1" layoutX="900.0" layoutY="116.0" prefHeight="418.0" prefWidth="357.0" visible="false" />
+        <TableView fx:id="tableView1" layoutX="200.0" layoutY="116.0" prefHeight="418.0" prefWidth="1000.0" visible="false" />
         <Button fx:id="confirmBtnTable2" layoutX="1088.0" layoutY="555.0" mnemonicParsing="false" onAction="#handleConfirmTable2" text="Confirm" visible="false" />
         <Button fx:id="cancelBtn" layoutX="1012.0" layoutY="555.0" mnemonicParsing="false" onAction="#handleCancel" text="Cancel" visible="false" />
         <Button layoutX="599.0" layoutY="69.0" mnemonicParsing="false" onAction="#handleHideShow" text="Hide/Show" />
         <Button fx:id="confirmBtnTable1" layoutX="651.0" layoutY="568.0" mnemonicParsing="false" onAction="#handleConfirmTable1" text="Confirm" />
-        <Label fx:id="totalPriceLabel" layoutX="820.0" layoutY="540.0" prefHeight="20.0" prefWidth="357.0" text="Total Price: $0.00" visible="false" />
+        <Label fx:id="totalPriceLabel" layoutX="820.0" layoutY="568.0" prefHeight="20.0" prefWidth="357.0" text="Total Price: $0.00" visible="false" />
     </children>
 </AnchorPane>

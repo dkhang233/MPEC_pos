@@ -15,7 +15,7 @@
     fx:controller="com.pos.app.controller.SalesController">
     <children>
         <TableView fx:id="tableView" layoutX="79.0" layoutY="117.0" prefHeight="418.0"
-            prefWidth="915.0" AnchorPane.leftAnchor="79.0" AnchorPane.rightAnchor="663.0">
+            prefWidth="1100.0" AnchorPane.leftAnchor="79.0" AnchorPane.rightAnchor="200.0">
         </TableView>
         <Pane layoutX="110.0" layoutY="68.0" AnchorPane.leftAnchor="110.0">
             <children>
@@ -37,15 +37,15 @@
                 <String fx:value="btn-primary" />
             </styleClass>
         </Button> -->
-        <Button fx:id="deleteItemBtn" layoutX="499.0" layoutY="68.0" mnemonicParsing="false"
+        <Button fx:id="deleteItemBtn" layoutX="401.0" layoutY="68.0" mnemonicParsing="false"
             onAction="#deleteItem" prefHeight="26.0" prefWidth="60.0" text="Delete">
             <styleClass>
                 <String fx:value="btn-danger" />
                 <String fx:value="btn" />
             </styleClass>
         </Button>
-        <TableView fx:id="tableView1" layoutX="900.0" layoutY="116.0" prefHeight="418.0"
-            prefWidth="357.0" visible="false" />
+        <TableView fx:id="tableView1" layoutX="200.0" layoutY="116.0" prefHeight="418.0"
+            prefWidth="1000.0" visible="false" />
         <Button fx:id="confirmBtnTable2" layoutX="1088.0" layoutY="555.0" mnemonicParsing="false"
             onAction="#handleConfirmTable2" text="Confirm" visible="false" />
         <Button fx:id="cancelBtn" layoutX="1012.0" layoutY="555.0" mnemonicParsing="false"
@@ -54,7 +54,7 @@
             text="Hide/Show" />
         <Button fx:id="confirmBtnTable1" layoutX="651.0" layoutY="568.0" mnemonicParsing="false"
             onAction="#handleConfirmTable1" text="Confirm" />
-        <Label fx:id="totalPriceLabel" layoutX="820.0" layoutY="540.0" prefHeight="20.0"
+        <Label fx:id="totalPriceLabel" layoutX="820.0" layoutY="568.0" prefHeight="20.0"
             prefWidth="357.0" text="Total Price: $0.00" visible="false" />
     </children>
 </AnchorPane>

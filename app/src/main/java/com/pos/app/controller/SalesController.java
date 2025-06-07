@@ -59,19 +59,19 @@ public class SalesController {
         TableColumn<Sales, Integer> idCol = new TableColumn<>("ID");
         idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
 
-        TableColumn<Sales, String> barcodeCol = new TableColumn<>("Barcode");
+        TableColumn<Sales, String> barcodeCol = new TableColumn<>("Mã vạch");
         barcodeCol.setCellValueFactory(new PropertyValueFactory<>("barcode"));
 
-        TableColumn<Sales, String> nameCol = new TableColumn<>("Item Name");
+        TableColumn<Sales, String> nameCol = new TableColumn<>("Tên sản phẩm");
         nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
 
-        TableColumn<Sales, String> categoryCol = new TableColumn<>("Category");
+        TableColumn<Sales, String> categoryCol = new TableColumn<>("Phân loại");
         categoryCol.setCellValueFactory(new PropertyValueFactory<>("category"));
 
-        TableColumn<Sales, String> supplierCol = new TableColumn<>("Supplier");
+        TableColumn<Sales, String> supplierCol = new TableColumn<>("Nhà cung cấp");
         supplierCol.setCellValueFactory(new PropertyValueFactory<>("supplier"));
 
-        TableColumn<Sales, Double> wholesalePriceCol = new TableColumn<>("Cost Price");
+        TableColumn<Sales, Double> wholesalePriceCol = new TableColumn<>("Giá nhập");
         wholesalePriceCol.setCellValueFactory(new PropertyValueFactory<>("wholesalePrice"));
         wholesalePriceCol.setCellFactory(column -> new TableCell<Sales, Double>() {
             @Override
@@ -81,7 +81,7 @@ public class SalesController {
             }
         });
 
-        TableColumn<Sales, Double> retailPriceCol = new TableColumn<>("Selling Price");
+        TableColumn<Sales, Double> retailPriceCol = new TableColumn<>("Giá bán");
         retailPriceCol.setCellValueFactory(new PropertyValueFactory<>("retailPrice"));
         retailPriceCol.setCellFactory(column -> new TableCell<Sales, Double>() {
             @Override
@@ -91,7 +91,7 @@ public class SalesController {
             }
         });
 
-        TableColumn<Sales, Integer> quantityCol = new TableColumn<>("Quantity");
+        TableColumn<Sales, Integer> quantityCol = new TableColumn<>("Số lượng");
         quantityCol.setCellValueFactory(new PropertyValueFactory<>("quantity"));
         quantityCol.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
         quantityCol.setOnEditCommit(event -> {
@@ -102,7 +102,7 @@ public class SalesController {
         TableColumn<Sales, String> avatarCol = new TableColumn<>("Avatar");
         avatarCol.setCellValueFactory(new PropertyValueFactory<>("avatar"));
 
-        TableColumn<Sales, Double> totalCol = new TableColumn<>("Total");
+        TableColumn<Sales, Double> totalCol = new TableColumn<>("Tổng");
         totalCol.setCellValueFactory(new PropertyValueFactory<>("total"));
         totalCol.setCellFactory(column -> new TableCell<Sales, Double>() {
             @Override
@@ -120,19 +120,19 @@ public class SalesController {
         TableColumn<Sales, Integer> idColRight = new TableColumn<>("ID");
         idColRight.setCellValueFactory(new PropertyValueFactory<>("id"));
 
-        TableColumn<Sales, String> barcodeColRight = new TableColumn<>("Barcode");
+        TableColumn<Sales, String> barcodeColRight = new TableColumn<>("Mã vạch");
         barcodeColRight.setCellValueFactory(new PropertyValueFactory<>("barcode"));
 
-        TableColumn<Sales, String> nameColRight = new TableColumn<>("Item Name");
+        TableColumn<Sales, String> nameColRight = new TableColumn<>("Tên sản phẩm");
         nameColRight.setCellValueFactory(new PropertyValueFactory<>("name"));
 
-        TableColumn<Sales, String> categoryColRight = new TableColumn<>("Category");
+        TableColumn<Sales, String> categoryColRight = new TableColumn<>("Phân loại");
         categoryColRight.setCellValueFactory(new PropertyValueFactory<>("category"));
 
-        TableColumn<Sales, String> supplierColRight = new TableColumn<>("Supplier");
+        TableColumn<Sales, String> supplierColRight = new TableColumn<>("Nhà cung cấp");
         supplierColRight.setCellValueFactory(new PropertyValueFactory<>("supplier"));
 
-        TableColumn<Sales, Double> wholesalePriceColRight = new TableColumn<>("Wholesale Price");
+        TableColumn<Sales, Double> wholesalePriceColRight = new TableColumn<>("Giá nhập");
         wholesalePriceColRight.setCellValueFactory(new PropertyValueFactory<>("wholesalePrice"));
         wholesalePriceColRight.setCellFactory(column -> new TableCell<Sales, Double>() {
             @Override
@@ -142,7 +142,7 @@ public class SalesController {
             }
         });
 
-        TableColumn<Sales, Double> retailPriceColRight = new TableColumn<>("Retail Price");
+        TableColumn<Sales, Double> retailPriceColRight = new TableColumn<>("Giá bán");
         retailPriceColRight.setCellValueFactory(new PropertyValueFactory<>("retailPrice"));
         retailPriceColRight.setCellFactory(column -> new TableCell<Sales, Double>() {
             @Override
@@ -152,13 +152,13 @@ public class SalesController {
             }
         });
 
-        TableColumn<Sales, Integer> quantityColRight = new TableColumn<>("Quantity");
+        TableColumn<Sales, Integer> quantityColRight = new TableColumn<>("Số lượng");
         quantityColRight.setCellValueFactory(new PropertyValueFactory<>("quantity"));
 
         TableColumn<Sales, String> avatarColRight = new TableColumn<>("Avatar");
         avatarColRight.setCellValueFactory(new PropertyValueFactory<>("avatar"));
 
-        TableColumn<Sales, Double> totalColRight = new TableColumn<>("Total");
+        TableColumn<Sales, Double> totalColRight = new TableColumn<>("Tổng");
         totalColRight.setCellValueFactory(new PropertyValueFactory<>("total"));
         totalColRight.setCellFactory(column -> new TableCell<Sales, Double>() {
             @Override
@@ -242,9 +242,9 @@ public class SalesController {
             for (Sales item : leftTableItems) {
                 if (item.getQuantity() <= 0) {
                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setTitle("Invalid Quantity");
+                    alert.setTitle("Số lượng không hợp lệ");
                     alert.setHeaderText(null);
-                    alert.setContentText("Invalid quantity for item: " + item.getName());
+                    alert.setContentText("Số lượng sản phẩm không hợp lệ: " + item.getName());
                     alert.showAndWait();
                     valid = false;
                     break;
@@ -254,9 +254,9 @@ public class SalesController {
                         .findFirst();
                 if (item2.isEmpty()) {
                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setTitle("Item Not Found");
+                    alert.setTitle("Không tìm thấy sản phẩm");
                     alert.setHeaderText(null);
-                    alert.setContentText("Item not found: " + item.getName());
+                    alert.setContentText("Sản phẩm không tìm thấy: " + item.getName());
                     alert.showAndWait();
                     valid = false;
                     break;
@@ -264,9 +264,9 @@ public class SalesController {
 
                 if (item2.get().getQuantity().get() < item.getQuantity()) {
                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setTitle("Insufficient Quantity");
+                    alert.setTitle("Số lượng không đủ");
                     alert.setHeaderText(null);
-                    alert.setContentText("Not enough quantity for item: " + item.getName());
+                    alert.setContentText("Không đủ số lượng cho sản phẩm: " + item.getName());
                     alert.showAndWait();
                     valid = false;
                     break;
@@ -281,11 +281,13 @@ public class SalesController {
             confirmBtnTable2.setVisible(true);
             cancelBtn.setVisible(true);
             totalPriceLabel.setVisible(true);
+            isTableHidden = !isTableHidden;
+            tableView.setVisible(!isTableHidden);
         } else {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("No Items");
+            alert.setTitle("Không có sản phẩm");
             alert.setHeaderText(null);
-            alert.setContentText("There are no items in Table 1 to transfer.");
+            alert.setContentText("Không có sản phẩm nào để bán.");
             alert.showAndWait();
         }
     }
@@ -323,5 +325,7 @@ public class SalesController {
         confirmBtnTable2.setVisible(false);
         cancelBtn.setVisible(false);
         totalPriceLabel.setVisible(false);
+
+        tableView.setVisible(isTableHidden);
     }
 }
