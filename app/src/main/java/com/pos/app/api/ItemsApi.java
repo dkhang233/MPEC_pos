@@ -8,6 +8,7 @@ import com.pos.app.dto.ItemDto;
 import com.pos.app.dto.ItemQuantityDto;
 import com.pos.app.model.Inventory;
 import com.pos.app.model.Item;
+import com.pos.app.store.ItemStore;
 import com.pos.app.store.UserStore;
 import com.pos.app.util.AlertBox;
 
@@ -32,7 +33,9 @@ public class ItemsApi extends BaseApi {
             // Chuyển chuỗi JSON thành List<ItemDto>
             List<ItemDto> res = objectMapper.readValue(response,
                     objectMapper.getTypeFactory().constructCollectionType(List.class, ItemDto.class));
+            // Chuyển đổi List<ItemDto> thành List<Item>
             List<Item> data = res.stream().map(ItemDto::mapToItem).toList();
+            // Cập nhật danh sách nhà cung cấp trong ItemStore
             return data;
         } catch (JsonProcessingException e) {
             e.printStackTrace();

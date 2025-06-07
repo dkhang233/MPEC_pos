@@ -22,7 +22,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "Item API", description = "API for managing items")
+@Tag(name = "ItemDto API", description = "API for managing items")
 public class ItemController {
     private final ItemService itemService;
 

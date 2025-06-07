@@ -2,6 +2,7 @@ package com.pos.app.util;
 
 import com.dlsc.formsfx.model.structure.*;
 import com.pos.app.api.ItemsApi;
+import com.pos.app.api.SupplierApi;
 import com.pos.app.model.*;
 
 import com.dlsc.formsfx.model.validators.IntegerRangeValidator;
@@ -26,17 +27,26 @@ import java.io.File;
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
 public class ItemManager {
     final List<Item> items = ImportExportFile.getItems();
     final ItemsApi itemsApi = new ItemsApi();
+    final SupplierApi supplierApi = new SupplierApi();
 
     public void getItemsData() {
         // Lấy dữ liệu từ API
         List<Item> items = itemsApi.getItems();
+        items.forEach(item -> {
+            boolean exists = ItemStore.suppliers.stream().anyMatch(supplier -> supplier.getCompanyName().equals(item.getSupplier().get()));
+            if (!exists)
+                ItemStore.suppliers.add(supplierApi.getSupplier(item.getSupplier().get()));
+        });
         ItemStore.items.addAll(items);
         ItemStore.visibleItems.addAll(items);
+
+
     }
 
     // Xử lý khi người dùng chọn tạo item mới
@@ -219,6 +229,15 @@ public class ItemManager {
 
     // Tạo form để thêm mới và cập nhật item
     private Form createItemForm(BindingNewItem newItemModel) {
+        SingleSelectionField<String> supplierField = Field.ofSingleSelectionType(newItemModel.getSuppliers())
+                .select(1)
+                .label("Supplier")
+                .tooltip("Supplier");
+        supplierField.selectionProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                newItemModel.getSupplier().set(newValue);
+            }
+        });
         return Form.of(
                 Group.of(
                         Field.ofStringType(newItemModel.getBarcode())
@@ -232,9 +251,7 @@ public class ItemManager {
                                 .label("Category")
                                 .required("Category is required"),
 
-                        Field.ofStringType(newItemModel.getSupplier())
-                                .label("Supplier")
-                                .tooltip("Supplier"),
+                        supplierField,
 
                         Field.ofDoubleType(newItemModel.getCostPrice())
                                 .label("Cost Price")

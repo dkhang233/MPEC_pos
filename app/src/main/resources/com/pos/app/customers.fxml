@@ -26,7 +26,7 @@
                 <String fx:value="btn" />
                 <String fx:value="btn-primary" />
             </styleClass></Button>
-        <Button fx:id="deleteCustomerBtn" layoutX="160.0" layoutY="20.0" text="Xóa khách hàng" onAction="#deleteCustomer">
+        <Button fx:id="deleteCustomerBtn" layoutX="180.0" layoutY="20.0" text="Xóa khách hàng" onAction="#deleteCustomer">
         <styleClass>
             <String fx:value="btn-danger" />
             <String fx:value="btn" />

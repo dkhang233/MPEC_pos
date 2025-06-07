@@ -56,6 +56,5 @@ public class ItemStore {
                         System.out.println("fromIndex: " + fromIndex + " toIndex: " + toIndex);
                         itemPage.addAll(visibleItems.subList(fromIndex, toIndex));
                 });
-
         }
 }
