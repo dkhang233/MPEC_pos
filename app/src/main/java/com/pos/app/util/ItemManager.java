@@ -40,7 +40,7 @@ public class ItemManager {
         List<Item> items = itemsApi.getItems();
         items.forEach(item -> {
             boolean exists = ItemStore.suppliers.stream().anyMatch(supplier -> supplier.getCompanyName().equals(item.getSupplier().get()));
-            if (!exists)
+            if (!exists && !item.getSupplier().get().equals("Không có"))
                 ItemStore.suppliers.add(supplierApi.getSupplier(item.getSupplier().get()));
         });
         ItemStore.items.addAll(items);
