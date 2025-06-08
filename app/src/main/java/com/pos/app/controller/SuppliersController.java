@@ -81,7 +81,7 @@ public class SuppliersController {
     private void deleteCustomer() {
         Supplier selected = customersTable.getSelectionModel().getSelectedItem();
         if (selected != null) {
-            customersList.remove(selected);
+            ItemStore.suppliers.get().remove(selected);
             customersTable.getSelectionModel().clearSelection(); // Xóa lựa chọn sau khi xóa
         } else {
             showAlert("Không có lựa chọn", "Hãy chọn một khách hàng để xóa");
@@ -96,8 +96,8 @@ public class SuppliersController {
     // Hiển thị dialog để thêm khách hàng
     private void showAddDialog() {
         Dialog<Pair<String, String>> dialog = new Dialog<>();
-        dialog.setTitle("Thêm khách hàng mới");
-        dialog.setHeaderText("Nhập thông tin khách hàng");
+        dialog.setTitle("Thêm nhà cung cấp mới");
+        dialog.setHeaderText("Nhập thông tin nhà cung cấp");
 
         ButtonType okButton = new ButtonType("Submit", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(okButton, ButtonType.CANCEL);
@@ -110,13 +110,12 @@ public class SuppliersController {
         TextField lastName = new TextField();
         TextField email = new TextField();
 
-        grid.add(new Label("Họ:"), 0, 0);
+        grid.add(new Label("Tên công ty:"), 0, 0);
         grid.add(firstName, 1, 0);
-        grid.add(new Label("Tên:"), 0, 1);
+        grid.add(new Label("Số điện thoại:"), 0, 1);
         grid.add(lastName, 1, 1);
-        grid.add(new Label("Email:"), 0, 2);
+        grid.add(new Label("Địa chỉ:"), 0, 2);
         grid.add(email, 1, 2);
-        grid.add(new Label("Số điện thoại:"), 0, 3);
 
         dialog.getDialogPane().setContent(grid);
 

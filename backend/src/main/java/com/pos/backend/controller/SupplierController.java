@@ -39,12 +39,12 @@ public class SupplierController {
         return supplierService.createSupplier(supplier);
     }
 
-//
-//    @PutMapping("/suppliers/{id}")
-//    @Operation(summary = "Update item by ID", description = "Update an item by its ID")
-//    public Item updateItem(@PathVariable int id, @RequestBody Item item) {
-//        return supplierService.updateItem(id, item);
-//    }
+
+    @PutMapping("/suppliers")
+    @Operation(summary = "Update item by ID", description = "Update an item by its ID")
+    public Supplier updateItem(@RequestBody Supplier supplier) {
+        return supplierService.updateSupplier(supplier);
+    }
 //
 //    @DeleteMapping("/suppliers/{id}")
 //    @Operation(summary = "Delete item by ID", description = "Delete an item by its ID")

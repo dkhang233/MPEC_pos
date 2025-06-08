@@ -25,6 +25,21 @@ public class SupplierService {
         return supplierRepository.save(supplier);
     }
 
+    public Supplier updateSupplier(Supplier supplier) {
+        Supplier existingSupplier = supplierRepository.findById(supplier.getId())
+                .orElseThrow(() -> new RuntimeException("Supplier not found with ID: " + supplier.getId()));
+        existingSupplier.setCompanyName(supplier.getCompanyName());
+        existingSupplier.setAddress(supplier.getAddress());
+        existingSupplier.setPhoneNumber(supplier.getPhoneNumber());
+        existingSupplier.setAddress(supplier.getAddress());
+        existingSupplier.setDeleted(supplier.isDeleted());
+        existingSupplier.setOwnedBy(supplier.getOwnedBy());
+
+        existingSupplier = supplierRepository.save(existingSupplier);
+        // Implementation for updating a supplier can be added here
+        return existingSupplier; // Placeholder return statement
+    }
+
     public Supplier getSupplierByCompanyName(String companyName) {
         return supplierRepository.findByCompanyName(companyName)
                 .orElseThrow(() -> new RuntimeException("Supplier not found with company name: " + companyName));
